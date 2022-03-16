@@ -1,7 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { sessionService } from 'redux-react-session';
-import { browserHistory } from 'react-router';
-import humps from 'humps';
+import { hashHistory } from 'react-router';
 import { routes } from '../constants/routesPaths';
 
 const saveSessionHeaders = (headers) => {
@@ -30,9 +29,9 @@ const handleErrors = response =>
 
     sessionService.loadSession()
     .catch(() => {
-      if (response.status === 401) {
+      if (response.status === 401 && !response.url.includes('users/password')) {
         sessionService.deleteSession();
-        browserHistory.replace(routes.login);
+        hashHistory.replace(routes.login);
       }
     });
 
@@ -59,8 +58,10 @@ class Api {
       fetch(url, requestData)
         .then(handleErrors)
         .then(getResponseBody)
-        .then(response => resolve(humps.camelizeKeys(response)))
-        .catch(error => reject(humps.camelizeKeys(error)));
+        .then(response => {
+          resolve(response)
+        })
+        .catch(error => reject(error));
     });
   }
 
@@ -79,7 +80,9 @@ class Api {
     const requestData = {
       method: 'get',
       headers: {
-        Accept: 'application/json'
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store'
       }
     };
     return this.addTokenHeader(requestData)
@@ -87,56 +90,95 @@ class Api {
   }
 
   post(uri, data, apiUrl = config.API_URL) {
-    const decamelizeData = humps.decamelizeKeys(data);
     const requestData = {
       method: 'post',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store'
       },
-      body: JSON.stringify(decamelizeData)
+      body: JSON.stringify(data)
     };
     return this.addTokenHeader(requestData)
     .then(data => this.performRequest(uri, apiUrl, data));
   }
 
   delete(uri, data, apiUrl = config.API_URL) {
-    const decamelizeData = humps.decamelizeKeys(data);
     const requestData = {
       method: 'delete',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store'
       },
-      body: JSON.stringify(decamelizeData)
+      body: JSON.stringify(data)
     };
     return this.addTokenHeader(requestData)
     .then(data => this.performRequest(uri, apiUrl, data));
   }
 
   put(uri, data, apiUrl = config.API_URL) {
-    const decamelizeData = humps.decamelizeKeys(data);
     const requestData = {
       method: 'put',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store'
       },
-      body: JSON.stringify(decamelizeData)
+      body: JSON.stringify(data)
     };
     return this.addTokenHeader(requestData)
     .then(data => this.performRequest(uri, apiUrl, data));
   }
+  putWithCustomHeaders(uri, data, headers, apiUrl = config.API_URL) {
+    const requestData = {
+      method: 'put',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'access-token': headers.token,
+        'client': headers.client,
+        'uid': headers.uid,
+      },
+      body: JSON.stringify(data)
+    };
+    return this.performRequest(uri, apiUrl, requestData);
+  }
+
+  putFormData(uri, data, apiUrl = config.API_URL) {
+    const requestData = {
+      method: 'put',
+      headers: {
+        Accept: 'application/json',
+        //'Content-Type': 'multipart/form-data'
+      },
+      body: data
+    };
+    return this.addTokenHeader(requestData)
+      .then(data => this.performRequest(uri, apiUrl, data));
+  }
+
+  postFormData(uri, data, apiUrl = config.API_URL) {
+    const requestData = {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        //'Content-Type': 'multipart/form-data'
+      },
+      body: data
+    };
+    return this.addTokenHeader(requestData)
+      .then(data => this.performRequest(uri, apiUrl, data));
+  }
 
   patch(uri, data, apiUrl = config.API_URL) {
-    const decamelizeData = humps.decamelizeKeys(data);
     const requestData = {
       method: 'patch',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(decamelizeData)
+      body: JSON.stringify(data)
     };
     return this.addTokenHeader(requestData)
     .then(data => this.performRequest(uri, apiUrl, data));

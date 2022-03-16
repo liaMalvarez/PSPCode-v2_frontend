@@ -1,4 +1,786 @@
-body {
-  font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 100%;
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans:regular,bold,italic,light');
+
+$color_header: #393e3f;
+$color_dos: #a5b7be;
+$color_danger: #f04134;
+$color_danger_hover: #bd3931;
+$color_success: #87d068;
+$color_warning: #ffbc5a;
+$color_colorless: #8fa1a8;
+$color_background: #f9f9f9;
+$color_professor_sider: #0c4156;
+
+$color_1: #0dc0bb;
+$color_1_hover: #0daea9;
+
+
+/*****************************/
+/** UTILS ********************/
+
+.centredContent {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.displayNone {
+  display: none;
+}
+
+b {
+  &.warning {
+    color: $color_warning;
+  }
+  &.danger {
+    color: $color_danger;
+  }
+  &.success {
+    color: $color_success;
+  }
+}
+
+.hCenter {
+  text-align: center;
+}
+.ant-layout a.dangerLink {
+  color: $color_danger;
+  &:hover {
+    color: $color_danger_hover;
+  }
+}
+form .ant-input-number {
+  margin: 0;
+}
+
+
+.ant-btn-success:focus, .ant-btn-success:hover {
+  background-color: #259b24;
+  border-color: #259b24;
+  color: #fff;
+}
+.ant-btn-success {
+  background-color: $color_success;
+  border-color: $color_success;
+  color: #fff;
+}
+.ant-btn-boton1 {
+  background-color: $color_1;
+  color: white;
+  border: none;
+  border-radius: 15px;
+
+  &:hover,
+  &:focus {
+    background-color: $color_1_hover;
+    color: white;
+  }
+}
+
+.customProgress {
+  .ant-progress-inner {
+    vertical-align: top;
+  }
+}
+.ant-layout-footer {
+  display: none;
+}
+
+/*****************************/
+
+
+/*****************************/
+/** COMPONENTS ***************/
+
+.logo {
+  display:block;
+  color: $color_1;
+  text-transform: lowercase;
+  span {
+    color: $color_dos;
+  }
+}
+
+.fullFormPage {
+
+  .logo {
+    margin-bottom: 60px;
+    font-size: 40px;
+    margin-left: 20px;
+    margin-right: 40px;
+    width: 297px;
+    text-align: center;
+  }
+
+  input[type="text"], input[type="email"], input[type="password"] {
+
+    font-weight: 300;
+    background: none;
+    border: none;
+    border-bottom: solid 2px $color_dos;
+    transition: border 0.5s;
+    padding-bottom: 5px;
+    width: calc(100% - 20px);
+    margin-bottom: 25px;
+    border-radius: 0;
+    border-left-style: none;
+    border-right-style: none;
+    border-top-style: none;
+    padding-right: 20px;
+    outline: 0;
+    &:focus {
+      border-bottom: solid 2px $color_1;
+      background-position: 0 0;
+    }
+    &::-webkit-input-placeholder {
+      color: $color_dos;
+    }
+
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus
+    &:-webkit-autofill {
+      -webkit-text-fill-color: $color_dos;
+      -webkit-box-shadow: 0 0 0px 1000px $color_header inset;
+    }
+  }
+  form .anticon {
+    position: relative;
+    right: 19px;
+  }
+  form button .anticon {
+    right: 0;
+  }
+  form button:before {
+    background: none;
+    opacity: 0;
+    border: none;
+  }
+
+  .textAboveForm {
+    display: block;
+    width: 350px;
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+  .textBelowButton {
+    display: block;
+    text-align: center;
+    margin-top:20px;
+  }
+
+  .ant-btn-boton1 {
+    margin-top:10px;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
+
+/*****************************/
+
+/*****************************/
+/** LAYOUT *******************/
+
+.ant-layout {
+
+  a {
+    font-weight: 300;
+    color: $color_1;
+    &:hover {
+      color: $color_1_hover;
+    }
+  }
+  .separator {
+    width: 80%;
+    height: 1px;
+    margin: 30px auto;
+    border-top: 1px solid #CCC5;
+  }
+}
+
+
+/*****************************/
+
+
+
+
+
+
+
+.ant-layout {
+
+  min-height: 100vh;
+  font-weight: 300;
+  font: 18px 'Josefin Sans', sans-serif;
+  color: $color_header;
+
+  &:not(.darkLayout) {
+    /*HEADER*/
+    .ant-layout-header {
+      color: $color_1;
+      background: $color_header;
+      height: 50px;
+      line-height: 50px;
+      padding: 0 40px;
+
+      .logoBar {
+        display: inline;
+        float: left;
+        .logo {
+          font-size: 20px;
+        }
+      }
+
+      .notificationBar {
+        display: inline;
+        float:right;
+        .ant-avatar {
+          background-color: $color_1;
+          cursor: pointer;
+        }
+        .item {
+          margin-right: 15px;
+          line-height: 52px;
+          display:inline;
+          &:last-of-type {
+            margin-right: 0px;
+          }
+          .ant-badge-count {
+            top: -6px;
+            height:18px;
+            border-radius: 10px;
+            min-width:18px;
+            line-height: 18px;
+            font-size:10px;
+          }
+        }
+      }
+    }
+
+    /* LEFT SIDER FOR PROFESSORS */
+    .professorSider {
+        background: $color_professor_sider;
+        a {
+          color: #fff;
+          span {
+            display: block;
+            margin-bottom: 10px;
+            font: 18px 'Josefin Sans', sans-serif;
+            font-weight: 300;
+            text-align: left;
+            padding-left: 12px;
+            top: 10px;
+            border-bottom: 1px solid #CCC2;
+            padding-bottom: 5px;
+            position: relative;
+            .anticon {
+              position: absolute;
+              right: -8px;
+              color: $color_background;
+            }
+          }
+        }
+    }
+    /* CONTENT */
+    .ant-layout-content {
+      padding: 5px 40px 0px 40px;
+      background-color: $color_background;
+      .ant-breadcrumb {
+      }
+      h1 {
+        margin-top: 10px;
+        font-size: 20px;
+      }
+      .ant-tabs {
+        .ant-tabs-ink-bar {
+          background-color: $color_1;
+        }
+        .ant-tabs-nav .ant-tabs-tab-active {
+          color: $color_1;
+          &:hover {
+            color: $color_1_hover;
+          }
+        }
+        .ant-tabs-nav .ant-tabs-tab:hover {
+          color: $color_1_hover;
+        }
+        .ant-tabs-tabpane {
+          margin-top: 10px;
+        }
+      }
+      .ant-table-wrapper {
+        .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+          padding: 10px 8px;
+        }
+        .ant-table-thead > tr > th {
+          background-color: inherit;
+          padding: 10px 8px 5px 8px;
+        }
+        .ant-table-tbody > tr:nth-of-type(2n) {
+          background: rgba(235, 235, 235, 0.53);
+        }
+      }
+    }
+  }
+
+  &.darkLayout {
+    background-color: $color_header;
+    color: $color_dos;
+  }
+}
+
+
+.projectsListTable {
+  .projectName {
+    font-size: 16px;
+  }
+  .projectProcess {
+    font-size: 12px;
+    color: $color_colorless;
+  }
+  .line {
+    border-left: 5px solid;
+    padding-left: 7px;
+    border-color: $color_header;
+    line-height: 17px;
+    &.approved, &.colorless {
+      border-color: $color_colorless;
+    }
+    &.dued, &.being_corrected, &.warning {
+      border-color: $color_warning;
+    }
+    &.working, &.assigned, &.success {
+      border-color: $color_success;
+    }
+    &.need_correction, &.danger {
+      border-color: $color_danger;
+    }
+  }
+  .dot {
+    padding: 5px;
+    border-radius: 5px;
+    background-color: $color_header;
+    float: left;
+    display: block;
+    width: 5px;
+    height: 5px;
+    position: relative;
+    top: 6px;
+    margin-right: 10px;
+    &.approved, &.colorless {
+      background-color: $color_colorless;
+    }
+    &.dued, &.being_corrected, &.warning {
+      background-color: $color_warning;
+    }
+    &.working, &.assigned, &.success {
+      background-color: $color_success;
+    }
+    &.need_correction, &.danger {
+      background-color: $color_danger;
+    }
+  }
+}
+
+
+
+.projectDetails {
+  .ant-tag {
+    background-color: $color_dos;
+    border-color: $color_colorless;
+    color: white;
+    &:last-of-type {
+      margin-right: 0px;
+    }
+  }
+  .ant-tabs-extra-content .projectTime {
+    font-size: 20px;
+  }
+  .ant-layout-sider {
+    background: $color_colorless;
+    color: #fff;
+    .box {
+      padding-left:15px;
+      padding-right:15px;
+    }
+    h2 {
+      font-weight: 300;
+      color: inherit;
+      font-size: 20px;
+      position: relative;
+      top: 36px;
+    }
+    .ant-timeline {
+      color: #fff;
+      position: relative;
+      top: 40px;
+      .ant-timeline-item-tail {
+        border-left: 1px solid #BDD3DB;
+      }
+      .ant-timeline-item:last-of-type {
+        font-size: 16px;
+      }
+      .ant-timeline-item-head-custom {
+        border-radius: 10px;
+        padding: 2px;
+        div {
+          padding: 4px;
+          border-radius: 4px;
+
+        }
+      }
+      .ant-timeline-item-head-red {
+        background-color: $color_danger;
+        div {
+          background-color: #fff;
+        }
+      }
+      .ant-timeline-item-last {
+        height: 120px;
+      }
+    }
+    .submitProjectBtn {
+      position: fixed;
+      bottom: 0px;
+      padding: 14px 17px;
+      background-color: #a5b7beeb;
+      text-align: center;
+      width: 200px;
+      .ant-btn-icon-only:first-of-type {
+        margin-right: 20px;
+      }
+    }
+  }
+  .projectDetailsSummary {
+    .ant-table-wrapper {
+      margin-bottom: 40px;
+      .ant-table-thead > tr > th:nth-of-type(n+2) {
+        width: 85px;
+      }
+      .ant-table-row:last-of-type {
+        font-weight: bold;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+    }
+  }
+  .projectDetailsPhases {
+    .ant-steps {
+      overflow-x: scroll;
+      margin-bottom: 20px;
+      .dot {
+        padding: 6px;
+        border-radius: 6px;
+        background-color: $color_dos;
+        float: left;
+        display: block;
+        width: 6px;
+        position: relative;
+        z-index:999;
+        height: 6px;
+        bottom: 1px;
+      }
+      .anticon {
+        position: relative;
+        z-index: 999;
+        background-color: $color_background;
+        top: 1px;
+        left: -5px;
+      }
+      .ant-steps-item-finish .dot {
+        background-color: $color_1;
+        &:hover {
+          background-color: $color_1_hover;
+        }
+      }
+      .ant-steps-item-finish .dot.cantedit {
+        background-color: #393e3f;
+        &:hover {
+          background-color: $color_header;
+        }
+      }
+      .ant-steps-item-tail:after {
+        background-color: #d9d9d9;
+        height:2px;
+        position: relative;
+        z-index: 1;
+      }
+      .ant-steps-item-title {
+        margin-top: 10px;
+        font-size: 14px;
+        line-height: 20px;
+        position: relative;
+        bottom: 3px;
+        color: $color_colorless;
+        text-transform: uppercase;
+      }
+    }
+    .ant-steps-dot .ant-steps-item-tail {
+      position: relative;
+      top: 6px;
+      z-index: 1;
+      margin-left: 30px;
+    }
+    .ant-steps-dot .ant-steps-item-icon {
+      margin-left: 24px;
+    }
+    .ant-steps-item-finish > .ant-steps-item-content > .ant-steps-item-title {
+      bottom: 1px;
+      color: $color_header;
+    }
+    .ant-steps-label-vertical .ant-steps-item-content {
+      width: 60px;
+    }
+    .separator {
+      margin: 50px auto;
+    }
+    form {
+      .ant-row .ant-form-item:last-of-type {
+        margin-bottom: 0;
+      }
+      .ant-form-item-label {
+        width: 175px;
+        text-align: left;
+      }
+      .ant-select, .ant-calendar-picker, .ant-input-number {
+        width: calc(100% - 30px);
+        max-width: 220px;
+      }
+      textarea.ant-input {
+        max-width: unset;
+        width: calc(100% - 30px);
+        vertical-align: middle;
+      }
+      .anticon-info-circle {
+        color: $color_dos;
+        margin-left: 15px;
+        &:hover {
+          color: $color_colorless;
+        }
+      }
+      .defectList {
+        h3 {
+          font-weight:300;
+          float: left;
+          margin-bottom: 20px;
+        }
+        .logNewDefect {
+          float: right;
+        }
+        .ant-table-wrapper {
+          clear: both;
+        }
+        .ant-table-thead > tr > th:nth-of-type(6),
+        .ant-table-tbody > tr > td:nth-of-type(6),
+        .ant-table-thead > tr > th:nth-of-type(7),
+        .ant-table-tbody > tr > td:nth-of-type(7),
+        .ant-table-thead > tr > th:nth-of-type(8),
+        .ant-table-tbody > tr > td:nth-of-type(8) {
+          text-align: center;
+        }
+      }
+    }
+  }
+  .projectDetailsFiles {
+    .ant-upload {
+      &.ant-upload-drag p.ant-upload-drag-icon .anticon {
+        color: $color_1;
+        &:hover {
+          color: $color_1_hover;
+        }
+      }
+    }
+    .ant-upload-list {
+      display: none;
+    }
+    .dragBox {
+      margin-top: 15px;
+      margin-bottom: 20px;
+      height: 180px;
+    }
+  }
+  .projectDetailsMessages {
+    .singleMessage {
+      margin-bottom: 20px;
+      background: #CCC6;
+      border-radius: 11px;
+      padding: 12px 12px 1px 19px;
+      width: fit-content;
+      min-width: 250px;
+      &.right {
+        margin-left: auto;
+        margin-right: 0;
+        background: rgb(43, 153, 255);
+        color: white;
+        a {
+          color: white;
+          &:hover {
+            color: white;
+            span {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+      &.left {
+
+      }
+      .avatar {
+        .ant-avatar.ant-avatar-icon {
+          display: inline-grid;
+          margin-right: 13px;
+        }
+      }
+      .date {
+        font-size: 12px;
+        color: $color_colorless;
+        margin-bottom: 5px;
+      }
+      &.right .date {
+        color: #ffffffa8;
+      }
+      .name {
+        font-weight: 500;
+      }
+      span.ant-avatar.statusAvatar.ant-avatar-circle.ant-avatar-icon {
+        position: absolute;
+        margin-left: -32px;
+        margin-top: -27px;
+        border: 2px solid $color_background;
+        i {
+          line-height: 30px;
+        }
+      }
+    }
+    .write {
+      .ant-btn {
+        float: right;
+        margin-top: 15px;
+      }
+    }
+    .empty {
+      margin: 0 auto;
+      display: block;
+      width: fit-content;
+      color: $color_colorless;
+    }
+  }
+}
+
+.userDetails {
+  .userProfile {
+    h3 {
+      font-weight:300;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    form {
+      .ant-row .ant-form-item:last-of-type {
+        margin-bottom: 0;
+      }
+      .ant-form-item-label {
+        width: 175px;
+        text-align: left;
+      }
+      .ant-select, .ant-calendar-picker, .ant-input-number, .ant-input {
+        width: calc(100% - 30px);
+        max-width: 220px;
+      }
+      textarea.ant-input {
+        max-width: unset;
+        width: calc(100% - 30px);
+        vertical-align: middle;
+      }
+      .anticon-info-circle {
+        color: $color_dos;
+        margin-left: 15px;
+        &:hover {
+          color: $color_colorless;
+        }
+      }
+    }
+    .actions {
+      width: 90%;
+      text-align: right;
+      button.ant-btn.ant-btn-boton1 {
+        margin-left: 20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    }
+  }
+}
+
+.submission-checklist {
+  span {
+    display: block;
+  }
+  .anticon {
+    margin-right: 5px;
+  }
+  .success .anticon {
+    color: $color_success;
+  }
+  .danger .anticon {
+    color: $color_danger;
+  }
+}
+.defectFormPopover {
+  .ant-form-item-label {
+    width: 140px;
+    text-align: left;
+    margin-left: 15px;
+  }
+  .ant-select, .ant-calendar-picker, .ant-input-number {
+    width: calc(100% - 30px);
+    max-width: 220px;
+  }
+  textarea.ant-input {
+    max-width: unset;
+    width: calc(100% - 30px);
+    vertical-align: middle;
+  }
+  .anticon-info-circle {
+    color: $color_dos;
+    margin-left: 15px;
+    &:hover {
+      color: $color_colorless;
+    }
+  }
+}
+.modalCorrectProject {
+  .ant-progress-outer {
+    position: relative;
+    top: 9px;
+  }
+  .ant-upload-list-item-info .anticon-loading {
+    display: none;
+  }
+}
+.professorDashboard {
+  .filters {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+}
+.ant-menu-vertical .ant-menu-item.notificationItem {
+  line-height: 20px;
+  padding-top: 10px;
+  padding-bottom: 40px;
+
+}
+.notificationItem .notificationDate {
+  font-size: 11px;
+  display: block;
+  margin-top: -3px;
+}
+.modalUpdateLOCs {
+  .ant-form-item-label {
+    float: left;
+    width: 200px;
+    text-align: left;
+  }
+  .ant-form-item-control-wrapper {
+    float: left;
+  }
 }

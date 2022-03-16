@@ -3,10 +3,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
+import ReactGA from 'react-ga';
+
+ReactGA.initialize('UA-115026786-1'); //Unique Google Analytics tracking number
+
+function gaTrackPageView() {
+  ReactGA.pageview(window.location.hash);
+}
 
 const Root = ({ store, history, routes, render }) => (
   <Provider store={store}>
-    <Router history={history} routes={routes} render={render} />
+    <Router history={history} routes={routes} render={render} onUpdate={gaTrackPageView} />
   </Provider>
 );
 

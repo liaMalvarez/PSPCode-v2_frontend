@@ -30,18 +30,23 @@
     "open:cover": "npm run test:cover && open coverage/lcov-report/index.html",
     "deploy:staging": "npm run just-build && babel-node tools/deployS3 staging",
     "deploy:production": "npm run just-build &&  babel-node tools/deployS3 production",
+    "deploy:gh": "npm run just-build && gh-pages -d dist",
     "analyze-bundle": "babel-node ./tools/analyzeBundle.js"
   },
-  "author": "Bernabe Gonzalez",
+  "author": "Guillermo y Guillermo",
   "license": "MIT",
+  "homepage": "https://tavidian.github.io/psp-react",
   "dependencies": {
-    "humps": "2.0.0",
+    "antd": "3.0.0-alpha.13",
     "immutable": "3.8.1",
     "isomorphic-fetch": "2.2.1",
     "lodash": "4.17.4",
+    "moment": "2.18.1",
     "prop-types": "15.5.10",
     "react": "15.5.4",
     "react-dom": "15.5.4",
+    "react-ga": "2.4.1",
+    "react-moment": "0.6.5",
     "react-redux": "5.0.4",
     "react-router": "3.0.5",
     "react-router-redux": "4.0.8",
@@ -81,6 +86,7 @@
     "express": "4.15.2",
     "extract-text-webpack-plugin": "2.1.0",
     "file-loader": "0.11.1",
+    "gh-pages": "1.1.0",
     "html-webpack-plugin": "2.28.0",
     "identity-obj-proxy": "3.0.0",
     "jest": "20.0.1",
@@ -116,7 +122,7 @@
     },
     "globals": {
       "config": {
-        "API_URL": "http://api-testing-url.com"
+        "API_URL": "localhost:3000"
       }
     }
   },

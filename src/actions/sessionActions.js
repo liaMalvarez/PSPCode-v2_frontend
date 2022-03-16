@@ -1,15 +1,15 @@
 import { SubmissionError } from 'redux-form';
-import { browserHistory } from 'react-router';
+import { hashHistory } from 'react-router';
 import { sessionService } from 'redux-react-session';
 import sessionApi from '../api/sessionApi';
-import { routes } from '../constants/routesPaths';
+import {removeAllCokies} from "../utils/functions";
 
 export const login = user =>
   () =>
-    sessionApi.login({ user }).then(({ user }) => {
+    sessionApi.login({ user }).then((user) => {
       sessionService.saveUser(user)
       .then(() => {
-        browserHistory.push(routes.index);
+        hashHistory.push('/');
       });
     }).catch((err) => {
       throw new SubmissionError({
@@ -22,7 +22,44 @@ export const logout = () =>
     sessionApi.logout().then(() => {
       sessionService.deleteSession();
       sessionService.deleteUser();
-      browserHistory.push(routes.login);
+      removeAllCokies();
+      localStorage.clear();
+      hashHistory.push('/session/login');
     }).catch((err) => {
+      removeAllCokies();
+      sessionService.deleteSession();
+      sessionService.deleteUser();
+      removeAllCokies();
+      localStorage.clear();
+      hashHistory.push('/session/login');
       throw (err);
     });
+
+
+export const forgot = (user) =>
+  () => sessionApi.forgot(user, String(window.location.href).replace("session/password/forgot","session/password/reset")).then((r) => {
+    throw new SubmissionError({ok:true});
+  }).catch((err) => {
+    if (err.errors && err.errors.ok) {
+      throw new SubmissionError({ _error: 'yes' });
+    } else {
+      throw new SubmissionError({ _error: 'no' });
+    }
+  });
+
+
+export const reset = (user) =>
+  () => {
+    const url = new URL(window.location.href);
+    const headers = {token: url.searchParams.get("token"), uid: url.searchParams.get("uid"), client: url.searchParams.get("client_id")};
+    return sessionApi.reset(user, headers).then((r) => {
+      throw new SubmissionError({ok:true});
+    }).catch((err) => {
+      if (err.errors && err.errors.ok) {
+        throw new SubmissionError({ _error: 'yes' });
+      } else {
+        throw new SubmissionError({ _error: 'no' });
+      }
+    });
+  };
+

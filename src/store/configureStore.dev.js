@@ -49,7 +49,7 @@ export default function configureStore(initialState) {
     });
   }
 
-  sessionService.initSessionService(store, {redirectPath: '/login'});
+  sessionService.initSessionService(store, {redirectPath: '/session/login', driver:'COOKIES'});
 
   return store;
 }

@@ -1,5 +1,5 @@
 export const routes = {
   index: '/',
-  login: 'login',
+  login: '/session/login',
   signUp: 'sign-up'
 };

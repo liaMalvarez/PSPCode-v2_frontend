@@ -5,9 +5,9 @@ import { bindActionCreators } from 'redux';
 import * as sessionActions from '../../actions/sessionActions';
 
 const LogoutButton = ({ actions: { logout } }) => (
-  <button onClick={logout}>
-    LOGOUT
-  </button>
+  <a onClick={logout}>
+    Logout
+  </a>
 );
 
 const { object } = PropTypes;
