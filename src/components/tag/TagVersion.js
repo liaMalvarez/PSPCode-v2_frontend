@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
 const Tag = require('antd/lib/tag');
@@ -34,7 +33,7 @@ class TagVersion extends Component {
         } else {
           return (
             <span key={item.version.version}>Version {item.version.version}
-              <Link onClick={() => this.props.onChange(this.props.idstudent,this.props.idproject,item.version.id)}> (review)</Link>
+              <button type="button" onClick={() => this.props.onChange(this.props.idstudent,this.props.idproject,item.version.id)}> (review)</button>
               <br/>
             </span>);
         }
@@ -52,7 +51,7 @@ class TagVersion extends Component {
         <div>
           <span>
             You are reviewing an old version of your project. <br />
-            <Link onClick={() => this.props.onChange(this.props.idstudent,this.props.idproject,this.last.version.id)}>Go to the last version</Link> instead.
+            <button type="button" onClick={() => this.props.onChange(this.props.idstudent,this.props.idproject,this.last.version.id)}>Go to the last version</button> instead.
           </span>
         </div>
       );

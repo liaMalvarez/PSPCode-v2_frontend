@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+
 import * as signUpActions from '../actions/signUpActions';
 import SignUpForm from '../components/user/SignUpForm';
 
@@ -18,7 +19,7 @@ SignUpPage.propTypes = {
   actions: object.isRequired
 };
 
-const mapDispatch = dispatch => ({
+const mapDispatch = (dispatch) => ({
   actions: bindActionCreators(signUpActions, dispatch)
 });
 

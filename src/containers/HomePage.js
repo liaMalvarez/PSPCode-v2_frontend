@@ -1,67 +1,30 @@
-import React, { Component, PropTypes } from 'react';
-import {Link, hashHistory} from 'react-router';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
-import CustomHeader from '../components/layout/CustomHeader';
-import CustomFooter from '../components/layout/CustomFooter';
-import {logout} from "../actions/sessionActions";
 
-
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
-const Sider = require('antd/lib/layout/Sider');
-
-const { Content } = Layout;
+import { logout } from '../actions/sessionActions';
 
 require('antd/dist/antd.css');
 
+const HomePage = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate('/session/login');
+  }, []);
 
-
-class HomePage extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-  componentDidMount() {
-    this.redirectToPage();
-  }
-  redirectToPage() {
-    if(!this.props.session.authenticated || !this.props.session.user.id) {
-      hashHistory.push('/session/login');
-    } else if(this.props.session.user.role === 'professor') {
-      hashHistory.push('/professor/dashboard/projects');
-    } else {
-      hashHistory.push('/students/' + this.props.session.user.id + '/projects');
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if(!nextProps.session.authenticated || !nextProps.session.user.id ) {
-      hashHistory.push('/session/login');
-    } else {
-      this.redirectToPage();
-    }
-  }
-
-  render() {
-    return (
-      <div>Welcome.
-        <a onClick={logout}>Logout</a>
-      </div>
-    );
-  }
+  return (
+    <div>
+      Welcome.
+      <button onClick={logout} type="button">Logout</button>
+    </div>
+  );
 };
 
-const mapStateToProps = (state, ownState) => {
-  console.log(ownState.params);
-  return {
-    session: state.session
-  };
-};
+const mapStateToProps = (state) => ({
+  session: state.session
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-  }
-};
+const mapDispatchToProps = () => ({
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

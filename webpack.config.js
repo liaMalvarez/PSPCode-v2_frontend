@@ -7,8 +7,10 @@ module.exports = {
     extensions: ['*', '.js', '.jsx', '.json']
   },
   devServer: {
+    historyApiFallback: true,
     open: true,
     contentBase: './dist',
+    port: 8080,
   },
   devtool: 'inline-source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
   entry: [

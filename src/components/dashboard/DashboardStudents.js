@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { dashboardStudentsList, dashboardStudentsListFailure, dashboardStudentsListSuccess, dashboardStudentsListReset,
 dashboardStudentsAssign, dashboardStudentsAssignFailure, dashboardStudentsAssignSuccess,
@@ -91,7 +91,7 @@ class DashboardStudents extends Component {
       r = { status: 'Not Assigned', color: 'success', msg: record.first_name + ' hasn\'t this project assigned.'};
       r.action = 'assign';
     } else if (status === 'pending') {
-      r = { status: 'Pending', color: 'warning', msg: (<span>{record.first_name} hasn't this project assigned and is still working on {record.current_project.name}. <Link onClick={() => this.assign({id: record.id, name: record.first_name}, this.projectOfRecord(record))}>Assign anyway</Link></span>)};
+      r = { status: 'Pending', color: 'warning', msg: (<span>{record.first_name} hasn't this project assigned and is still working on {record.current_project.name}. <button type="button" onClick={() => this.assign({id: record.id, name: record.first_name}, this.projectOfRecord(record))}>Assign anyway</button></span>)};
     }
 
     return r;
@@ -199,11 +199,11 @@ class DashboardStudents extends Component {
         if (status.action === 'correct') {
           btn = (<Link to={`/students/${record.id}/projects/${this.projectOfRecord(record).assigned_project_id}`}><Button type="boton1">Correct</Button></Link>);
         } else if (status.action === 'poke_this') {
-          btn = (<Link onClick={() => this.poke({id: record.id, name: record.first_name}, this.projectOfRecord(record))}><Button type="boton1" disabled={this.message_poking}>Poke</Button></Link>);
+          btn = (<button type="button" onClick={() => this.poke({id: record.id, name: record.first_name}, this.projectOfRecord(record))}><Button type="boton1" disabled={this.message_poking}>Poke</Button></button>);
         } else if (status.action === 'poke_current') {
-          btn = (<Link onClick={() => this.poke({id: record.id, name: record.first_name}, record.current_project)}><Button type="boton1" disabled={this.message_poking}>Poke</Button></Link>);
+          btn = (<button type="button" onClick={() => this.poke({id: record.id, name: record.first_name}, record.current_project)}><Button type="boton1" disabled={this.message_poking}>Poke</Button></button>);
         } else if (status.action === 'assign') {
-          btn = (<Link onClick={() => this.assign({id: record.id, name: record.first_name}, this.projectOfRecord(record))}><Button type="boton1" disabled={this.message_assigning}>Assign</Button></Link>);
+          btn = (<button type="button" onClick={() => this.assign({id: record.id, name: record.first_name}, this.projectOfRecord(record))}><Button type="boton1" disabled={this.message_assigning}>Assign</Button></button>);
         }
 
         return btn;

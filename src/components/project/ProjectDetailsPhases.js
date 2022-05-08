@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import DefectsList from './defect/DefectsList';
 import DefectForm from './defect/DefectForm';
@@ -141,30 +141,30 @@ class ProjectDetailsPhases extends Component {
     if (status === 'finish' && this.state.canEdit) {
       return (
         <Popover content="You are working on this phase.">
-          <Link onClick={() => this.selectPhase(this.props.version.phases[index])}>
+          <button type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
             <span className="dot" />
-          </Link>
+          </button>
         </Popover>);
     } else if (status === 'finish' && !this.state.canEdit) {
       return (
         <Popover content="You are reviewing this phase.">
-          <Link onClick={() => this.selectPhase(this.props.version.phases[index])}>
+          <button type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
             <span className="dot cantedit" />
-          </Link>
+          </button>
         </Popover>);
     } else if (status === 'process') {
       return (
         <Popover content="Click to review this phase.">
-          <Link onClick={() => this.selectPhase(this.props.version.phases[index])}>
+          <button type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
             <span className="dot"/>
-          </Link>
+          </button>
         </Popover>);
     } else if (status === 'wait' && this.state.canEdit) {
       return (
         <Popover content="Click to start a new phase.">
-          <Link onClick={this.createPhase}>
+          <button type="button" onClick={this.createPhase}>
             <Icon type="plus-circle" />
-          </Link>
+          </button>
         </Popover>);
     } else if (status === 'wait' && !this.state.canEdit) {
       return (

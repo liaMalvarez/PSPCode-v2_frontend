@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import LogoutButton from '../session/LogoutButton';
 import NotificationBadge from '../common/NotificactionBadge';
 import Logo from '../common/Logo';

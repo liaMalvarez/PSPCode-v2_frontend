@@ -3,9 +3,10 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
-import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import { Route, Routes, HashRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
 import enUS from 'antd/lib/locale-provider/en_US';
+
 import configureStore from './store/configureStore';
 
 import ProjectListPage from './containers/ProjectsListPage';
@@ -25,10 +26,10 @@ const LocaleProvider = require('antd/lib/locale-provider');
 const store = configureStore();
 
 render(
-  <LocaleProvider locale={enUS}>
-    <AppContainer>
-      <Provider store={store}>
-        <BrowserRouter>
+  <HashRouter>
+    <LocaleProvider locale={enUS}>
+      <AppContainer>
+        <Provider store={store}>
           <Routes>
             <Route path="/" element={<HomePage />} />
 
@@ -47,9 +48,9 @@ render(
             <Route path="/session/password/forgot" element={<SessionPasswordForgotPage />} />
             <Route path="/session/password/reset" element={<SessionPasswordResetPage />} />
           </Routes>
-        </BrowserRouter>
-      </Provider>
-    </AppContainer>
-  </LocaleProvider>,
+        </Provider>
+      </AppContainer>
+    </LocaleProvider>
+  </HashRouter>,
   document.getElementById('app')
 );

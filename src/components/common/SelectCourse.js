@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { dashboardCourseList, dashboardCourseListFailure, dashboardCourseListReset, dashboardCourseListSuccess, dashboardCourseSelect, dashboardCourseSelectFailure, dashboardCourseSelectReset, dashboardCourseSelectSuccess} from '../../actions/dashboardActions';
 import {getCacheObject} from "../../utils/functions";

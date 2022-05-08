@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { Link } from 'react-router';
 import SingleMessage from './message/SingleMessage';
 import {
   attachFileOnProjectVersion, attachFileOnProjectVersionSuccess, attachFileOnProjectVersionFailure, attachFileOnProjectVersionReset,
@@ -141,7 +140,7 @@ class ProjectDetailsMessage extends Component {
         </div>
         {this.props.session.user.role !== 'professor' && this.props.version.status === 'working' &&
         <div>
-          <span>If you want to delete this zip or upload it again, <Link className="dangerLink" onClick={this.onDelete}>click here</Link>.</span>
+          <span>If you want to delete this zip or upload it again, <button type="button" className="dangerLink" onClick={this.onDelete}>click here</button>.</span>
         </div>
         }
       </div>

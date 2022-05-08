@@ -1,11 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
 const Progress = require('antd/lib/progress');
 
 class CustomProgress extends Component {
-
   constructor(props) {
     super(props);
   }
@@ -31,7 +29,7 @@ class CustomProgress extends Component {
 const mapStateToProps = (state) => ({
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomProgress);

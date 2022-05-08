@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import Input from '../common/Input';
 import * as constraints from '../../utils/constraints';
-import {Link} from "react-router";
+import {Link} from "react-router-dom";
 import * as qs from 'query-string';
 
 const Button = require('antd/lib/button');
