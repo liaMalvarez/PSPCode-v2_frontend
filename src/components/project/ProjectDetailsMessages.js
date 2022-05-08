@@ -1,16 +1,17 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
+import {
+  message,
+  Button,
+  Input,
+} from 'antd';
+
 import SingleMessage from './message/SingleMessage';
-import { createMessageOnProject, createMessageOnProjectSuccess, createMessageOnProjectFailure, createMessageOnProjectReset } from '../../actions/projectActions';
+import { createMessageOnProject, createMessageOnProjectSuccess, createMessageOnProjectFailure } from '../../actions/projectActions';
 
-const TextArea = require('antd/lib/input/TextArea');
-const Button = require('antd/lib/button');
-const message = require('antd/lib/message');
-
+const { TextArea } = Input;
 
 class ProjectDetailsMessages extends Component {
-
   constructor(props) {
     super(props);
 
@@ -24,6 +25,7 @@ class ProjectDetailsMessages extends Component {
 
   componentDidMount() {
   }
+
   componentWillReceiveProps(nextProps) {
     if (this.message_creating && nextProps.created) {
       this.message_creating();
@@ -31,6 +33,7 @@ class ProjectDetailsMessages extends Component {
       this.handleChange('message', '');
     }
   }
+
   handleChange = (attr, value) => {
     if (attr === 'message') {
       this.setState({
@@ -53,15 +56,13 @@ class ProjectDetailsMessages extends Component {
     return (
       <div className="projectDetailsMessages">
         <div>
-          {this.props.project.messages.length > 0 && [...this.props.project.messages].sort((a, b) => a.id - b.id).map((item, i) => {
-            return (<SingleMessage key={item.id} data={item} />);
-          })}
+          {this.props.project.messages.length > 0 && [...this.props.project.messages].sort((a, b) => a.id - b.id).map((item, i) => (<SingleMessage key={item.id} data={item} />))}
           {this.props.project.messages.length === 0 && <span className="empty">No messages to be shown</span>}
         </div>
         <div className="separator" />
         <div className="write">
-          <TextArea style={{width: '100%'}} autosize={{minRows:3}} value={this.state.message} disabled={this.message_creating} onChange={e => this.handleChange('message', e.target.value)} />
-          <Button type="boton1" onClick={this.sendNewMessage} disabled={this.state.message.length===0 || this.message_creating}>Send Message</Button>
+          <TextArea style={{ width: '100%' }} autosize={{ minRows: 3 }} value={this.state.message} disabled={this.message_creating} onChange={(e) => this.handleChange('message', e.target.value)} />
+          <Button type="boton1" onClick={this.sendNewMessage} disabled={this.state.message.length === 0 || this.message_creating}>Send Message</Button>
         </div>
       </div>
 
@@ -69,25 +70,21 @@ class ProjectDetailsMessages extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    session: state.session,
-    created: state.projects.project_messages_created
-  };
-};
+const mapStateToProps = (state) => ({
+  session: state.session,
+  created: state.projects.project_messages_created
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    createMessage: (userid,projectid,message) => {
-      dispatch(createMessageOnProject(userid,projectid,message)).payload.then((result) => {
-        if (true) {
-          dispatch(createMessageOnProjectSuccess(result));
-        } else {
-          dispatch(createMessageOnProjectFailure(result.error));
-        }
-      });
-    }
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  createMessage: (userid, projectid, message) => {
+    dispatch(createMessageOnProject(userid, projectid, message)).payload.then((result) => {
+      if (true) {
+        dispatch(createMessageOnProjectSuccess(result));
+      } else {
+        dispatch(createMessageOnProjectFailure(result.error));
+      }
+    });
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectDetailsMessages);

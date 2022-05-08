@@ -1,16 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Icon } from '@ant-design/compatible';
+import { Layout, Breadcrumb } from 'antd';
 
 import CustomHeader from '../components/layout/CustomHeader';
 import CustomFooter from '../components/layout/CustomFooter';
 import DashboardProjects from '../components/dashboard/DashboardProjects';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import SelectCourse from '../components/common/SelectCourse';
-
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
 
 const { Content } = Layout;
 

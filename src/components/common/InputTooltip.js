@@ -1,10 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { TEXTS }from '../../constants/constants'
+import { Icon } from '@ant-design/compatible';
+import { Popover } from 'antd';
 
-const Icon = require('antd/lib/icon');
-const Popover = require('antd/lib/popover');
+import { TEXTS } from '../../constants/constants'
 
 class InputTooltip extends Component {
 

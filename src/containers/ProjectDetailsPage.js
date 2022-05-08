@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Icon } from '@ant-design/compatible';
+import {
+  Layout,
+  Breadcrumb,
+  Tabs,
+  Modal,
+  Timeline,
+  Button,
+  InputNumber,
+  message,
+  Popover,
+  Upload,
+  Form,
+  Input
+} from 'antd';
+
 import CustomHeader from '../components/layout/CustomHeader';
 import CustomFooter from '../components/layout/CustomFooter';
 import TagProcess from '../components/tag/TagProcess';
@@ -29,27 +45,12 @@ import SpanData from '../components/common/SpanData';
 import CustomProgress from '../components/common/CustomProgress';
 import { pspDataFetch, pspDataFetchFailure, pspDataFetchSuccess } from '../actions/utilsActions';
 
-const Layout = require('antd/lib/layout');
-const Sider = require('antd/lib/layout/Sider');
-const Tabs = require('antd/lib/tabs');
-const Modal = require('antd/lib/modal');
-const Timeline = require('antd/lib/timeline');
-const TimelineItem = require('antd/lib/timeline/TimelineItem');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
-const Button = require('antd/lib/button');
-const InputNumber = require('antd/lib/input-number');
-const message = require('antd/lib/message');
-const Popover = require('antd/lib/popover');
-const Upload = require('antd/lib/upload');
-const Form = require('antd/lib/form');
-const TextArea = require('antd/lib/input/TextArea');
 require('antd/dist/antd.css');
 
-const { Content } = Layout;
-const FormItem = Form.Item;
-
+const { Content, Sider } = Layout;
+const { TextArea } = Input;
 const { TabPane } = Tabs;
+const FormItem = Form.Item;
 
 const ProjectDetailsPage = ({
   params,
@@ -81,7 +82,7 @@ const ProjectDetailsPage = ({
   fetchProjectDetailsVersionSummaryProp
 }) => {
   const navigate = useNavigate();
-  
+
   const [defaultActiveKey, setDefaultActiveKey] = useState(params.tab || 'summary');
   const [modalUpdateLOCs, setModalUpdateLOCs] = useState({ total: '', new_reusable: '' });
   const [redeliver, setRedeliver] = useState(false);
@@ -230,11 +231,11 @@ const ProjectDetailsPage = ({
   };
 
   const printTimeLine = () => project_data.timeline.map((item, i) => (
-    <TimelineItem dot={<div />} color={PROJECT_STATUS[item.status].color} key={i}>
+    <Timeline.Item dot={<div />} color={PROJECT_STATUS[item.status].color} key={i}>
       {PROJECT_STATUS[item.status].name}
       <br />
       {new Date(item.date).toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' })}
-    </TimelineItem>
+    </Timeline.Item>
   ));
 
   const submissionChecklist = () => {

@@ -1,12 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Icon } from '@ant-design/compatible';
+import { Popover } from 'antd';
 
-const Icon = require('antd/lib/icon');
-const Popover = require('antd/lib/popover');
-
-const Input = ({ input, label, type, placeholder, meta: { touched, error } }) => (
+const Input = ({
+  input, label, type, placeholder, meta: { touched, error }
+}) => (
   <div>
-    {label && <label>{label}</label>}
+    {label && (
+      <label>
+        {label}
+      </label>
+    )}
     <div>
       <input {...input} {...{ placeholder, type }} />
       {touched && error && <Popover content={error}><Icon type="close-circle" /></Popover>}

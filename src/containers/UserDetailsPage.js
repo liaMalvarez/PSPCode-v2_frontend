@@ -2,17 +2,15 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Icon } from '@ant-design/compatible';
+import { Layout, Breadcrumb, Tabs } from 'antd';
+
 import CustomHeader from '../components/layout/CustomHeader';
 import CustomFooter from '../components/layout/CustomFooter';
 import UserProfile from '../components/user/UserProfile';
 import { fetchUserDetails, fetchUserDetailsFailure, fetchUserDetailsSuccess } from '../actions/userActions';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import CustomProgress from '../components/common/CustomProgress';
-
-const Layout = require('antd/lib/layout');
-const Tabs = require('antd/lib/tabs');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
 
 require('antd/dist/antd.css');
 

@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
+import { Icon } from '@ant-design/compatible';
+import { Layout } from 'antd';
 
 import * as sessionActions from '../actions/sessionActions';
 import PasswordResetForm from '../components/session/PasswordResetForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
 require('antd/dist/antd.css');
 
 const { Content } = Layout;

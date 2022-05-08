@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
-
-const Icon = require('antd/lib/icon');
-const Badge = require('antd/lib/badge');
-const Popover = require('antd/lib/popover');
-const Avatar = require('antd/lib/avatar');
-const Menu = require('antd/lib/menu');
+import { Icon } from '@ant-design/compatible';
+import {
+  Popover,
+  Badge,
+  Avatar,
+  Menu
+} from 'antd';
 
 const NotificationBadge = ({
   count,

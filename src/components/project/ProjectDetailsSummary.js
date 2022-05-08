@@ -1,9 +1,10 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
-
-const Table = require('antd/lib/table');
-const Popover = require('antd/lib/popover');
+import {
+  Table,
+  Popover,
+} from 'antd';
 
 class ProjectDetailsSummary extends Component {
 

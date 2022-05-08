@@ -1,17 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Icon } from '@ant-design/compatible';
+import { Layout, Breadcrumb, Tabs } from 'antd';
 
 import CustomHeader from '../components/layout/CustomHeader';
 import CustomFooter from '../components/layout/CustomFooter';
 import ProjectList from '../components/project/ProjectsList';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import SpanData from '../components/common/SpanData';
-
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Tabs = require('antd/lib/tabs');
-const Breadcrumb = require('antd/lib/breadcrumb');
 
 const { Content } = Layout;
 const { TabPane } = Tabs;

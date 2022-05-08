@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-
-const Progress = require('antd/lib/progress');
+import { Progress } from 'antd';
 
 class CustomProgress extends Component {
   constructor(props) {

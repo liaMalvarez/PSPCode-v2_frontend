@@ -6,24 +6,20 @@ module.exports = {
   resolve: {
     extensions: ['*', '.js', '.jsx', '.json']
   },
-  devServer: {
-    historyApiFallback: true,
-    open: true,
-    contentBase: './dist',
-    port: 8080,
-  },
   devtool: 'inline-source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
   entry: [
+    'react-hot-loader/patch',
     path.resolve(__dirname, 'src/index.js') // Defining path seems necessary for this to work consistently on Windows machines.
   ],
   target: 'web', // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
   output: {
     path: path.resolve(__dirname, 'dist'), // Note: Physical files are only output by the production build task `npm run build`.
     filename: 'bundle.js',
+    publicPath: '/',
   },
   plugins: [
-    new HtmlWebpackPlugin({     // Create HTML file that includes references to bundled CSS and JS.
-      template: 'src/index.ejs',
+    new HtmlWebpackPlugin({ // Create HTML file that includes references to bundled CSS and JS.
+      template: 'src/index.html',
       minify: {
         removeComments: true,
         collapseWhitespace: true
@@ -45,12 +41,41 @@ module.exports = {
         }
       },
       { test: /\.eot(\?v=\d+.\d+.\d+)?$/, loader: 'file-loader' },
-      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
-      { test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/, loader: 'url-loader?limit=10000&mimetype=application/octet-stream' },
-      { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader?limit=10000&mimetype=image/svg+xml' },
-      { test: /\.(jpe?g|png|gif)$/i, loader: 'file-loader?name=[name].[ext]' },
-      { test: /\.ico$/, loader: 'file-loader?name=[name].[ext]' },
-      { test: /(\.css|\.scss)$/, loaders: ['style-loader', 'css-loader?sourceMap', 'postcss-loader', 'sass-loader?sourceMap'] }
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: 'application/font-woff'
+        }
+      },
+      {
+        test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: 'application/octet-stream'
+        }
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: 'image/svg+xml'
+        }
+      },
+      {
+        test: /\.(jpe?g|png|gif|ico)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]'
+        }
+      },
+      {
+        test: /(\.css|\.scss)$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      }
     ]
   }
 };

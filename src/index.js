@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { Route, Routes, HashRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
 import enUS from 'antd/lib/locale-provider/en_US';
+import { ConfigProvider } from 'antd';
 
 import configureStore from './store/configureStore';
 
@@ -21,13 +22,11 @@ import HomePage from './containers/HomePage';
 
 import './styles/styles.scss';
 
-const LocaleProvider = require('antd/lib/locale-provider');
-
 const store = configureStore();
 
 render(
   <HashRouter>
-    <LocaleProvider locale={enUS}>
+    <ConfigProvider locale={enUS}>
       <AppContainer>
         <Provider store={store}>
           <Routes>
@@ -50,7 +49,7 @@ render(
           </Routes>
         </Provider>
       </AppContainer>
-    </LocaleProvider>
+    </ConfigProvider>
   </HashRouter>,
   document.getElementById('app')
 );
