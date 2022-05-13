@@ -39,5 +39,5 @@ dist
 .DS_Store
 
 # Environments constants
-src/constants/devConstants.js
+.env
 src/constants/prodConstants.js

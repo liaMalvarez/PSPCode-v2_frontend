@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Icon } from '@ant-design/compatible';
+import { 
+  CloudUploadOutlined, 
+  CheckCircleOutlined, 
+  CloseCircleOutlined,
+  CheckOutlined,
+  HomeOutlined,
+  CloseOutlined,
+  LoadingOutlined,
+  UploadOutlined,
+  RightOutlined
+ } from '@ant-design/icons';
 import {
   Layout,
   Breadcrumb,
@@ -53,16 +63,12 @@ const { TabPane } = Tabs;
 const FormItem = Form.Item;
 
 const ProjectDetailsPage = ({
-  params,
   reset,
   psp_data,
   fetchPSPData,
-  tab,
   project_data,
-  project_id,
   session,
   project_loading,
-  studentId,
   startProject: startProjectProp,
   fetchProjectDetailsProp,
   fetchProjectDetailsVersionProp,
@@ -82,8 +88,11 @@ const ProjectDetailsPage = ({
   fetchProjectDetailsVersionSummaryProp
 }) => {
   const navigate = useNavigate();
+  const { idstudent: studentId, idproject: project_id, tab } = useParams();
+  const params = useParams();
 
-  const [defaultActiveKey, setDefaultActiveKey] = useState(params.tab || 'summary');
+  console.log('paraaaams', params);
+  const [defaultActiveKey, setDefaultActiveKey] = useState(tab || 'summary');
   const [modalUpdateLOCs, setModalUpdateLOCs] = useState({ total: '', new_reusable: '' });
   const [redeliver, setRedeliver] = useState(false);
   const [correctProject, setCorrectProject] = useState({});
@@ -101,6 +110,7 @@ const ProjectDetailsPage = ({
     key = allowed_tabs.some((x) => x === key) ? key : allowed_tabs[0];
 
     if (key === 'summary' && version_data) {
+      console.log('VERSION DATA', version_data);
       fetchProjectDetailsVersionSummaryProp(studentId, project_id, version_data.id);
     }
     setDefaultActiveKey(key);
@@ -117,12 +127,16 @@ const ProjectDetailsPage = ({
   }, []);
 
   useEffect(() => {
-    changeTab(tab);
-
     if (project_data) { // FIX que solo ejecute si project_id cambia
       reset();
     }
+  }, [project_id]);
 
+  useEffect(() => {
+    changeTab(tab);
+  }, [tab]);
+
+  useEffect(() => {
     if (!project_data && !project_loading && !version_loading) {
       if (session && (session.user.role === 'professor' || session.user.id == studentId)) {
         fetchProjectDetailsProp(studentId, project_id);
@@ -156,7 +170,6 @@ const ProjectDetailsPage = ({
       setMessageApproving('');
     }
   }, [
-    tab,
     project_id,
     project_data,
     project_error,
@@ -189,7 +202,7 @@ const ProjectDetailsPage = ({
           <br />
           <Upload {...uploaderProps} customRequest={(x) => setCorrectProject({ ...correctProject, file: x.file })}>
             <Button>
-              <Icon type="upload" />
+              <CloudUploadOutlined />
               {' '}
               Click to Upload
             </Button>
@@ -413,10 +426,10 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover content="Approve this project" placement="topLeft">
-            <Button type="boton1" icon="check" shape="circle" onClick={() => correctProjectFunc('approved')} />
+            <Button type="boton1" icon={<CheckOutlined />} shape="circle" onClick={() => correctProjectFunc('approved')} />
           </Popover>
           <Popover content="This project needs correction" placement="topLeft">
-            <Button type="danger" icon="close" shape="circle" onClick={() => correctProjectFunc('need_correction')} />
+            <Button type="danger" icon={<CloseOutlined />} shape="circle" onClick={() => correctProjectFunc('need_correction')} />
           </Popover>
         </div>
       );
@@ -427,7 +440,9 @@ const ProjectDetailsPage = ({
         <div className="submission-checklist">
           {checklist.list.map((value) => (
             <span key={value.key} className={value.valid ? 'success' : 'danger'}>
-              <Icon type={value.valid ? 'check-circle' : 'close-circle'} />
+              {value.valid
+                ? (<CheckCircleOutlined />)
+                : (<CloseCircleOutlined />)}
               {value.message}
             </span>
           ))}
@@ -437,7 +452,7 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover title="Submission checklist" content={submissionChecklistPopover} placement="leftBottom">
-            <Button onClick={submitProject} icon={submitting ? 'loading' : 'upload'} type="boton1" disabled={!checklist.canSubmit}>
+            <Button onClick={submitProject} icon={submitting ? <LoadingOutlined /> : <UploadOutlined />} type="boton1" disabled={!checklist.canSubmit}>
               Submit to
               {project_data.professor.first_name}
             </Button>
@@ -448,7 +463,7 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here to allow phases recording" placement="leftBottom">
-            <Button onClick={startProjectFunc} icon="right" type="boton1">
+            <Button onClick={startProjectFunc} icon={<RightOutlined />} type="boton1">
               Start
               {project_data.psp_project.name}
             </Button>
@@ -459,7 +474,7 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here, make your corrections and submit it again" placement="leftBottom">
-            <Button onClick={continueProject} icon="right" type="boton1">
+            <Button onClick={continueProject} icon={<RightOutlined />} type="boton1">
               Continue
               {project_data.psp_project.name}
             </Button>
@@ -539,7 +554,7 @@ const ProjectDetailsPage = ({
         <ProfessorSider selected="dashboard.students" />
         <Content>
           <Breadcrumb>
-            <Breadcrumb.Item><Link to="/"><Icon type="home" /></Link></Breadcrumb.Item>
+            <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
             {session.user.role !== 'professor' && <Breadcrumb.Item><Link to={`/students/${studentId}/projects`}>Projects</Link></Breadcrumb.Item>}
             {session.user.role === 'professor' && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
             {session.user.role === 'professor' && <Breadcrumb.Item><Link to={`/users/${studentId}`}><SpanData entityName="student" entityId={studentId} loading output="first_name" /></Link></Breadcrumb.Item>}
@@ -594,12 +609,7 @@ const ProjectDetailsPage = ({
   );
 };
 
-const mapStateToProps = (state, ownState) => ({
-
-  studentId: ownState.params.idstudent,
-  project_id: ownState.params.idproject,
-  tab: ownState.params.tab,
-
+const mapStateToProps = (state) => ({
   session: state.session,
 
   psp_data: state.utils.psp_data,

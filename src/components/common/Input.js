@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon } from '@ant-design/compatible';
 import { Popover } from 'antd';
+import { CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 const Input = ({
   input, label, type, placeholder, meta: { touched, error }
@@ -14,8 +14,14 @@ const Input = ({
     )}
     <div>
       <input {...input} {...{ placeholder, type }} />
-      {touched && error && <Popover content={error}><Icon type="close-circle" /></Popover>}
-      {false && touched && !error && <Icon type="check-circle" /> }
+      {touched && error && (
+        <Popover content={error}>
+          <CloseCircleOutlined />
+        </Popover>
+      )}
+      {false && touched && !error && (
+        <CheckCircleOutlined />
+      )}
     </div>
   </div>
 );

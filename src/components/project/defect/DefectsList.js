@@ -6,7 +6,7 @@ import {
   Button,
   Table,
 } from 'antd';
-import { Icon } from '@ant-design/compatible';
+import { InfoCircleOutlined, EditOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons';
 
 import {
   deleteDefectOnProjectVersionPhase, deleteDefectOnProjectVersionPhaseFailure, deleteDefectOnProjectVersionPhaseSuccess,
@@ -113,7 +113,7 @@ class DefectsList extends Component {
         }
         return (
           <Popover content={this.descriptionPopOver(text)}>
-            <span><Icon type="info-circle-o" /></span>
+            <span><InfoCircleOutlined /></span>
           </Popover>
         );
       }
@@ -122,9 +122,9 @@ class DefectsList extends Component {
       key: 'action',
       render: (text, record, index) => (
         <span>
-          <Button onClick={() => this.props.onEdit(record)} icon="edit" disabled={!this.props.canEdit} />
+          <Button onClick={() => this.props.onEdit(record)} icon={<EditOutlined />} disabled={!this.props.canEdit} />
 &nbsp;
-          <Button onClick={() => this.deleteDefect(record.id)} icon="delete" disabled={!this.props.canEdit} />
+          <Button onClick={() => this.deleteDefect(record.id)} icon={<CloseOutlined />} disabled={!this.props.canEdit} />
         </span>)
     }];
     return (

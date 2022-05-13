@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import {
@@ -6,7 +6,12 @@ import {
   Upload,
   Modal,
 } from 'antd';
-import { Icon } from '@ant-design/compatible';
+import {
+  CloseCircleOutlined,
+  LoadingOutlined,
+  DownloadOutlined,
+  InboxOutlined
+} from '@ant-design/icons';
 
 import {
   attachFileOnProjectVersion, attachFileOnProjectVersionSuccess, attachFileOnProjectVersionFailure, attachFileOnProjectVersionReset,
@@ -112,7 +117,7 @@ class ProjectDetailsMessage extends Component {
         <div className="dragBox">
           <div className="ant-upload ant-upload-drag">
             <p className="ant-upload-drag-icon">
-              <Icon type="close-circle" className="danger" />
+              <CloseCircleOutlined />
             </p>
             <p className="ant-upload-text">Whoops, Something went wrong</p>
             <p className="ant-upload-hint">There is no zip file to download</p>
@@ -129,7 +134,11 @@ class ProjectDetailsMessage extends Component {
           <a href={this.props.version.file} target="blank">
             <div className="ant-upload ant-upload-drag">
               <p className="ant-upload-drag-icon">
-                <Icon type={this.props.deleting ? 'loading' : 'download'} />
+                {
+                  this.props.deleting
+                    ? <LoadingOutlined />
+                    : <DownloadOutlined />
+                }
               </p>
               <p className="ant-upload-text">Click here to download a zip with all the project files</p>
               {false && <p className="ant-upload-hint">
@@ -161,7 +170,9 @@ class ProjectDetailsMessage extends Component {
         <div className="dragBox">
           <Dragger {...this.uploaderProps} customRequest={(x) => this.customRequest(x)} beforeUpload={this.beforeUpload} onSuccess={this.onSuccess} onError={this.onError} disabled={!canUpload || this.state.uploading}>
             <p className="ant-upload-drag-icon">
-              <Icon type={this.state.uploading ? 'loading' : 'inbox'} />
+              {this.state.uploading
+                ? <LoadingOutlined />
+                : <InboxOutlined />}
             </p>
             <p className="ant-upload-text">Click or drag file to this area to upload your project files</p>
             <p className="ant-upload-hint">Upload only a single zip file with all your project files inside</p>

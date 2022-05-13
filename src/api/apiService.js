@@ -74,7 +74,7 @@ class Api {
       }).catch(() => requestData);
   }
 
-  get(uri, apiUrl = config.API_URL) {
+  get(uri, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'get',
       headers: {
@@ -87,7 +87,7 @@ class Api {
       .then((data) => this.performRequest(uri, apiUrl, data));
   }
 
-  post(uri, data, apiUrl = config.API_URL) {
+  post(uri, data, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'post',
       headers: {
@@ -101,7 +101,7 @@ class Api {
       .then((data) => this.performRequest(uri, apiUrl, data));
   }
 
-  delete(uri, data, apiUrl = config.API_URL) {
+  delete(uri, data, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'delete',
       headers: {
@@ -115,7 +115,7 @@ class Api {
       .then((data) => this.performRequest(uri, apiUrl, data));
   }
 
-  put(uri, data, apiUrl = config.API_URL) {
+  put(uri, data, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'put',
       headers: {
@@ -129,7 +129,7 @@ class Api {
       .then((data) => this.performRequest(uri, apiUrl, data));
   }
 
-  putWithCustomHeaders(uri, data, headers, apiUrl = config.API_URL) {
+  putWithCustomHeaders(uri, data, headers, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'put',
       headers: {
@@ -144,7 +144,7 @@ class Api {
     return this.performRequest(uri, apiUrl, requestData);
   }
 
-  putFormData(uri, data, apiUrl = config.API_URL) {
+  putFormData(uri, data, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'put',
       headers: {
@@ -157,7 +157,7 @@ class Api {
       .then((data) => this.performRequest(uri, apiUrl, data));
   }
 
-  postFormData(uri, data, apiUrl = config.API_URL) {
+  postFormData(uri, data, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'post',
       headers: {
@@ -170,7 +170,7 @@ class Api {
       .then((data) => this.performRequest(uri, apiUrl, data));
   }
 
-  patch(uri, data, apiUrl = config.API_URL) {
+  patch(uri, data, apiUrl = process.env.API_URL) {
     const requestData = {
       method: 'patch',
       headers: {

@@ -3,10 +3,12 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
+
 import { Route, Routes, HashRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
 import enUS from 'antd/lib/locale-provider/en_US';
 import { ConfigProvider } from 'antd';
+import { createHashHistory } from 'history';
 
 import configureStore from './store/configureStore';
 
@@ -24,8 +26,9 @@ import './styles/styles.scss';
 
 const store = configureStore();
 
+const history = createHashHistory();
 render(
-  <HashRouter>
+  <HashRouter history={history} location={history.location} navigator={history}>
     <ConfigProvider locale={enUS}>
       <AppContainer>
         <Provider store={store}>
@@ -34,12 +37,13 @@ render(
 
             {/* Students */}
             <Route path="/users/:iduser(/returntoproject/:returntoprojectid)" element={<UserDetailsPage />} />
+            <Route path="/students/:idstudent/projects/:idproject/:tab" element={<ProjectDetailsPage />} />
+            <Route path="/students/:idstudent/projects/:idproject" element={<ProjectDetailsPage />} />
             <Route path="/students/:idstudent/projects" element={<ProjectListPage />} />
-            <Route path="/students/:idstudent/projects/:idproject(/:tab)" element={<ProjectDetailsPage />} />
 
             {/* Professors */}
+            <Route path="/professor/dashboard/projects/:idproject" element={<DashboardStudentsPage />} />
             <Route path="/professor/dashboard/projects" element={<DashboardProjectsPage />} />
-            <Route path="/professor/dashboard/projects(/:idproject)" element={<DashboardStudentsPage />} />
             <Route path="/professor/dashboard/students" element={<DashboardStudentsPage />} />
 
             {/* Session */}

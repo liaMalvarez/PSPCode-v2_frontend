@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
-import { Icon } from '@ant-design/compatible';
+import { SmileOutlined } from '@ant-design/icons';
 import { Layout } from 'antd';
 
 import * as sessionActions from '../actions/sessionActions';
@@ -22,7 +22,7 @@ const SessionPasswordForgotPage = ({ actions: { forgot } }) => (
         <PasswordForgotForm onSubmit={forgot} />
         <div className="textBelowButton">
           <Link to="/session/login">
-            <Icon type="smile-o" />
+            <SmileOutlined style={{ marginRight: '10px' }} />
             I remember my password
           </Link>
         </div>

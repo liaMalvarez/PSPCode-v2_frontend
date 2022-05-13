@@ -5,11 +5,7 @@ import sessionApi from '../api/sessionApi';
 import { removeAllCokies } from '../utils/functions';
 
 export const login = (user) => () => sessionApi.login({ user }).then((user) => {
-  const navigate = useNavigate();
-  sessionService.saveUser(user)
-    .then(() => {
-      navigate('/');
-    });
+  sessionService.saveUser(user);
 }).catch((err) => {
   throw new SubmissionError({
     _error: err.errors[0]
@@ -34,7 +30,7 @@ export const logout = () => () => sessionApi.logout().then(() => {
   throw (err);
 });
 
-export const forgot = (user) => () => sessionApi.forgot(user, String(window.location.href).replace('session/password/forgot', 'session/password/reset')).then((r) => {
+export const forgot = (user) => () => sessionApi.forgot(user, String(window.location.href).replace('session/password/forgot', 'session/password/reset')).then(() => {
   throw new SubmissionError({ ok: true });
 }).catch((err) => {
   if (err.errors && err.errors.ok) {
@@ -47,7 +43,7 @@ export const forgot = (user) => () => sessionApi.forgot(user, String(window.loca
 export const reset = (user) => () => {
   const url = new URL(window.location.href);
   const headers = { token: url.searchParams.get('token'), uid: url.searchParams.get('uid'), client: url.searchParams.get('client_id') };
-  return sessionApi.reset(user, headers).then((r) => {
+  return sessionApi.reset(user, headers).then(() => {
     throw new SubmissionError({ ok: true });
   }).catch((err) => {
     if (err.errors && err.errors.ok) {

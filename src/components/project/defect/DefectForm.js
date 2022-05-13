@@ -10,7 +10,7 @@ import {
   Modal,
   Button,
 } from 'antd';
-import { Icon } from '@ant-design/compatible';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 import projectApi from '../../../api/projectApi';
 import InputTooltip from '../../common/InputTooltip';
@@ -190,7 +190,7 @@ class DefectForm extends Component {
             )
           </Option>))}
         </Select>
-        {this.state.fixDefectsLoading && <Icon type="loading" style={{ marginLeft: '15px' }} />}
+        {this.state.fixDefectsLoading && <LoadingOutlined style={{ marginLeft: '15px' }} />}
         {!this.state.fixDefectsLoading && <InputTooltip input="project_details_phase_defect_form_fix_defect" />}
       </FormItem>
       <FormItem
@@ -214,7 +214,7 @@ class DefectForm extends Component {
   render() {
     return (
       <div>
-        <Button className="logNewDefect" icon="plus" type="boton1" onClick={this.modalShow} disabled={!this.props.canEdit}>Record New Defect</Button>
+        <Button className="logNewDefect" icon={<PlusOutlined />} type="boton1" onClick={this.modalShow} disabled={!this.props.canEdit}>Record New Defect</Button>
         {this.props.canEdit
         && <Modal
           confirmLoading={this.props.creating || this.props.editing}

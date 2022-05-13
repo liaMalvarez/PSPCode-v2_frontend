@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { Icon } from '@ant-design/compatible';
+import { LoadingOutlined } from '@ant-design/icons';
+
 import {
   Popover,
   Badge,
@@ -119,11 +120,11 @@ const NotificationBadge = ({
   };
 
   const renderTitle = () => (
-    <span>
+    <div>
       {title}
       {' '}
-      {loading && <Icon type="loading" />}
-    </span>
+      {loading && <LoadingOutlined />}
+    </div>
   );
 
   const renderContent = () => (
@@ -163,7 +164,7 @@ const NotificationBadge = ({
     return (
       <Popover placement="bottomRight" title={renderTitle()} content={renderContent()} trigger="click" visible={popOverVisible} onVisibleChange={handleVisibleChange}>
         <Badge count={count}>
-          <Avatar icon={icon} onClick={() => markAsSeen()} />
+          <Avatar shape="circle" icon={icon} />
         </Badge>
       </Popover>
     );
@@ -172,7 +173,7 @@ const NotificationBadge = ({
   return (
     <Popover placement="bottomRight" title={renderTitle()} content={`There are no ${title} yet.`} trigger="click">
       <Badge count="0">
-        <Avatar icon={icon} />
+        <Avatar shape="circle" icon={icon} />
       </Badge>
     </Popover>
   );

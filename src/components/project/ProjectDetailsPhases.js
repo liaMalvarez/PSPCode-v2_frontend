@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   message,
@@ -14,7 +13,7 @@ import {
   Row,
   Col
 } from 'antd';
-import { Icon } from '@ant-design/compatible';
+import { PlusCircleOutlined } from '@ant-design/icons';
 
 import DefectsList from './defect/DefectsList';
 import DefectForm from './defect/DefectForm';
@@ -54,9 +53,6 @@ class ProjectDetailsPhases extends Component {
       activePhase: this.props.version.phases[this.props.version.phases.length - 1],
       activeDefect: null
     };
-  }
-
-  componentWillUnmount() {
   }
 
   componentDidMount() {
@@ -159,12 +155,12 @@ class ProjectDetailsPhases extends Component {
       return (
         <Popover content="Click to start a new phase.">
           <button type="button" onClick={this.createPhase}>
-            <Icon type="plus-circle" />
+            <PlusCircleOutlined />
           </button>
         </Popover>);
     } if (status === 'wait' && !this.state.canEdit) {
       return (
-        <Icon type="plus-circle" />
+        <PlusCircleOutlined />
       );
     }
   };
@@ -505,7 +501,7 @@ class ProjectDetailsPhases extends Component {
               <br />
               If you want to delete this phase,
               {' '}
-              <Link className="dangerLink" onClick={this.deletePhase}>click here</Link>
+              <button type="button" className="dangerLink" onClick={this.deletePhase}>click here</button>
               .
                                                                            </span>}
           </div>

@@ -1,6 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Icon } from '@ant-design/compatible';
+import { LoadingOutlined } from '@ant-design/icons';
 import { Select } from 'antd';
 
 import {
@@ -8,50 +8,53 @@ import {
   dashboardCourseListFailure,
   dashboardCourseListSuccess,
   dashboardCourseSelect,
-  dashboardCourseSelectFailure,
   dashboardCourseSelectSuccess
 } from '../../actions/dashboardActions';
 import { getCacheObject } from '../../utils/functions';
 
-class SelectCourse extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-    if (!this.props.list) {
-      this.props.dashboardCourseList();
+const SelectCourse = ({
+  list,
+  dashboardCourseListProp,
+  dashboardCourseSelectProp,
+  active,
+  error
+}) => {
+  useEffect(() => {
+    if (!list) {
+      dashboardCourseListProp();
     }
-  }
+  }, []);
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.list && !nextProps.active) {
+  useEffect(() => {
+    if (list && !active) {
       const c = getCacheObject('courses_active');
-      this.props.dashboardCourseSelect(c || nextProps.list[0]);
+      dashboardCourseSelectProp(c || list[0]);
     }
-    if (nextProps.error) {
-      alert(`Something went wrong: ${JSON.stringify(nextProps.error)}`);
+    if (error) {
+      alert(`Something went wrong: ${JSON.stringify(error)}`);
     }
-  }
+  }, [list, active, error]);
 
-  render() {
-    if (!this.props.list || !this.props.active) {
-      return (
-        <Select value="loading">
-          <Select.Option key="loading" value="loading"><Icon type="loading" /></Select.Option>
-        </Select>
-      );
-    }
+  if (!list || !active) {
     return (
-      <Select value={String(this.props.active.id)} onChange={(value) => this.props.dashboardCourseSelect(this.props.list.find((o) => String(o.id) == String(value)))}>
-        {this.props.list.map((item, i) => (<Select.Option key={item.id} value={String(item.id)}>{item.name}</Select.Option>))}
+      <Select value="loading">
+        <Select.Option key="loading" value="loading"><LoadingOutlined /></Select.Option>
       </Select>
     );
   }
-}
+  return (
+    <Select
+      value={String(active.id)}
+      onChange={
+        (value) => dashboardCourseSelectProp(
+          list.find((o) => String(o.id) == String(value))
+        )
+      }
+    >
+      {list.map((item) => (<Select.Option key={item.id} value={String(item.id)}>{item.name}</Select.Option>))}
+    </Select>
+  );
+};
 
 const mapStateToProps = (state) => ({
 
@@ -63,20 +66,16 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  dashboardCourseList: () => {
+  dashboardCourseListProp: () => {
     dispatch(dashboardCourseList()).payload.then((result) => {
       dispatch(dashboardCourseListSuccess(result));
     }).catch((error) => {
       dispatch(dashboardCourseListFailure(error));
     });
   },
-  dashboardCourseSelect: (course) => {
+  dashboardCourseSelectProp: (course) => {
     dispatch(dashboardCourseSelect(course)).payload.then((result) => {
-      if (true) {
-        dispatch(dashboardCourseSelectSuccess(result));
-      } else {
-        dispatch(dashboardCourseSelectFailure(result.error));
-      }
+      dispatch(dashboardCourseSelectSuccess(result));
     });
   },
 });

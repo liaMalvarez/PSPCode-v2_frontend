@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Icon } from '@ant-design/compatible';
+import { HomeOutlined } from '@ant-design/icons';
 import { Layout, Breadcrumb, Tabs } from 'antd';
 
 import CustomHeader from '../components/layout/CustomHeader';
@@ -22,11 +22,10 @@ const UserDetailsPage = ({
   user_data,
   user_loading,
   session,
-  user_id,
-  location_hash,
-  returntoprojectid,
   reset
 }) => {
+  const { hash: location_hash, iduser: user_id, returntoprojectid } = useParams();
+
   useEffect(() => {
     if (!user_data) {
       if (session && (session.user.role === 'professor' || session.user.id == user_id)) {
@@ -48,7 +47,7 @@ const UserDetailsPage = ({
         <ProfessorSider selected="dashboard.students" />
         <Content>
           <Breadcrumb>
-            <Breadcrumb.Item><Link to="/"><Icon type="home" /></Link></Breadcrumb.Item>
+            <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
             {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
             {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item>{user_data.first_name}</Breadcrumb.Item>}
             {(session.user.id == user_id || session.user.role !== 'professor') && <Breadcrumb.Item>My Profile</Breadcrumb.Item>}
@@ -76,10 +75,7 @@ const UserDetailsPage = ({
   );
 };
 
-const mapStateToProps = (state, ownState) => ({
-  location_hash: ownState.location.hash,
-  user_id: ownState.params.iduser,
-  returntoprojectid: ownState.params.returntoprojectid,
+const mapStateToProps = (state) => ({
   session: state.session,
   user_data: state.users.active.user,
   user_loading: state.users.active.loading,

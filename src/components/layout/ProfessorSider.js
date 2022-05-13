@@ -2,22 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Layout } from 'antd';
-import { Icon } from '@ant-design/compatible';
+import { CaretLeftOutlined } from '@ant-design/icons';
 
 const { Sider } = Layout;
 
 class ProfessorSider extends Component {
   constructor(props) {
     super(props);
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillReceiveProps(nextProps) {
   }
 
   render() {
@@ -30,14 +21,14 @@ class ProfessorSider extends Component {
           <span>
             Projects Dashboard
             {' '}
-            {this.props.selected === 'dashboard.projects' && <Icon type="caret-left" />}
+            {this.props.selected === 'dashboard.projects' && <CaretLeftOutlined />}
           </span>
         </Link>
         <Link to="/professor/dashboard/students">
           <span>
             Students Dashboard
             {' '}
-            {this.props.selected === 'dashboard.students' && <Icon type="caret-left" />}
+            {this.props.selected === 'dashboard.students' && <CaretLeftOutlined />}
           </span>
         </Link>
       </Sider>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Icon } from '@ant-design/compatible';
+import { HomeOutlined } from '@ant-design/icons';
 import { Layout, Breadcrumb } from 'antd';
 
 import CustomHeader from '../components/layout/CustomHeader';
@@ -21,7 +21,7 @@ const DashboardProjectsPage = () => (
       <ProfessorSider selected="dashboard.projects" />
       <Content className="professorDashboard">
         <Breadcrumb>
-          <Breadcrumb.Item><Link to="/"><Icon type="home" /></Link></Breadcrumb.Item>
+          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
           <Breadcrumb.Item>Projects</Breadcrumb.Item>
         </Breadcrumb>
         <h1>Projects Dashboard</h1>

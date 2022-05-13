@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
-import { Icon } from '@ant-design/compatible';
+import { MehOutlined } from '@ant-design/icons';
 import { Layout } from 'antd';
 
 import * as sessionActions from '../actions/sessionActions';
@@ -22,7 +22,7 @@ const SessionPasswordResetPage = ({ actions: { reset } }) => (
         <PasswordResetForm onSubmit={reset} />
         <div className="textBelowButton">
           <Link to="/session/login">
-            <Icon type="meh-o" />
+            <MehOutlined style={{ marginRight: '10px' }} />
             I do not want to rest my password
           </Link>
         </div>
