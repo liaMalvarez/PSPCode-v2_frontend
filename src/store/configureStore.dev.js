@@ -37,9 +37,8 @@ export default function configureStore(initialState) {
 
   const store = createStore(rootReducer, initialState, compose(
     applyMiddleware(...middewares),
-    window.devToolsExtension ? window.devToolsExtension() : f => f // add support for Redux dev tools
-    )
-  );
+    window.devToolsExtension ? window.devToolsExtension() : (f) => f // add support for Redux dev tools
+  ));
 
   if (module.hot) {
     // Enable Webpack hot module replacement for reducers
@@ -49,7 +48,7 @@ export default function configureStore(initialState) {
     });
   }
 
-  sessionService.initSessionService(store, {redirectPath: '/session/login', driver:'COOKIES'});
+  sessionService.initSessionService(store, { redirectPath: '/session/login', driver: 'COOKIES' });
 
   return store;
 }
