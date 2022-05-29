@@ -1,20 +1,21 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import {
+  Table,
+  Button,
+  Popover,
+} from 'antd';
+
 import {
   fetchProjects, fetchProjectsFailure, fetchProjectsSuccess,
   resetProjectsList
 } from '../../actions/projectActions';
-import {PROJECT_STATUS} from '../../constants/constants';
+import { PROJECT_STATUS } from '../../constants/constants';
 
-const Icon = require('antd/lib/icon');
-const Table = require('antd/lib/table');
-const Button = require('antd/lib/button');
 const moment = require('moment/moment');
-const Popover = require('antd/lib/popover');
 
 class ProjectList extends Component {
-
   constructor(props) {
     super(props);
     this.state = { sortedInfo: null, filteredInfo: null };
@@ -29,7 +30,7 @@ class ProjectList extends Component {
   }
 
   handleChange = (pagination, filters, sorter) => {
-    this.setState({ sortedInfo: sorter, filteredInfo: filters});
+    this.setState({ sortedInfo: sorter, filteredInfo: filters });
   };
 
   render() {
@@ -40,11 +41,16 @@ class ProjectList extends Component {
       dataIndex: 'name',
       key: 'name',
       render: (text, record, index) => {
-        const status = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status !='approved' )?'dued':record.status;
+        const status = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status != 'approved') ? 'dued' : record.status;
         return (
-          <div className={'line ' + status}>
-            <span className="projectName">{record.name}</span><br />
-            <span className="projectProcess">Process: {record.process.name}</span>
+          <div className={`line ${status}`}>
+            <span className="projectName">{record.name}</span>
+            <br />
+            <span className="projectProcess">
+              Process:
+              {' '}
+              {record.process.name}
+            </span>
           </div>
         );
       },
@@ -53,17 +59,16 @@ class ProjectList extends Component {
       dataIndex: 'assigned',
       key: 'assigned',
       sorter: (a, b) => moment.duration(moment(b.assigned).diff(moment(a.assigned))).asMilliseconds(),
-      render: (text, record, index) =>  moment(text).format('DD/MM/YYYY'),
+      render: (text, record, index) => moment(text).format('DD/MM/YYYY'),
       sortOrder: this.state.sortedInfo.columnKey === 'assigned' && this.state.sortedInfo.order,
     }, {
       title: 'DEADLINE',
       dataIndex: 'deadline',
       key: 'deadline',
       sorter: (a, b) => moment.duration(moment(b.deadline).diff(moment(a.deadline))).asMilliseconds(),
-      render: (text, record, index) => {
-        //const dued = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status !='approved' );
-        return moment(text).format('DD/MM/YYYY');
-      },
+      render: (text, record, index) =>
+        // const dued = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status !='approved' );
+        moment(text).format('DD/MM/YYYY'),
       sortOrder: this.state.sortedInfo.columnKey === 'deadline' && this.state.sortedInfo.order,
     }, {
       title: 'STATUS',
@@ -78,18 +83,21 @@ class ProjectList extends Component {
       filteredValue: this.state.filteredInfo.status,
       onFilter: (value, record) => record.status.includes(value),
       render: (text, record, index) => {
-        const status = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status !='approved' )?'dued':record.status;
-        const span = (<span><span className={'dot ' + status} /> {PROJECT_STATUS[text].name}</span>);
+        const status = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status != 'approved') ? 'dued' : record.status;
+        const span = (<span>
+          <span className={`dot ${status}`} />
+          {' '}
+          {PROJECT_STATUS[text].name}
+                      </span>);
         if (status === 'dued') {
-          return (<Popover content={"This project is dued, harry up!"}>{span}</Popover>);
-        } else {
-          return span;
+          return (<Popover content="This project is dued, harry up!">{span}</Popover>);
         }
+        return span;
       }
     }, {
       title: 'ACTION',
       key: 'action',
-      render: (text, record, index) => (<Link to={'/students/' + this.props.studentId + '/projects/' + record.key}><Button type="boton1">View Project</Button></Link>)
+      render: (text, record, index) => (<Link to={`/students/${this.props.studentId}/projects/${record.key}`}><Button type="boton1">View Project</Button></Link>)
     }];
     return (
       <Table className="projectsListTable" columns={columns} dataSource={this.props.projects} onChange={this.handleChange} loading={this.props.loading} pagination={false} />
@@ -97,30 +105,25 @@ class ProjectList extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    projects: state.projects.list.projects,
-    loading: state.projects.list.loading,
-    error: state.projects.list.error,
-  };
-};
+const mapStateToProps = (state) => ({
+  projects: state.projects.list.projects,
+  loading: state.projects.list.loading,
+  error: state.projects.list.error,
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    fetchProjects: (userid) => {
-      dispatch(fetchProjects(userid)).payload.then((result) => {
-        if (true) {
-          dispatch(fetchProjectsSuccess(result));
-        } else {
-          dispatch(fetchProjectsFailure(result.error));
-        }
-
-      });
-    },
-    reset: () => {
-      dispatch(resetProjectsList());
-    }
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  fetchProjects: (userid) => {
+    dispatch(fetchProjects(userid)).payload.then((result) => {
+      if (true) {
+        dispatch(fetchProjectsSuccess(result));
+      } else {
+        dispatch(fetchProjectsFailure(result.error));
+      }
+    });
+  },
+  reset: () => {
+    dispatch(resetProjectsList());
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectList);

@@ -1,13 +1,10 @@
 import React from 'react';
-
-const Layout = require('antd/lib/layout');
+import { Layout } from 'antd';
 
 const { Footer } = Layout;
 
-const CustomFooter = () => {
-  return (
-    <Footer />
-  );
-}
+const CustomFooter = () => (
+  <Footer />
+);
 
 export default CustomFooter;

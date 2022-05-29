@@ -76,14 +76,53 @@ export default {
   ],
   module: {
     rules: [
-      { test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel-loader' },
-      { test: /\.eot(\?v=\d+.\d+.\d+)?$/, loader: 'url-loader?name=[name].[ext]' },
-      { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff&name=[name].[ext]' },
-      { test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/, loader: 'url-loader?limit=10000&mimetype=application/octet-stream&name=[name].[ext]' },
-      { test: /\.svg(\?v=\d+.\d+.\d+)?$/, loader: 'url-loader?limit=10000&mimetype=image/svg+xml&name=[name].[ext]' },
-      { test: /\.(jpe?g|png|gif)$/i, loader: 'file-loader?name=[name].[ext]' },
-      { test: /\.ico$/, loader: 'file-loader?name=[name].[ext]' },
-      { test: /(\.css|\.scss)$/, loader: ExtractTextPlugin.extract('css-loader?sourceMap!postcss-loader!sass-loader?sourceMap') }
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+          babelrc: false,
+          presets: [['@babel/preset-env', { modules: false }], '@babel/preset-react'],
+          plugins: ['react-hot-loader/babel'],
+        }
+      },
+      { test: /\.eot(\?v=\d+.\d+.\d+)?$/, loader: 'file-loader' },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: 'application/font-woff'
+        }
+      },
+      {
+        test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: 'application/octet-stream'
+        }
+      },
+      {
+        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: 'image/svg+xml'
+        }
+      },
+      {
+        test: /\.(jpe?g|png|gif|ico)$/i,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]'
+        }
+      },
+      {
+        test: /(\.css|\.scss)$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      }
     ]
   }
 };

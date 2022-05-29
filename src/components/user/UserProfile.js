@@ -3,18 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { sessionService } from 'redux-react-session';
+import {
+  message,
+  Spin,
+  Form,
+  Select,
+  Row,
+  Col,
+  Input,
+  Button,
+} from 'antd';
+
 import InputTooltip from '../common/InputTooltip';
 import { ROLES } from '../../constants/constants';
 import { updateUser, updateUserSuccess, updateUserFailure } from '../../actions/userActions';
-
-const Spin = require('antd/lib/spin');
-const Button = require('antd/lib/button');
-const message = require('antd/lib/message');
-const Row = require('antd/lib/row');
-const Col = require('antd/lib/col');
-const Input = require('antd/lib/input');
-const Select = require('antd/lib/select');
-const Form = require('antd/lib/form');
 
 require('antd/dist/antd.css');
 
@@ -48,7 +50,6 @@ const UserProfile = ({
   const [sessionState, setSessionState] = useState({ token: '', uid: '', client: '' });
   const [savingMessage, setSavingMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
 
   useEffect(() => {
     sessionService.loadSession()

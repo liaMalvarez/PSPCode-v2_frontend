@@ -1,18 +1,20 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import {
+  Popover,
+  Modal,
+  Button,
+  Table,
+} from 'antd';
+import { InfoCircleOutlined, EditOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons';
+
 import {
   deleteDefectOnProjectVersionPhase, deleteDefectOnProjectVersionPhaseFailure, deleteDefectOnProjectVersionPhaseSuccess,
 } from '../../../actions/projectActions';
 
-const Button = require('antd/lib/button');
-const Icon = require('antd/lib/icon');
-const Table = require('antd/lib/table');
-const Modal = require('antd/lib/modal');
-const Popover = require('antd/lib/popover');
 const moment = require('moment/moment');
 
 class DefectsList extends Component {
-
   constructor(props) {
     super(props);
     this.state = { sortedInfo: null, filteredInfo: null };
@@ -22,11 +24,11 @@ class DefectsList extends Component {
   }
 
   componentDidMount() {
-    //this.props.fetchProjects();
+    // this.props.fetchProjects();
   }
 
   handleChange = (pagination, filters, sorter) => {
-    this.setState({ sortedInfo: sorter, filteredInfo: filters});
+    this.setState({ sortedInfo: sorter, filteredInfo: filters });
   };
 
   deleteDefect = (defectId) => {
@@ -38,7 +40,7 @@ class DefectsList extends Component {
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        _this.props.deleteDefect(_this.props.studentId,_this.props.projectId,_this.props.version.id,_this.props.phase.id,defectId)
+        _this.props.deleteDefect(_this.props.studentId, _this.props.projectId, _this.props.version.id, _this.props.phase.id, defectId);
       },
       onCancel() {
         console.log('jsut nothing happen');
@@ -46,9 +48,7 @@ class DefectsList extends Component {
     });
   };
 
-  descriptionPopOver = (text) => {
-    return (<span style={{maxWidth:'250px',display:'block'}}>{text}</span>);
-  };
+  descriptionPopOver = (text) => (<span style={{ maxWidth: '250px', display: 'block' }}>{text}</span>);
 
   render() {
     this.state.sortedInfo = this.state.sortedInfo || {};
@@ -60,21 +60,19 @@ class DefectsList extends Component {
       sorter: (a, b) => a.id - b.id,
       render: (text, record, index) => text,
       sortOrder: this.state.sortedInfo.columnKey === 'id' && this.state.sortedInfo.order,
-    },{
+    }, {
       title: 'DISCOVERED TIME',
       dataIndex: 'discovered_time',
       key: 'discovered_time',
       sorter: (a, b) => new Date(a.discovered_time).getTime() - new Date(b.discovered_time).getTime(),
-      render: (text, record, index) => {
-        return moment(text).format('DD/MM/YYYY HH:mm:ss');
-        } ,
+      render: (text, record, index) => moment(text).format('DD/MM/YYYY HH:mm:ss'),
       sortOrder: this.state.sortedInfo.columnKey === 'discovered_time' && this.state.sortedInfo.order,
     }, {
       title: 'PHASE INJECTED',
       dataIndex: 'phase_injected',
       key: 'phase_injected',
       sorter: (a, b) => a.phase_injected.psp_phase.id - b.phase_injected.psp_phase.id,
-      render: (text, record, index) =>  text.psp_phase.name,
+      render: (text, record, index) => text.psp_phase.name,
       sortOrder: this.state.sortedInfo.columnKey === 'phase_injected' && this.state.sortedInfo.order,
     }, {
       title: 'TYPE',
@@ -97,10 +95,10 @@ class DefectsList extends Component {
       render: (text, record, index) => {
         let r = '-';
         if (text) {
-          //const defect = this.props.defects.find(o => o.id === text);
-          //if (defect) {
-            //r = defect.id;
-          //}
+          // const defect = this.props.defects.find(o => o.id === text);
+          // if (defect) {
+          // r = defect.id;
+          // }
           r = text;
         }
         return r;
@@ -115,7 +113,7 @@ class DefectsList extends Component {
         }
         return (
           <Popover content={this.descriptionPopOver(text)}>
-            <span><Icon type="info-circle-o" /></span>
+            <span><InfoCircleOutlined /></span>
           </Popover>
         );
       }
@@ -124,8 +122,9 @@ class DefectsList extends Component {
       key: 'action',
       render: (text, record, index) => (
         <span>
-          <Button onClick={()=> this.props.onEdit(record)} icon="edit" disabled={!this.props.canEdit} />&nbsp;
-          <Button onClick={()=> this.deleteDefect(record.id)} icon="delete" disabled={!this.props.canEdit} />
+          <Button onClick={() => this.props.onEdit(record)} icon={<EditOutlined />} disabled={!this.props.canEdit} />
+&nbsp;
+          <Button onClick={() => this.deleteDefect(record.id)} icon={<CloseOutlined />} disabled={!this.props.canEdit} />
         </span>)
     }];
     return (
@@ -134,28 +133,24 @@ class DefectsList extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    loading: state.projects.project_version_defects_loading,
-    deleting: state.projects.project_version_phase_defect_deleting,
-    creating: state.projects.project_version_phase_defect_creating,
-    editing: state.projects.project_version_phase_defect_editing
-  };
-};
+const mapStateToProps = (state) => ({
+  loading: state.projects.project_version_defects_loading,
+  deleting: state.projects.project_version_phase_defect_deleting,
+  creating: state.projects.project_version_phase_defect_creating,
+  editing: state.projects.project_version_phase_defect_editing
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
+const mapDispatchToProps = (dispatch) => ({
 
-    deleteDefect: (userid,projectid,versionid,phaseid,defectid) => {
-      dispatch(deleteDefectOnProjectVersionPhase(userid,projectid,versionid,phaseid,defectid)).payload.then((result) => {
-        if (true) {
-          dispatch(deleteDefectOnProjectVersionPhaseSuccess(result));
-        } else {
-          dispatch(deleteDefectOnProjectVersionPhaseFailure(result.error));
-        }
-      });
-    }
-  };
-};
+  deleteDefect: (userid, projectid, versionid, phaseid, defectid) => {
+    dispatch(deleteDefectOnProjectVersionPhase(userid, projectid, versionid, phaseid, defectid)).payload.then((result) => {
+      if (true) {
+        dispatch(deleteDefectOnProjectVersionPhaseSuccess(result));
+      } else {
+        dispatch(deleteDefectOnProjectVersionPhaseFailure(result.error));
+      }
+    });
+  }
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(DefectsList);

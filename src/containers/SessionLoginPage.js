@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
+import { Layout } from 'antd';
+import { FrownOutlined } from '@ant-design/icons';
 
 import * as sessionActions from '../actions/sessionActions';
 import LoginForm from '../components/session/LoginForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
 require('antd/dist/antd.css');
 
 const { Content } = Layout;
@@ -22,7 +22,7 @@ const UserLoginPage = ({ actions: { login } }) => (
         <LoginForm onSubmit={login} />
         <div className="textBelowButton">
           <Link to="/session/password/forgot">
-            <Icon type="frown-o" />
+            <FrownOutlined style={{ marginRight: '10px' }} />
             I forgot my password
           </Link>
         </div>

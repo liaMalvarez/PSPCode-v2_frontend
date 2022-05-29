@@ -5,9 +5,12 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { Route, Routes, HashRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
+import { ConfigProvider } from 'antd';
+import { createHashHistory } from 'history';
 import enUS from 'antd/lib/locale-provider/en_US';
 
 import configureStore from './store/configureStore';
+import routes from './constants/routesPaths';
 
 import ProjectListPage from './containers/ProjectsListPage';
 import ProjectDetailsPage from './containers/ProjectDetailsPage';
@@ -21,36 +24,36 @@ import HomePage from './containers/HomePage';
 
 import './styles/styles.scss';
 
-const LocaleProvider = require('antd/lib/locale-provider');
-
 const store = configureStore();
 
+const history = createHashHistory();
 render(
-  <HashRouter>
-    <LocaleProvider locale={enUS}>
+  <HashRouter history={history} location={history.location} navigator={history}>
+    <ConfigProvider locale={enUS}>
       <AppContainer>
         <Provider store={store}>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path={routes.index} element={<HomePage />}>
+              {/* Students */}
+              <Route path={routes.studentReturnProject} element={<UserDetailsPage />} />
+              <Route path={routes.studentProjectDetailsTab} element={<ProjectDetailsPage />} />
+              <Route path={routes.studentProjectDetails} element={<ProjectDetailsPage />} />
+              <Route path={routes.studentProjectsList} element={<ProjectListPage />} />
 
-            {/* Students */}
-            <Route path="/users/:iduser(/returntoproject/:returntoprojectid)" element={<UserDetailsPage />} />
-            <Route path="/students/:idstudent/projects" element={<ProjectListPage />} />
-            <Route path="/students/:idstudent/projects/:idproject(/:tab)" element={<ProjectDetailsPage />} />
+              {/* Professors */}
+              <Route path={routes.professorProjectDetails} element={<DashboardStudentsPage />} />
+              <Route path={routes.professorProjectsList} element={<DashboardProjectsPage />} />
+              <Route path={routes.professorStudentsList} element={<DashboardStudentsPage />} />
 
-            {/* Professors */}
-            <Route path="/professor/dashboard/projects" element={<DashboardProjectsPage />} />
-            <Route path="/professor/dashboard/projects(/:idproject)" element={<DashboardStudentsPage />} />
-            <Route path="/professor/dashboard/students" element={<DashboardStudentsPage />} />
-
-            {/* Session */}
-            <Route path="/session/login" element={<SessionLoginPage />} />
-            <Route path="/session/password/forgot" element={<SessionPasswordForgotPage />} />
-            <Route path="/session/password/reset" element={<SessionPasswordResetPage />} />
+              {/* Session */}
+              <Route path={routes.login} element={<SessionLoginPage />} />
+              <Route path={routes.passwordForgot} element={<SessionPasswordForgotPage />} />
+              <Route path={routes.passwordReset} element={<SessionPasswordResetPage />} />
+            </Route>
           </Routes>
         </Provider>
       </AppContainer>
-    </LocaleProvider>
+    </ConfigProvider>
   </HashRouter>,
   document.getElementById('app')
 );
