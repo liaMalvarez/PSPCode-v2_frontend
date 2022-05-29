@@ -1,19 +1,14 @@
 {
   "presets": [
     [
-      "env", {
+      "@babel/preset-env", {
       "targets": {}
     }
     ],
-    "react",
-    "stage-1"
+    "@babel/preset-react"
   ],
-  "env": {
-    "production": {
-      "plugins": [
-        "transform-react-constant-elements",
-        "transform-react-remove-prop-types"
-      ]
-    }
-  }
+  "plugins": [
+    "@babel/plugin-transform-react-constant-elements",
+    "transform-react-remove-prop-types"
+  ]
 }

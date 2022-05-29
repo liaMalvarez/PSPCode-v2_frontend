@@ -1,67 +1,62 @@
-import React, { Component, PropTypes } from 'react';
-import {Link, hashHistory} from 'react-router';
+import React, { useEffect, useState } from 'react';
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+  matchPath
+} from 'react-router-dom';
 import { connect } from 'react-redux';
-import CustomHeader from '../components/layout/CustomHeader';
-import CustomFooter from '../components/layout/CustomFooter';
-import {logout} from "../actions/sessionActions";
 
-
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
-const Sider = require('antd/lib/layout/Sider');
-
-const { Content } = Layout;
+import routes from '../constants/routesPaths';
 
 require('antd/dist/antd.css');
 
+const HomePage = ({ session }) => {
+  const { pathname } = useLocation();
 
+  const [hasUpdated, setHasUpdated] = useState(false);
 
-class HomePage extends Component {
+  const allowedRoutesArray = Object.values(routes);
+  allowedRoutesArray.shift();
 
-  constructor(props) {
-    super(props);
-  }
-  componentDidMount() {
-    this.redirectToPage();
-  }
-  redirectToPage() {
-    if(!this.props.session.authenticated || !this.props.session.user.id) {
-      hashHistory.push('/session/login');
-    } else if(this.props.session.user.role === 'professor') {
-      hashHistory.push('/professor/dashboard/projects');
-    } else {
-      hashHistory.push('/students/' + this.props.session.user.id + '/projects');
-    }
-  }
+  const allowedRoute = allowedRoutesArray
+    .some((route) => matchPath(route, pathname));
 
-  componentWillReceiveProps(nextProps) {
-    if(!nextProps.session.authenticated || !nextProps.session.user.id ) {
-      hashHistory.push('/session/login');
-    } else {
-      this.redirectToPage();
-    }
-  }
+  useEffect(() => {
+    setHasUpdated(true);
+  }, [session]);
 
-  render() {
+  if (!session.authenticated && hasUpdated) {
     return (
-      <div>Welcome.
-        <a onClick={logout}>Logout</a>
-      </div>
+      <Navigate to="session/login" />
     );
   }
-};
 
-const mapStateToProps = (state, ownState) => {
-  console.log(ownState.params);
-  return {
-    session: state.session
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
+  if ((!session.authenticated && !hasUpdated) || !Object.keys(session.user).length) {
+    return (
+      <div />
+    );
   }
+
+  if (pathname === '/' || pathname === '/session/login' || !allowedRoute) {
+    return (
+      <Navigate to={session.user.role === 'professor'
+        ? '/professor/dashboard/projects'
+        : `students/${session.user.id}/projects`}
+      />
+    );
+  }
+
+  return (
+    <Outlet />
+  );
 };
+
+const mapStateToProps = (state) => ({
+  session: state.session,
+});
+
+const mapDispatchToProps = () => ({
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

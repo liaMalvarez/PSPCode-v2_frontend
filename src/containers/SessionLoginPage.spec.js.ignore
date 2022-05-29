@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import nock from 'nock';
 import { Field } from 'redux-form';
-import { browserHistory } from 'react-router';
+import { browserHistory } from 'react-router-dom';
 import { sessionService } from 'redux-react-session';
 import configureStore from '../store/configureStore';
 import LoginPage from './SessionLoginPage';

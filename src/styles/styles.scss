@@ -11,7 +11,7 @@ $color_background: #f9f9f9;
 $color_professor_sider: #0c4156;
 
 $color_1: #0dc0bb;
-$color_1_hover: #0daea9;
+$color_1_hover: #0F9692;
 
 
 /*****************************/
@@ -22,7 +22,11 @@ $color_1_hover: #0daea9;
   display: flex;
   justify-content: center;
 }
-
+.ant-avatar{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .displayNone {
   display: none;
 }
@@ -50,6 +54,12 @@ b {
 }
 form .ant-input-number {
   margin: 0;
+}
+.ant-form-item-control-input-content {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
 }
 
 
@@ -221,7 +231,7 @@ form .ant-input-number {
       height: 50px;
       line-height: 50px;
       padding: 0 40px;
-
+      margin-bottom: 15px;
       .logoBar {
         display: inline;
         float: left;
@@ -231,7 +241,10 @@ form .ant-input-number {
       }
 
       .notificationBar {
-        display: inline;
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        align-items: center;
         float:right;
         .ant-avatar {
           background-color: $color_1;
@@ -240,7 +253,8 @@ form .ant-input-number {
         .item {
           margin-right: 15px;
           line-height: 52px;
-          display:inline;
+          align-items: center;
+          display:flex;
           &:last-of-type {
             margin-right: 0px;
           }
@@ -284,8 +298,6 @@ form .ant-input-number {
     .ant-layout-content {
       padding: 5px 40px 0px 40px;
       background-color: $color_background;
-      .ant-breadcrumb {
-      }
       h1 {
         margin-top: 10px;
         font-size: 20px;
@@ -294,10 +306,12 @@ form .ant-input-number {
         .ant-tabs-ink-bar {
           background-color: $color_1;
         }
-        .ant-tabs-nav .ant-tabs-tab-active {
-          color: $color_1;
-          &:hover {
-            color: $color_1_hover;
+        .ant-tabs-tab-active{
+          .ant-tabs-tab-btn {
+            color: $color_1;
+            &:hover {
+              color: $color_1_hover;
+            }
           }
         }
         .ant-tabs-nav .ant-tabs-tab:hover {
@@ -464,7 +478,17 @@ form .ant-input-number {
     }
   }
   .projectDetailsPhases {
+    .dot-button{
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+    }
+    .active{
+      margin-bottom: 6px;
+    }
     .ant-steps {
+      padding-top: 2px;
       overflow-x: scroll;
       margin-bottom: 20px;
       .dot {
@@ -479,10 +503,11 @@ form .ant-input-number {
         height: 6px;
         bottom: 1px;
       }
-      .anticon {
+      .icon {
         position: relative;
         z-index: 999;
-        background-color: $color_background;
+        background-color: transparent;
+        border: none;
         top: 1px;
         left: -5px;
       }
@@ -502,7 +527,7 @@ form .ant-input-number {
         background-color: #d9d9d9;
         height:2px;
         position: relative;
-        z-index: 1;
+        z-index: 0;
       }
       .ant-steps-item-title {
         margin-top: 10px;
@@ -517,18 +542,19 @@ form .ant-input-number {
     .ant-steps-dot .ant-steps-item-tail {
       position: relative;
       top: 6px;
-      z-index: 1;
+      z-index: 0;
+      width: 103%;
       margin-left: 30px;
     }
     .ant-steps-dot .ant-steps-item-icon {
       margin-left: 24px;
     }
-    .ant-steps-item-finish > .ant-steps-item-content > .ant-steps-item-title {
+    .ant-steps-item-finish > .ant-steps-item-container >.ant-steps-item-content > .ant-steps-item-title {
       bottom: 1px;
       color: $color_header;
     }
     .ant-steps-label-vertical .ant-steps-item-content {
-      width: 60px;
+      width: 69px;
     }
     .separator {
       margin: 50px auto;
@@ -783,4 +809,15 @@ form .ant-input-number {
   .ant-form-item-control-wrapper {
     float: left;
   }
+}
+button {
+  cursor: pointer;
+}
+
+.btn {
+  cursor: pointer;
+}
+
+ol {
+padding: 0;
 }
