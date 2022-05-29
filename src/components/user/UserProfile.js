@@ -56,7 +56,7 @@ const UserProfile = ({
       .then((loadedSession) => {
         setSessionState(loadedSession);
       });
-  });
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -104,8 +104,8 @@ const UserProfile = ({
   return (
     <div className="userProfile">
       <Form onSubmit={() => {}}>
+        <h3>Personal Info</h3>
         <Row>
-          <h3>Personal Info</h3>
           <Col span={12}>
             <FormItem
               {...formItemLayout}
@@ -162,8 +162,8 @@ const UserProfile = ({
         {userState.role === 'student'
           && (
             <div>
+              <h3>Personal Background</h3>
               <Row>
-                <h3>Personal Background</h3>
                 <Col span={12}>
                   <FormItem
                     {...formItemLayout}

@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 
+import CustomProgress from '../components/common/CustomProgress';
 import routes from '../constants/routesPaths';
 
 require('antd/dist/antd.css');
@@ -27,21 +28,22 @@ const HomePage = ({ session }) => {
   }, [session]);
 
   if (!session.authenticated && hasUpdated) {
+    if (pathname === '/session/login') {
+      return <Outlet />;
+    }
     return (
       <Navigate to="session/login" />
     );
   }
 
-  if ((!session.authenticated && !hasUpdated) || !Object.keys(session.user).length) {
-    return (
-      <div />
-    );
+  if ((!session.authenticated && !hasUpdated) || (session.authenticated && !Object.keys(session.user).length)) {
+    return (<CustomProgress />);
   }
 
   if (pathname === '/' || pathname === '/session/login' || !allowedRoute) {
     return (
       <Navigate to={session.user.role === 'professor'
-        ? '/professor/dashboard/projects'
+        ? 'professor/dashboard/projects'
         : `students/${session.user.id}/projects`}
       />
     );

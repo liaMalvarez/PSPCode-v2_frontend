@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import React, { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { HomeOutlined } from '@ant-design/icons';
 import { Layout, Breadcrumb, Tabs } from 'antd';
@@ -8,9 +8,10 @@ import { Layout, Breadcrumb, Tabs } from 'antd';
 import CustomHeader from '../components/layout/CustomHeader';
 import CustomFooter from '../components/layout/CustomFooter';
 import UserProfile from '../components/user/UserProfile';
-import { fetchUserDetails, fetchUserDetailsFailure, fetchUserDetailsSuccess } from '../actions/userActions';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import CustomProgress from '../components/common/CustomProgress';
+
+import { fetchUserDetails, fetchUserDetailsSuccess } from '../actions/userActions';
 
 require('antd/dist/antd.css');
 
@@ -22,19 +23,22 @@ const UserDetailsPage = ({
   user_data,
   user_loading,
   session,
-  reset
+  fetchUserDetailsProp
 }) => {
   const { hash: location_hash, iduser: user_id, returntoprojectid } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user_data) {
       if (session && (session.user.role === 'professor' || session.user.id == user_id)) {
-        fetchUserDetails(user_id);
+        fetchUserDetailsProp(user_id);
+      } else if (session) {
+        navigate(session.user.role === 'professor'
+          ? 'professor/dashboard/projects'
+          : `students/${session.user.id}/projects`);
       }
     }
-
-    return () => { reset(); };
-  }, [user_data, session, user_id]);
+  }, [user_data, session]);
 
   if (user_loading || !user_data) {
     return (<CustomProgress />);
@@ -64,13 +68,9 @@ const UserDetailsPage = ({
               </TabPane>
             </Tabs>
           </section>
-
           <CustomFooter />
-
         </Content>
-
       </Layout>
-
     </Layout>
   );
 };
@@ -83,19 +83,11 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  fetchUserDetails: (id) => {
+  fetchUserDetailsProp: (id) => {
     dispatch(fetchUserDetails(id)).payload.then((result) => {
-      if (true) {
-        dispatch(fetchUserDetailsSuccess(result));
-      } else {
-        dispatch(fetchUserDetailsFailure(result.error));
-      }
+      dispatch(fetchUserDetailsSuccess(result));
     });
   },
-  reset: () => {
-    // dispatch(resetUserDetails());
-    // dispatch(resetUserDetailsVersion());
-  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserDetailsPage);
