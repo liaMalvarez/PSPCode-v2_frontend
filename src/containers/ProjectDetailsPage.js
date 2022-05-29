@@ -599,12 +599,8 @@ const ProjectDetailsPage = ({
             </Timeline>
           </div>
           {printStatusButtons()}
-          <div>
-            <button type="button" onClick={adminExportData}>.</button>
-          </div>
         </Sider>
       </Layout>
-
     </Layout>
   );
 };

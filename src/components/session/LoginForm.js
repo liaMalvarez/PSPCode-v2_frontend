@@ -18,8 +18,13 @@ export const LoginForm = (props) => {
 
   const onLogin = async (event) => {
     event.preventDefault();
-    handleSubmit();
-    navigate('/');
+    const user = await handleSubmit();
+
+    if (user.role === 'professor') {
+      navigate('/professor/dashboard/projects');
+    } else if (user.role === 'student') {
+      navigate(`/students/${user.id}/projects`);
+    }
   };
 
   return (
@@ -47,7 +52,14 @@ export const LoginForm = (props) => {
         />
       </div>
       <div className="hCenter">
-        <Button htmlType="submit" loading={submitting} onClick={onLogin} type="boton1">{submitting ? ' Loading...' : 'Log In'}</Button>
+        <Button
+          htmlType="submit"
+          loading={submitting}
+          onClick={onLogin}
+          type="boton1"
+        >
+          {submitting ? ' Loading...' : 'Log In'}
+        </Button>
       </div>
     </form>
   );

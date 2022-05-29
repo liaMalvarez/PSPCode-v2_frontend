@@ -13,7 +13,7 @@ import {
   Row,
   Col
 } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleTwoTone, PlusCircleFilled } from '@ant-design/icons';
 
 import DefectsList from './defect/DefectsList';
 import DefectForm from './defect/DefectForm';
@@ -133,35 +133,34 @@ class ProjectDetailsPhases extends Component {
     if (status === 'finish' && this.state.canEdit) {
       return (
         <Popover content="You are working on this phase.">
-          <button type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
+          <button className="dot-button" type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
             <span className="dot" />
           </button>
         </Popover>);
     } if (status === 'finish' && !this.state.canEdit) {
       return (
         <Popover content="You are reviewing this phase.">
-          <button type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
+          <button className="dot-button" type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
             <span className="dot cantedit" />
           </button>
         </Popover>);
     } if (status === 'process') {
       return (
         <Popover content="Click to review this phase.">
-          <button type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
+          <button className="dot-button" type="button" onClick={() => this.selectPhase(this.props.version.phases[index])}>
             <span className="dot" />
           </button>
         </Popover>);
     } if (status === 'wait' && this.state.canEdit) {
       return (
         <Popover content="Click to start a new phase.">
-          <button type="button" onClick={this.createPhase}>
-            <PlusCircleOutlined />
+          <button className="dot-button" type="button" onClick={this.createPhase}>
+            <PlusCircleTwoTone twoToneColor="#0dc0bb"/>
           </button>
         </Popover>);
     } if (status === 'wait' && !this.state.canEdit) {
       return (
-        <PlusCircleOutlined />
-      );
+<PlusCircleTwoTone twoToneColor="#B1B1B1"/>      );
     }
   };
 
@@ -185,6 +184,7 @@ class ProjectDetailsPhases extends Component {
               <FormItem
                 {...formItemLayout}
                 label="Plan Time"
+                style={{ display: 'flex' }}
               >
                 <InputNumber
                   min={0} value={this.state.activePhase.plan_time ? this.state.activePhase.plan_time : null}
@@ -423,7 +423,6 @@ class ProjectDetailsPhases extends Component {
                   {...formItemLayout}
                   label="Start Time"
                   className="inputDatepicker"
-
                 >
                   <DatePicker disabledDate={(date) => this.noFutureDate(date)} value={this.state.activePhase.start_time ? moment(this.state.activePhase.start_time) : null} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss" onChange={(value) => this.editPhase('start_time', value)} disabled={(!this.state.canEdit)} />
                   <InputTooltip input="project_details_phase_form_start_time" />

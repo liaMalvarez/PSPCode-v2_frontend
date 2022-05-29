@@ -1,11 +1,11 @@
 import { SubmissionError } from 'redux-form';
-import { useNavigate } from 'react-router-dom';
 import { sessionService } from 'redux-react-session';
 import sessionApi from '../api/sessionApi';
 import { removeAllCokies } from '../utils/functions';
 
 export const login = (user) => () => sessionApi.login({ user }).then((user) => {
   sessionService.saveUser(user);
+  return user;
 }).catch((err) => {
   throw new SubmissionError({
     _error: err.errors[0]
@@ -13,20 +13,16 @@ export const login = (user) => () => sessionApi.login({ user }).then((user) => {
 });
 
 export const logout = () => () => sessionApi.logout().then(() => {
-  const navigate = useNavigate();
   sessionService.deleteSession();
   sessionService.deleteUser();
   removeAllCokies();
   localStorage.clear();
-  navigate('/session/login');
 }).catch((err) => {
-  const navigate = useNavigate();
   removeAllCokies();
   sessionService.deleteSession();
   sessionService.deleteUser();
   removeAllCokies();
   localStorage.clear();
-  navigate('/session/login');
   throw (err);
 });
 

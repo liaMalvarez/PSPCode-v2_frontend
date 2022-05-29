@@ -1,6 +1,5 @@
 import fetch from 'isomorphic-fetch';
 import { sessionService } from 'redux-react-session';
-import { useNavigate } from 'react-router-dom';
 import { routes } from '../constants/routesPaths';
 
 const saveSessionHeaders = (headers) => {
@@ -30,7 +29,6 @@ const handleErrors = (response) => new Promise((resolve, reject) => {
     .catch(() => {
       if (response.status === 401 && !response.url.includes('users/password')) {
         sessionService.deleteSession();
-        useNavigate().replace(routes.login);
       }
     });
 
