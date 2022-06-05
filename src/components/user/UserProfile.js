@@ -22,23 +22,13 @@ require('antd/dist/antd.css');
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 12 },
-  },
-};
 
 const UserProfile = ({
   session,
   error,
   updated,
   returnToProjectId,
-  updateUser,
+  updateUserProp,
   user,
   loading
 }) => {
@@ -48,8 +38,8 @@ const UserProfile = ({
   const [canEditProfessor, setCanEditProfessor] = useState(true);
   const [userState, setUserState] = useState(user);
   const [sessionState, setSessionState] = useState({ token: '', uid: '', client: '' });
-  const [savingMessage, setSavingMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [isSavingInfo, setIsSavingInfo] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
 
   useEffect(() => {
     sessionService.loadSession()
@@ -60,41 +50,45 @@ const UserProfile = ({
 
   useEffect(() => {
     if (error) {
-      if (savingMessage) {
-        setSavingMessage('');
+      if (isSavingInfo) {
+        message.destroy();
+        setIsSavingInfo(false);
       }
-      if (errorMessage) {
-        setErrorMessage('');
-      }
-      setErrorMessage(message.error(error.msg, 7));
-    }
 
-    if (savingMessage && updated) {
-      setSavingMessage('');
+      message.error(error.msg, 7);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (isSavingInfo && updated) {
+      message.destroy();
+      setIsSavingInfo(false);
 
       if (session.user.role === 'student' && user.id === session.user.id) {
         sessionService.loadUser().then((currentUser) => {
           sessionService.saveUser({ ...currentUser, ...user });
         }).then(() => {
           if (returnToProjectId) {
-            navigate(`/students/${user.id}/projects/${returnToProjectId}`);
+            navigate(`students/${user.id}/projects/${returnToProjectId}`);
+          } else {
+            message.success('Correctly Saved', 2);
           }
         });
       }
     }
-  }, [error, updated, user, session]);
+  }, [updated, isSavingInfo, user, session]);
 
   const update = (attr, value) => {
     setUserState({ ...userState, [attr]: value });
   };
 
   const save = () => {
-    if (savingMessage) {
+    if (isSavingInfo) {
       return;
     }
-
-    setSavingMessage(message.loading('Saving user details', 0));
-    updateUser(userState);
+    message.loading('Saving user details', 1);
+    setIsSavingInfo(true);
+    updateUserProp(userState);
   };
 
   if (loading || !user) {
@@ -108,21 +102,18 @@ const UserProfile = ({
         <Row>
           <Col span={12}>
             <FormItem
-              {...formItemLayout}
               label="First Name"
             >
               <Input onChange={(e) => update('first_name', e.target.value)} value={userState.first_name} disabled={(!(canEditProfessor || canEditStudent))} />
               <InputTooltip input="user_profile_form_first_name" />
             </FormItem>
             <FormItem
-              {...formItemLayout}
               label="Last Name"
             >
               <Input onChange={(e) => update('last_name', e.target.value)} value={userState.last_name} disabled={(!(canEditProfessor || canEditStudent))} />
               <InputTooltip input="user_profile_form_last_name" />
             </FormItem>
             <FormItem
-              {...formItemLayout}
               label="Email"
             >
               <Input onChange={(e) => update('email', e.target.value)} value={userState.email} disabled={(!(canEditProfessor || canEditStudent))} />
@@ -131,14 +122,12 @@ const UserProfile = ({
           </Col>
           <Col span={12}>
             <FormItem
-              {...formItemLayout}
               label="Member Since"
             >
               <Input value={moment(userState.member_since).format('DD/MM/YYYY')} disabled />
               <InputTooltip input="user_profile_form_member_since" />
             </FormItem>
             <FormItem
-              {...formItemLayout}
               label="Role"
             >
               <Select onChange={(value) => update('role', value)} value={userState.role} disabled>
@@ -149,7 +138,6 @@ const UserProfile = ({
             {userState.role === 'student'
               && (
                 <FormItem
-                  {...formItemLayout}
                   label="Course"
                 >
                   <Input value={userState.course.name} disabled />
@@ -166,14 +154,12 @@ const UserProfile = ({
               <Row>
                 <Col span={12}>
                   <FormItem
-                    {...formItemLayout}
                     label="Programming Language"
                   >
                     <Input onChange={(e) => update('programming_language', e.target.value)} value={userState.programming_language} disabled={(!(canEditStudent))} />
                     <InputTooltip input="user_profile_form_programming_language" />
                   </FormItem>
                   <FormItem
-                    {...formItemLayout}
                     label="Programming Level"
                   >
                     <Select onChange={(e) => update('programming_experience', e)} value={userState.programming_experience} disabled={(!(canEditStudent))}>
@@ -185,7 +171,6 @@ const UserProfile = ({
                     <InputTooltip input="user_profile_form_programming_experience" />
                   </FormItem>
                   <FormItem
-                    {...formItemLayout}
                     label="Have a Job?"
                   >
 
@@ -198,21 +183,18 @@ const UserProfile = ({
                 </Col>
                 <Col span={12}>
                   <FormItem
-                    {...formItemLayout}
                     label="Job Position"
                   >
                     <Input onChange={(e) => update('job_role', e.target.value)} value={userState.job_role} disabled={(!(canEditStudent))} />
                     <InputTooltip input="user_profile_form_job_role" />
                   </FormItem>
                   <FormItem
-                    {...formItemLayout}
                     label="Academic Experience"
                   >
                     <Input onChange={(e) => update('academic_experience', e.target.value)} value={userState.academic_experience} disabled={(!(canEditStudent))} />
                     <InputTooltip input="user_profile_form_academic_experience" />
                   </FormItem>
                   <FormItem
-                    {...formItemLayout}
                     label="Collage Progress"
                   >
                     <Input onChange={(e) => update('collegue_career_progress', e.target.value)} value={userState.collegue_career_progress} disabled={(!(canEditStudent))} />
@@ -242,17 +224,13 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  updateUser: (user) => {
+  updateUserProp: (user) => {
     dispatch(updateUser(user)).payload.then((result) => {
       dispatch(updateUserSuccess(result));
     }).catch((x) => {
       dispatch(updateUserFailure(x));
     });
   },
-  reset: () => {
-    // dispatch(resetUserDetails());
-    // dispatch(resetUserDetailsVersion());
-  }
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserProfile);

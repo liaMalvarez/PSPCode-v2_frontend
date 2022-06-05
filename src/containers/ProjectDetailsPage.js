@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { 
-  CloudUploadOutlined, 
-  CheckCircleOutlined, 
+import {
+  CloudUploadOutlined,
+  CheckCircleOutlined,
   CloseCircleOutlined,
   CheckOutlined,
   HomeOutlined,
@@ -11,7 +11,7 @@ import {
   LoadingOutlined,
   UploadOutlined,
   RightOutlined
- } from '@ant-design/icons';
+} from '@ant-design/icons';
 import {
   Layout,
   Breadcrumb,
@@ -37,13 +37,13 @@ import TagInstructions from '../components/tag/TagInstructions';
 import projectApi from '../api/projectApi';
 import { PROJECT_STATUS, TEXTS } from '../constants/constants';
 import {
-  fetchProjectDetails, fetchProjectDetailsFailure, fetchProjectDetailsSuccess, fetchProjectDetailsVersion,
-  fetchProjectDetailsVersionSuccess, fetchProjectDetailsVersionFailure, fetchProjectDetailsVersionSummary,
-  fetchProjectDetailsVersionSummarySuccess, fetchProjectDetailsVersionSummaryFailure, submitProjectVersion,
-  submitProjectVersionFailure, submitProjectVersionSuccess, professorProjectApprove,
-  professorProjectApproveFailure, professorProjectApproveSuccess, professorProjectReject, professorProjectRejectFailure,
-  professorProjectRejectSuccess, startProject, startProjectSuccess, startProjectFailure,
-  continueProject, continueProjectSuccess, continueProjectFailure, resetProjectDetails, resetProjectDetailsVersion
+  fetchProjectDetails, fetchProjectDetailsSuccess, fetchProjectDetailsVersion,
+  fetchProjectDetailsVersionSuccess, fetchProjectDetailsVersionSummary,
+  fetchProjectDetailsVersionSummarySuccess, submitProjectVersion,
+  submitProjectVersionSuccess, professorProjectApprove,
+  professorProjectApproveSuccess, professorProjectReject,
+  professorProjectRejectSuccess, startProject, startProjectSuccess,
+  continueProject, continueProjectSuccess, resetProjectDetails, resetProjectDetailsVersion
 } from '../actions/projectActions';
 import ProjectDetailsSummary from '../components/project/ProjectDetailsSummary';
 import ProjectDetailsPhases from '../components/project/ProjectDetailsPhases';
@@ -53,7 +53,7 @@ import WorkingTime from '../components/project/detail/WorkingTime';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import SpanData from '../components/common/SpanData';
 import CustomProgress from '../components/common/CustomProgress';
-import { pspDataFetch, pspDataFetchFailure, pspDataFetchSuccess } from '../actions/utilsActions';
+import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
 require('antd/dist/antd.css');
 
@@ -69,7 +69,7 @@ const ProjectDetailsPage = ({
   project_data,
   session,
   project_loading,
-  startProject: startProjectProp,
+  startProjectProp,
   fetchProjectDetailsProp,
   fetchProjectDetailsVersionProp,
   approveProject,
@@ -77,7 +77,7 @@ const ProjectDetailsPage = ({
   version_data,
   submitting,
   submitProjectVersionProp,
-  continueProject: continueProjectProp,
+  continueProjectProp,
   version_error,
   version_loading,
   finished_rejecting,
@@ -96,12 +96,10 @@ const ProjectDetailsPage = ({
   const [modalUpdateLOCs, setModalUpdateLOCs] = useState({ total: '', new_reusable: '' });
   const [redeliver, setRedeliver] = useState(false);
   const [correctProject, setCorrectProject] = useState({});
-  const [messageRejecting, setMessageRejecting] = useState('');
-  const [messageStarting, setMessageStarting] = useState('');
-  const [messageContinueing, setMessageContinueing] = useState('');
-  const [messageApproving, setMessageApproving] = useState('');
-  const [messageUpdatingLocs, setMessageUpdatingLocs] = useState('');
-  const [messageValidating, setMessageValidating] = useState('');
+  const [messageRejecting, setMessageRejecting] = useState(false);
+  const [messageStarting, setMessageStarting] = useState(false);
+  const [messageContinueing, setMessageContinueing] = useState(false);
+  const [messageApproving, setMessageApproving] = useState(false);
   const [inputModalUpdateLOCsAdded, setInputModalUpdateLOCsAdded] = useState(null);
   const [inputModalUpdateLOCsAM, setInputModalUpdateLOCsAM] = useState(null);
 
@@ -158,16 +156,20 @@ const ProjectDetailsPage = ({
     }
 
     if (messageRejecting && finished_rejecting) {
-      setMessageRejecting('');
+      message.loading('Rejecting this Project', 4);
+      setMessageRejecting(false);
     }
     if (messageStarting && finished_starting) {
-      setMessageStarting('');
+      message.loading('Getting all ready, wait a second', 3);
+      setMessageStarting(false);
     }
     if (messageContinueing && finished_continueing) {
-      setMessageContinueing('');
+      message.loading('Generating a new version, wait a second', 3);
+      setMessageContinueing(false);
     }
     if (messageApproving && finished_approving) {
-      setMessageApproving('');
+      message.loading('Approving this Project', 3);
+      setMessageApproving(false);
     }
   }, [
     project_id,
@@ -231,10 +233,10 @@ const ProjectDetailsPage = ({
           return true;
         }
         if (verdict === 'approved') {
-          setMessageApproving(message.loading('Approving this Project', 0));
+          setMessageApproving(true);
           approveProject(project_data.course.id, project_data.course_project_instance.id, project_data.id, correctProject);
         } else {
-          setMessageRejecting(message.loading('Rejecting this Project', 0));
+          setMessageRejecting(true);
           rejectProject(project_data.course.id, project_data.course_project_instance.id, project_data.id, correctProject);
         }
       },
@@ -332,10 +334,9 @@ const ProjectDetailsPage = ({
     if (submitting) {
       return;
     }
-    setMessageValidating(message.loading('Validating, wait a second', 0));
 
     projectApi.first_project(studentId).then((data) => {
-      setMessageValidating('');
+      message.loading('Validating, wait a second', 4);
 
       const need_to_update_locs = data.phase_instance && (data.phase_instance.total == null || data.phase_instance.total == 0);
       if (!need_to_update_locs) {
@@ -366,11 +367,10 @@ const ProjectDetailsPage = ({
               message.warning('You must fill all the required inputs (marked with *)', 7);
               return true;
             }
-            setMessageUpdatingLocs(message.loading('Updating, wait a second', 0));
             projectApi.assigned_project_version_phases_update(studentId, data.id, data.project_delivery_id, data.phase_instance.id, {
               modified: 0, deleted: 0, reused: 0, new_reusable: modalUpdateLOCs.new_reusable, total: modalUpdateLOCs.total
             }).then(() => {
-              setMessageUpdatingLocs('');
+              message.loading('Updating, wait a second', 4);
               submitProject();
             });
           },
@@ -389,8 +389,10 @@ const ProjectDetailsPage = ({
     const background_ok = required_attrs.reduce((x, y) => x && session.user[y] && session.user[y].length > 0, true);
 
     if (background_ok) {
-      messageStarting = message.loading('Getting all ready, wait a second', 0);
+      setMessageStarting(true);
       startProjectProp(studentId, project_id);
+      message.destroy();
+      console.log('SALE');
     } else {
       Modal.confirm({
         title: 'Action Required',
@@ -408,7 +410,7 @@ const ProjectDetailsPage = ({
   };
 
   const continueProject = () => {
-    messageContinueing = message.loading('Generating a new version, wait a second', 0);
+    setMessageContinueing(true);
     continueProjectProp(studentId, project_id);
     setRedeliver(true);
   };
@@ -510,26 +512,6 @@ const ProjectDetailsPage = ({
     );
   };
 
-  const adminExportData = () => {
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
-    console.log('********************************************************');
-    console.log('******************** EXPORTING DATA ********************');
-    console.log('********************************************************');
-    console.log('**** PROJECT DATA **************************************');
-    console.log(JSON.stringify(project_data));
-    console.log('********************************************************');
-    console.log(' ');
-    console.log('**** VERSION DATA **************************************');
-    console.log(JSON.stringify(version_data));
-    console.log('********************************************************');
-    console.log('********************************************************');
-    console.log(' ');
-    console.log(' ');
-    console.log(' ');
-  };
-
   const goToTab = (key) => {
     navigate(`/students/${studentId}/projects/${project_id}/${key}`);
   };
@@ -629,83 +611,47 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchPSPData: () => {
     dispatch(pspDataFetch()).payload.then((result) => {
-      if (true) {
-        dispatch(pspDataFetchSuccess(result));
-      } else {
-        dispatch(pspDataFetchFailure(result.error));
-      }
+      dispatch(pspDataFetchSuccess(result));
     });
   },
   fetchProjectDetailsProp: (userid, projectid) => {
     dispatch(fetchProjectDetails(userid, projectid)).payload.then((result) => {
-      if (true) {
-        dispatch(fetchProjectDetailsSuccess(result));
-      } else {
-        dispatch(fetchProjectDetailsFailure(result.error));
-      }
+      dispatch(fetchProjectDetailsSuccess(result));
     });
   },
   fetchProjectDetailsVersionProp: (userid, projectid, versionid) => {
     dispatch(fetchProjectDetailsVersion(userid, projectid, versionid)).payload.then((result) => {
-      if (true) {
-        dispatch(fetchProjectDetailsVersionSuccess(result));
-      } else {
-        dispatch(fetchProjectDetailsVersionFailure(result.error));
-      }
+      dispatch(fetchProjectDetailsVersionSuccess(result));
     });
   },
   fetchProjectDetailsVersionSummaryProp: (userid, projectid, versionid) => {
     dispatch(fetchProjectDetailsVersionSummary(userid, projectid, versionid)).payload.then((result) => {
-      if (true) {
-        dispatch(fetchProjectDetailsVersionSummarySuccess(result));
-      } else {
-        dispatch(fetchProjectDetailsVersionSummaryFailure(result.error));
-      }
+      dispatch(fetchProjectDetailsVersionSummarySuccess(result));
     });
   },
   startProjectProp: (userid, projectid) => {
     dispatch(startProject(userid, projectid)).payload.then((result) => {
-      if (true) {
-        dispatch(startProjectSuccess(result));
-      } else {
-        dispatch(startProjectFailure(result.error));
-      }
+      dispatch(startProjectSuccess(result));
     });
   },
   continueProjectProp: (userid, projectid) => {
     dispatch(continueProject(userid, projectid)).payload.then((result) => {
-      if (true) {
-        dispatch(continueProjectSuccess(result));
-      } else {
-        dispatch(continueProjectFailure(result.error));
-      }
+      dispatch(continueProjectSuccess(result));
     });
   },
   submitProjectVersionProp: (userid, projectid) => {
     dispatch(submitProjectVersion(userid, projectid)).payload.then((result) => {
-      if (true) {
-        dispatch(submitProjectVersionSuccess(result));
-      } else {
-        dispatch(submitProjectVersionFailure(result.error));
-      }
+      dispatch(submitProjectVersionSuccess(result));
     });
   },
   approveProject: (courseId, projectId, assignedProjectId, data) => {
     dispatch(professorProjectApprove(courseId, projectId, assignedProjectId, data)).payload.then((result) => {
-      if (true) {
-        dispatch(professorProjectApproveSuccess(result));
-      } else {
-        dispatch(professorProjectApproveFailure(result.error));
-      }
+      dispatch(professorProjectApproveSuccess(result));
     });
   },
   rejectProject: (courseId, projectId, assignedProjectId, data) => {
     dispatch(professorProjectReject(courseId, projectId, assignedProjectId, data)).payload.then((result) => {
-      if (true) {
-        dispatch(professorProjectRejectSuccess(result));
-      } else {
-        dispatch(professorProjectRejectFailure(result.error));
-      }
+      dispatch(professorProjectRejectSuccess(result));
     });
   },
   reset: () => {
