@@ -129,7 +129,7 @@ form .ant-input-number {
     border-bottom: solid 2px $color_dos;
     transition: border 0.5s;
     padding-bottom: 5px;
-    width: calc(100% - 20px);
+    width: calc(100% - 10px);
     margin-bottom: 25px;
     border-radius: 0;
     border-left-style: none;
@@ -258,7 +258,7 @@ form .ant-input-number {
             margin-right: 0px;
           }
           .ant-badge-count {
-            top: -6px;
+            top: 5px;
             height:18px;
             border-radius: 10px;
             min-width:18px;
@@ -477,13 +477,13 @@ form .ant-input-number {
     }
   }
   .projectDetailsPhases {
-    .dot-button{
+    .dot-button {
       background: none;
       border: none;
       display: flex;
       align-items: center;
     }
-    .active{
+    .active {
       margin-bottom: 6px;
     }
     .ant-steps {
@@ -739,7 +739,10 @@ form .ant-input-number {
 
 .submission-checklist {
   span {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 3px;
   }
   .anticon {
     margin-right: 5px;
@@ -796,11 +799,20 @@ form .ant-input-number {
   padding-bottom: 40px;
 
 }
-.notificationItem .notificationDate {
-  font-size: 11px;
-  display: block;
-  margin-top: -3px;
+.notificationItem{
+  .notificationDate {
+    font-size: 11px;
+    display: block;
+    margin-top: -3px;
+  }
+  .notificationInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
 }
+
 .modalUpdateLOCs {
   .ant-form-item-label {
     float: left;
@@ -821,4 +833,14 @@ button {
 
 ol {
 padding: 0;
+}
+
+.ant-picker {
+  width: 77%;
+}
+
+.dot-button {
+  background: none;
+  border: none;
+  display: flex;
 }

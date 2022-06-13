@@ -25,7 +25,8 @@ module.exports = {
         removeComments: true,
         collapseWhitespace: true
       },
-      inject: true
+      inject: true,
+      favicon: 'src/favicon.ico'
     }),
     new Dotenv()
   ],
@@ -77,7 +78,7 @@ module.exports = {
       {
         test: /(\.css|\.scss)$/,
         use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
-      }
+      },
     ]
   }
 };
