@@ -231,7 +231,6 @@ form .ant-input-number {
       height: 50px;
       line-height: 50px;
       padding: 0 40px;
-      margin-bottom: 15px;
       .logoBar {
         display: inline;
         float: left;
@@ -296,7 +295,7 @@ form .ant-input-number {
     }
     /* CONTENT */
     .ant-layout-content {
-      padding: 5px 40px 0px 40px;
+      padding: 25px 40px 20px 40px;
       background-color: $color_background;
       h1 {
         margin-top: 10px;
@@ -704,7 +703,7 @@ form .ant-input-number {
         margin-bottom: 0;
       }
       .ant-form-item-label {
-        width: 175px;
+        width: 165px;
         text-align: left;
       }
       .ant-select, .ant-calendar-picker, .ant-input-number, .ant-input {
@@ -727,6 +726,8 @@ form .ant-input-number {
     .actions {
       width: 90%;
       text-align: right;
+      justify-content: flex-end;
+      align-items: center;
       button.ant-btn.ant-btn-boton1 {
         margin-left: 20px;
         padding-left: 20px;

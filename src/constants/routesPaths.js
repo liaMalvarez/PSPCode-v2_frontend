@@ -9,5 +9,6 @@ export default {
   studentProjectsList: 'students/:idstudent/projects',
   studentProjectDetails: 'students/:idstudent/projects/:idproject',
   studentProjectDetailsTab: 'students/:idstudent/projects/:idproject/:tab',
-  studentReturnProject: 'users/:iduser(/returntoproject/:returntoprojectid)',
+  userDetails: 'users/:iduser',
+  studentReturnProject: 'users/:iduser/returntoproject/:returntoprojectid',
 };

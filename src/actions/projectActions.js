@@ -152,7 +152,6 @@ export function fetchProjectDetails(userid, projectid) {
         projectApi.assigned_project_messages(userid, projectid),
         projectApi.assigned_project_timeline(userid, projectid),
       ]).then((responses) => {
-        console.log('fetchProjectDetails', responses);
         resolve({ ...responses[0], messages: responses[1].messages, timeline: responses[2].statuses });
       }).catch((error) => {
         reject({ error: true, msg: 'Something went wrong fetching the project', data });
@@ -630,7 +629,6 @@ export function startProject(userid, projectid) {
   return {
     type: PROJECT_ACTION_START,
     payload: new Promise((resolve, reject) => {
-      //  setTimeout(() => { resolve(MOCK_PROJECT_DETAILS_VERSION_3_1.summary);}, 3000);
       projectApi.assigned_project_start(userid, projectid).then((x) => {
         resolve(x.statuses);
       }).catch((error) => {

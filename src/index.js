@@ -35,6 +35,7 @@ render(
           <Routes>
             <Route path={routes.index} element={<HomePage />}>
               {/* Students */}
+              <Route path={routes.userDetails} element={<UserDetailsPage />} />
               <Route path={routes.studentReturnProject} element={<UserDetailsPage />} />
               <Route path={routes.studentProjectDetailsTab} element={<ProjectDetailsPage />} />
               <Route path={routes.studentProjectDetails} element={<ProjectDetailsPage />} />

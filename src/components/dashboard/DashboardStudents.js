@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
@@ -11,55 +11,79 @@ import {
 } from 'antd';
 
 import {
-  dashboardStudentsList, dashboardStudentsListFailure, dashboardStudentsListSuccess, dashboardStudentsListReset,
-  dashboardStudentsAssign, dashboardStudentsAssignFailure, dashboardStudentsAssignSuccess,
-  dashboardStudentsPoke, dashboardStudentsPokeFailure, dashboardStudentsPokeSuccess
+  dashboardStudentsList, dashboardStudentsListSuccess, dashboardStudentsListReset,
+  dashboardStudentsAssign, dashboardStudentsAssignSuccess,
+  dashboardStudentsPoke, dashboardStudentsPokeSuccess
 } from '../../actions/dashboardActions';
 
 const moment = require('moment/moment');
 
-class DashboardStudents extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { sortedInfo: null, filteredInfo: null };
-  }
+const DashboardStudents = ({
+  fetchStudents,
+  pokeStudent,
+  assignProject,
+  reset,
+  course,
+  projectId,
+  session,
+  students,
+  loading,
+  finished_poke,
+  finished_assign
+}) => {
+  const [sortedInfo, setSortedInfo] = useState(null);
+  const [filteredInfo, setFilteredInfo] = useState(null);
+  const [messagePoking, setMessagePoking] = useState('');
+  const [messageAssigning, setMessageAssigning] = useState('');
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
+  useEffect(
+    () => reset(), // on unmount
+    []
+  );
 
-  componentDidMount() {
-    if (this.props.course) {
-      this.props.fetchStudents(this.props.course.id, this.props.projectId);
+  useEffect(() => {
+    if (course && projectId) {
+      fetchStudents(course.id, projectId);
     }
-  }
+  }, [course, projectId]);
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.course && (!this.props.course || this.props.course.id != nextProps.course.id)) {
-      this.props.fetchStudents(nextProps.course.id, nextProps.projectId);
-      return;
+  useEffect(() => {
+    if (messagePoking && finished_poke) {
+      message.loading(messagePoking, 3);
+      setMessagePoking('');
     }
-    if (nextProps.projectId != this.props.projectId) {
-      this.props.fetchStudents(nextProps.course.id, nextProps.projectId);
-    }
-    if (this.message_poking && nextProps.finished_poke) {
-      this.message_poking();
-      this.message_poking = null;
-    }
-    if (this.message_assigning && nextProps.finished_assign) {
-      this.message_assigning();
-      this.message_assigning = null;
-      this.props.fetchStudents(nextProps.course.id, nextProps.projectId);
-    }
-  }
 
-  handleChange = (pagination, filters, sorter) => {
-    this.setState({ sortedInfo: sorter, filteredInfo: filters });
+    if (messageAssigning && finished_assign) {
+      message.loading(messageAssigning, 3);
+      setMessageAssigning('');
+      fetchStudents(course.id, projectId);
+    }
+  }, [finished_poke, finished_assign]);
+
+  const handleChange = (filters, sorter) => {
+    setSortedInfo(sorter);
+    setFilteredInfo(filters);
   };
 
-  projectOfRecord = (record) => {
+  const assign = (student, project) => {
+    Modal.confirm({
+      title: 'Are you sure?',
+      content: 'Are you sure you want to assign a new project to this student? This operation can\'t be undone.',
+      okText: 'Yes',
+      okType: 'primary',
+      cancelText: 'No',
+      onOk() {
+        setMessageAssigning(`Assigning ${project.name} to ${student.name}`);
+        assignProject(course.id, project.course_project_instance_id, student.id);
+      },
+      onCancel() {
+      },
+    });
+  };
+
+  const projectOfRecord = (record) => {
     let project = null;
-    if (this.props.projectId) {
+    if (projectId) {
       project = record.project;
       project.assigned_project_id = project.id;
     } else {
@@ -68,9 +92,9 @@ class DashboardStudents extends Component {
     return project;
   };
 
-  statusOfProject = (record) => {
-    let status = (this.projectOfRecord(record).status === 'assigned' || this.projectOfRecord(record).status === 'working' || this.projectOfRecord(record).status === 'need_correction') ? 'working' : this.projectOfRecord(record).status;
-    status = (status === 'working' && moment.duration(moment(this.projectOfRecord(record).deadline).diff(moment())).asMilliseconds() < 0) ? 'dued' : status;
+  const statusOfProject = (record) => {
+    let status = (projectOfRecord(record).status === 'assigned' || projectOfRecord(record).status === 'working' || projectOfRecord(record).status === 'need_correction') ? 'working' : projectOfRecord(record).status;
+    status = (status === 'working' && moment.duration(moment(projectOfRecord(record).deadline).diff(moment())).asMilliseconds() < 0) ? 'dued' : status;
     status = (status === 'not_assigned' && record.current_project.id && record.current_project.status != 'approved') ? 'pending' : status;
 
     let r = { status, color: 'colorless', msg: status };
@@ -92,151 +116,136 @@ class DashboardStudents extends Component {
       r = {
         status: 'Pending',
         color: 'warning',
-        msg: (<span>
-          {record.first_name}
-          {' '}
-          hasn't this project assigned and is still working on
-          {' '}
-          {record.current_project.name}
-          .
-          {' '}
-          <button type="button" onClick={() => this.assign({ id: record.id, name: record.first_name }, this.projectOfRecord(record))}>Assign anyway</button>
-        </span>)
+        msg: (
+          <span>
+            {record.first_name}
+            {' '}
+            hasn&apos;t this project assigned and is still working on
+            {' '}
+            {record.current_project.name}
+            .
+            {' '}
+            <button type="button" onClick={() => assign({ id: record.id, name: record.first_name }, projectOfRecord(record))}>Assign anyway</button>
+          </span>
+        )
       };
     }
 
     return r;
   };
 
-  poke = (student, project) => {
-    const _this = this;
+  const poke = (student, project) => {
     const v = (moment(project.deadline) < moment()) ? 'fue' : 'es';
     const text = `Hola ${student.name}!\nLa fecha límite de la entrega del ${project.name} ${v} el ${moment(project.deadline).format('DD/MM/YYYY')}.\nHay novedades ?`;
     Modal.confirm({
       title: 'Are you sure?',
-      content: (<span>
-        This will send the following message to
-        {' '}
-        {student.name}
-        :
-        <br />
-        <br />
-        {text}
-      </span>),
+      content: (
+        <span>
+          This will send the following message to
+          {' '}
+          {student.name}
+          :
+          <br />
+          <br />
+          {text}
+        </span>
+      ),
       okText: 'Send',
       okType: 'primary',
       cancelText: 'Cancel',
       onOk() {
-        _this.message_poking = message.loading(`Sending a poke to ${student.name}`, 0);
-        _this.props.pokeStudent(student.id, project.assigned_project_id, { message: { text } });
+        setMessagePoking(`Sending a poke to ${student.name}`);
+        pokeStudent(student.id, project.assigned_project_id, { message: { text } });
       },
       onCancel() {
       },
     });
   };
 
-  assign = (student, project) => {
-    const _this = this;
-    Modal.confirm({
-      title: 'Are you sure?',
-      content: 'Are you sure you want to assign a new project to this student? This operation can\'t be undone.',
-      okText: 'Yes',
-      okType: 'primary',
-      cancelText: 'No',
-      onOk() {
-        _this.message_assigning = message.loading(`Assigning ${project.name} to ${student.name}`, 0);
-        _this.props.assignProject(_this.props.course.id, project.course_project_instance_id, student.id);
-      },
-      onCancel() {
-      },
-    });
-  };
-
-  render() {
-    if (!this.props.session.user || !this.props.session.user.id) {
-      return (<div><Spin size="large" /></div>);
-    }
-    this.state.sortedInfo = this.state.sortedInfo || { columnKey: 'status', order: true };
-    this.state.filteredInfo = this.state.filteredInfo || { professor: [String(this.props.session.user.id)] };
-    const columns = [{
-      title: 'STUDENT NAME',
-      dataIndex: 'first_name',
-      key: 'first_name',
-      render: (text, record, index) => {
-        const status = this.statusOfProject(record);
-
-        return (
-          <div className={`line ${status.color}`}>
-            <span className="projectName">
-              {record.first_name}
-              {' '}
-              {record.last_name}
-            </span>
-            <br />
-            <span className="projectProcess">
-              <Link to={`/students/${record.id}/projects`}>view activity</Link>
-            </span>
-          </div>
-        );
-      }
-    }, {
-      title: 'TUTOR',
-      dataIndex: 'professor',
-      key: 'professor',
-      filters: this.props.students ? this.props.students.map((o) => ({ text: o.professor.first_name, value: o.professor.id })).reduce((x, y) => (x.some((o) => o.value === y.value) ? x : [...x, y]), []) : {},
-      filteredValue: this.state.filteredInfo.professor,
-      onFilter: (value, record) => String(record.professor.id) === String(value),
-      render: (text, record, index) => text.first_name,
-    }, {
-      title: 'CURRENT PROJECT',
-      key: 'project',
-      className: this.props.projectId ? 'displayNone' : '',
-      sorter: (a, b) => a.id - b.id,
-      render: (text, record, index) => this.projectOfRecord(record).name,
-      sortOrder: this.state.sortedInfo.columnKey === 'project' && this.state.sortedInfo.order,
-    }, {
-      title: 'STATUS',
-      dataIndex: 'status',
-      key: 'status',
-      sorter: (a, b) => this.statusOfProject(a).status > this.statusOfProject(b).status,
-      sortOrder: this.state.sortedInfo.columnKey === 'status' && this.state.sortedInfo.order,
-      render: (text, record, index) => {
-        const status = this.statusOfProject(record);
-
-        return status.status ? (
-          <Popover content={(<span style={{ maxWidth: '250px', display: 'block' }}>{status.msg}</span>)}>
-            <span>
-              <span className={`dot ${status.color}`} />
-              {status.status}
-            </span>
-          </Popover>
-        ) : (<span />);
-      }
-    }, {
-      title: 'ACTION',
-      key: 'action',
-      render: (text, record, index) => {
-        const status = this.statusOfProject(record);
-        let btn = (<span />);
-
-        if (status.action === 'correct') {
-          btn = (<Link to={`/students/${record.id}/projects/${this.projectOfRecord(record).assigned_project_id}`}><Button type="boton1">Correct</Button></Link>);
-        } else if (status.action === 'poke_this') {
-          btn = (<button type="button" onClick={() => this.poke({ id: record.id, name: record.first_name }, this.projectOfRecord(record))}><Button type="boton1" disabled={this.message_poking}>Poke</Button></button>);
-        } else if (status.action === 'poke_current') {
-          btn = (<button type="button" onClick={() => this.poke({ id: record.id, name: record.first_name }, record.current_project)}><Button type="boton1" disabled={this.message_poking}>Poke</Button></button>);
-        } else if (status.action === 'assign') {
-          btn = (<button type="button" onClick={() => this.assign({ id: record.id, name: record.first_name }, this.projectOfRecord(record))}><Button type="boton1" disabled={this.message_assigning}>Assign</Button></button>);
-        }
-
-        return btn;
-      }
-    }];
-    return (
-      <Table rowKey="id" className="projectsListTable" columns={columns} dataSource={this.props.students} onChange={this.handleChange} loading={this.props.loading} pagination={false} />
-    );
+  if (!session.user || !session.user.id) {
+    return (<div><Spin size="large" /></div>);
   }
-}
+  setSortedInfo(sortedInfo || { columnKey: 'status', order: true });
+  setFilteredInfo(filteredInfo || { professor: [String(session.user.id)] });
+
+  const columns = [{
+    title: 'STUDENT NAME',
+    dataIndex: 'first_name',
+    key: 'first_name',
+    render: (_, record) => {
+      const status = statusOfProject(record);
+
+      return (
+        <div className={`line ${status.color}`}>
+          <span className="projectName">
+            {record.first_name}
+            {' '}
+            {record.last_name}
+          </span>
+          <br />
+          <span className="projectProcess">
+            <Link to={`/students/${record.id}/projects`}>view activity</Link>
+          </span>
+        </div>
+      );
+    }
+  }, {
+    title: 'TUTOR',
+    dataIndex: 'professor',
+    key: 'professor',
+    filters: students ? students.map((o) => ({ text: o.professor.first_name, value: o.professor.id })).reduce((x, y) => (x.some((o) => o.value === y.value) ? x : [...x, y]), []) : {},
+    filteredValue: filteredInfo.professor,
+    onFilter: (value, record) => String(record.professor.id) === String(value),
+    render: (text) => text.first_name,
+  }, {
+    title: 'CURRENT PROJECT',
+    key: 'project',
+    className: projectId ? 'displayNone' : '',
+    sorter: (a, b) => a.id - b.id,
+    render: (_, record) => projectOfRecord(record).name,
+    sortOrder: sortedInfo.columnKey === 'project' && sortedInfo.order,
+  }, {
+    title: 'STATUS',
+    dataIndex: 'status',
+    key: 'status',
+    sorter: (a, b) => statusOfProject(a).status > statusOfProject(b).status,
+    sortOrder: sortedInfo.columnKey === 'status' && sortedInfo.order,
+    render: (_, record) => {
+      const status = statusOfProject(record);
+
+      return status.status ? (
+        <Popover content={(<span style={{ maxWidth: '250px', display: 'block' }}>{status.msg}</span>)}>
+          <span>
+            <span className={`dot ${status.color}`} />
+            {status.status}
+          </span>
+        </Popover>
+      ) : (<span />);
+    }
+  }, {
+    title: 'ACTION',
+    key: 'action',
+    render: (_, record) => {
+      const status = statusOfProject(record);
+      let btn = (<span />);
+
+      if (status.action === 'correct') {
+        btn = (<Link to={`/students/${record.id}/projects/${projectOfRecord(record).assigned_project_id}`}><Button type="boton1">Correct</Button></Link>);
+      } else if (status.action === 'poke_this') {
+        btn = (<button type="button" onClick={() => poke({ id: record.id, name: record.first_name }, projectOfRecord(record))}><Button type="boton1" disabled={messagePoking}>Poke</Button></button>);
+      } else if (status.action === 'poke_current') {
+        btn = (<button type="button" onClick={() => poke({ id: record.id, name: record.first_name }, record.current_project)}><Button type="boton1" disabled={messagePoking}>Poke</Button></button>);
+      } else if (status.action === 'assign') {
+        btn = (<button type="button" onClick={() => assign({ id: record.id, name: record.first_name }, projectOfRecord(record))}><Button type="boton1" disabled={messageAssigning}>Assign</Button></button>);
+      }
+
+      return btn;
+    }
+  }];
+  return (
+    <Table rowKey="id" className="projectsListTable" columns={columns} dataSource={students} onChange={handleChange} loading={loading} pagination={false} />
+  );
+};
 
 const mapStateToProps = (state) => ({
   course: state.dashboard.courses.active,
@@ -255,29 +264,17 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchStudents: (courseId, projectId) => {
     dispatch(dashboardStudentsList(courseId, projectId)).payload.then((result) => {
-      if (true) {
-        dispatch(dashboardStudentsListSuccess(result));
-      } else {
-        dispatch(dashboardStudentsListFailure(result.error));
-      }
+      dispatch(dashboardStudentsListSuccess(result));
     });
   },
   pokeStudent: (studentId, projectId, message) => {
     dispatch(dashboardStudentsPoke(studentId, projectId, message)).payload.then((result) => {
-      if (true) {
-        dispatch(dashboardStudentsPokeSuccess(result));
-      } else {
-        dispatch(dashboardStudentsPokeFailure(result.error));
-      }
+      dispatch(dashboardStudentsPokeSuccess(result));
     });
   },
   assignProject: (courseId, projectId, studentId) => {
     dispatch(dashboardStudentsAssign(courseId, projectId, studentId)).payload.then((result) => {
-      if (true) {
-        dispatch(dashboardStudentsAssignSuccess(result));
-      } else {
-        dispatch(dashboardStudentsAssignFailure(result.error));
-      }
+      dispatch(dashboardStudentsAssignSuccess(result));
     });
   },
   reset: () => {
