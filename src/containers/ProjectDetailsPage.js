@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import {
   CloudUploadOutlined,
   CheckCircleOutlined,
@@ -29,11 +30,8 @@ import {
 
 import CustomHeader from '../components/layout/CustomHeader';
 import CustomFooter from '../components/layout/CustomFooter';
-import TagProcess from '../components/tag/TagProcess';
-import TagTutor from '../components/tag/TagTutor';
-import TagLanguage from '../components/tag/TagLanguage';
-import TagVersion from '../components/tag/TagVersion';
-import TagInstructions from '../components/tag/TagInstructions';
+import TagVersion from '../components/TagVersion';
+import CustomTag from '../components/CustomTag';
 import projectApi from '../api/projectApi';
 import { PROJECT_STATUS, TEXTS } from '../constants/constants';
 import {
@@ -456,7 +454,7 @@ const ProjectDetailsPage = ({
           <Popover title="Submission checklist" content={submissionChecklistPopover} placement="leftBottom">
             <Button onClick={submitProject} icon={submitting ? <LoadingOutlined /> : <UploadOutlined />} type="boton1" disabled={!checklist.canSubmit}>
               Submit to
-              {project_data.professor.first_name}
+              {` ${project_data.professor.first_name}`}
             </Button>
           </Popover>
         </div>
@@ -529,6 +527,59 @@ const ProjectDetailsPage = ({
     return (<CustomProgress />);
   }
 
+  const tagBasicDescription = (text) => (
+    <div>
+      <span>
+        {text}
+      </span>
+    </div>
+  );
+
+  const tagsInfo = [
+    {
+      name: 'Instructions',
+      title: 'Instructions',
+      description: (
+        <div>
+          <span>
+            <a href={project_data.psp_project.instructions} target="blank">Click here to download </a>
+            the project instructions.
+            <br />
+            You have until
+            {` ${moment(project_data.psp_project.deadline).format('DD/MM/YYYY')} `}
+            to submit this project.
+          </span>
+        </div>
+      )
+    },
+    {
+      name: project_data.psp_project.process.name,
+      title: 'PSP Process',
+      description: tagBasicDescription(`This projects follows ${project_data.psp_project.process.name}`)
+    },
+    {
+      name: project_data.professor.first_name,
+      title: 'Tutor',
+      description: (
+        <div>
+          <span>
+            {`Full Name: ${project_data.professor.first_name} ${project_data.professor.last_name}`}
+          </span>
+          <br />
+          <span>
+            {'Email: '}
+            <a href={`to:${project_data.professor.email}`}>{project_data.professor.email}</a>
+          </span>
+        </div>
+      )
+    },
+    {
+      name: project_data.language,
+      title: 'Programming Language',
+      description: tagBasicDescription(`You have chosen to develop this project in ${project_data.language}`)
+    },
+  ];
+  
   return (
     <Layout>
       <CustomHeader />
@@ -545,12 +596,8 @@ const ProjectDetailsPage = ({
           </Breadcrumb>
           <h1>{project_data.psp_project.name}</h1>
           <section style={{ textAlign: 'right' }}>
-            <TagInstructions link={project_data.psp_project.instructions} deadline={project_data.psp_project.deadline} />
-            <TagProcess {...project_data.psp_project.process} />
-            <TagTutor {...project_data.professor} />
-            <TagLanguage language={project_data.language} />
+            {tagsInfo.map((tagInfo) => <CustomTag key={tagInfo.name} {...tagInfo} />)}
             <TagVersion active={version_data} timeline={project_data.timeline} onChange={fetchProjectDetailsVersionProp} idstudent={studentId} idproject={project_id} />
-
           </section>
           <section>
             <Tabs tabBarExtraContent={renderWorkingTime()} activeKey={defaultActiveKey} onChange={(key) => goToTab(key)}>

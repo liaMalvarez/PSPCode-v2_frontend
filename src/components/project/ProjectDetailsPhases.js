@@ -76,38 +76,37 @@ const ProjectDetailsPhases = ({
   useEffect(() => {
     if (error) {
       if (messageCreating) {
-        message.loading('Creating new phase', 3);
+        message.loading('Creating new phase', 2);
         setMessageCreating(false);
       }
       if (messageEditing) {
-        message.loading('Saving phase details', 3);
+        message.loading('Saving phase details', 2);
         setMessageEditing(false);
       }
       if (messageDeleting) {
-        message.loading('Deleting this phase', 3);
+        message.loading('Deleting this phase', 2);
         setMessageDeleting(false);
       }
 
       if (error.data && error.data.errors && error.data.errors && error.data.errors.elapsed_time) {
         message.error('Elapsed time should be a positive number (end_time - start_time - interruption_time)', 7);
       } else {
-        message.error(error.msg, 7);
+        message.error(error.msg, 5);
       }
     }
   }, [error]);
 
   useEffect(() => {
     if (messageCreating && created) {
-      message.loading('Creating new phase', 3);
       setMessageCreating(false);
       setActivePhase(version.phases[version.phases.length - 1]);
       setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     } else if (messageEditing && edited) {
-      message.loading('Saving phase details', 3);
+      message.success('Phase details saved successfully', 2);
       setMessageEditing(false);
       setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     } else if (messageDeleting && deleted) {
-      message.loading('Deleting this phase', 3);
+      message.success('Phase deleted successfully', 2);
       setMessageDeleting(false);
       setActivePhase(version.phases[version.phases.length - 1]);
       setCanEdit(version.status === 'working' && session.user.role !== 'professor');
@@ -142,17 +141,17 @@ const ProjectDetailsPhases = ({
 
     if (attr === 'psp_phase' && version && version.phases && version.phases.length > 0) {
       ['plan_loc', 'plan_time', 'actual_base_loc', 'deleted', 'modified', 'new_reusable', 'reused', 'total', 'pip_problem', 'pip_proposal', 'pip_notes']
-        .map((item) => { newState = { ...activePhase, [item]: null }; });
+        .map((item) => { newState = { ...newState, [item]: null }; });
       if (value.first) {
         const original_phase = [...version.phases].reverse().find((o) => o.psp_phase && o.psp_phase.first);
         if (original_phase) {
-          ['plan_loc', 'plan_time', 'actual_base_loc'].map((item) => { newState = { ...activePhase, [item]: original_phase[item] }; });
+          ['plan_loc', 'plan_time', 'actual_base_loc'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
         }
       }
       if (value.last) {
         const original_phase = [...version.phases].reverse().find((o) => o.psp_phase && o.psp_phase.last);
         if (original_phase) {
-          ['deleted', 'modified', 'new_reusable', 'reused', 'total'].map((item) => { newState = { ...activePhase, [item]: original_phase[item] }; });
+          ['deleted', 'modified', 'new_reusable', 'reused', 'total'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
         }
       }
     }
@@ -161,11 +160,12 @@ const ProjectDetailsPhases = ({
     if (typeof actualValue === 'string' && String(actualValue).trim() === String(value).trim()) return;
 
     if (formTimeout) clearTimeout(formTimeout);
+    setMessageEditing(true);
     formTimeout = setTimeout(() => {
       if (messageEditing) {
-        message.loading('Saving phase details', 3);
+        message.success('Phase details saved successfully', 2);
       }
-      setMessageEditing(true);
+      setMessageEditing(false);
       editPhaseProps(studentId, project.id, version.id, newState.id, newState);
     }, interval);
   };
@@ -321,9 +321,7 @@ const ProjectDetailsPhases = ({
   };
 
   const createPhase = () => {
-    if (messageCreating) {
-      message.loading('Creating new phase', 0);
-    }
+    message.loading('Creating new phase', 1);
     setMessageCreating(true);
     setCanEdit(false);
     createPhaseProps(studentId, project.id, version.id);
@@ -402,7 +400,11 @@ const ProjectDetailsPhases = ({
                 label="Phase"
                 className="inputSelect"
               >
-                <Select onChange={(value) => editPhase('psp_phase', psp_data.processes.find((o) => o.process.id == project.psp_project.process.id).process.phases.find((o) => o.id == value), 10)} value={activePhase.psp_phase ? String(activePhase.psp_phase.id) : ''} disabled={(!canEdit)}>
+                <Select 
+                  onChange={(value) => editPhase('psp_phase', psp_data.processes.find((o) => o.process.id == project.psp_project.process.id).process.phases.find((o) => o.id == value), 10)} 
+                  value={activePhase.psp_phase ? String(activePhase.psp_phase.id) : ''} 
+                  disabled={(!canEdit)}
+                >
                   {psp_data.processes.find((o) => o.process.id == project.psp_project.process.id).process.phases.map((item) => (<Option key={item.id} value={String(item.id)}>{item.name}</Option>))}
                 </Select>
                 <InputTooltip input="project_details_phase_form_phase" />

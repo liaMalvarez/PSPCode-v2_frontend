@@ -140,18 +140,21 @@ const NotificationBadge = ({
                 navigate(data.link);
               }}
               type="button"
+              className="dot-button"
             >
               <Badge status={(i < count) ? 'processing' : data.icon} />
-              <span className="notificationTtem">{data.text}</span>
-              <span className="notificationDate">{data.date}</span>
+              <div className="notificationInfo">
+                <span>{data.text}</span>
+                <span className="notificationDate">{data.date}</span>
+              </div>
             </button>
           </Menu.Item>
         );
       })}
 
       <Menu.Divider />
-      { ((notifications.length === (limit * page))
-        || (notifications.length === limit * (page - 1) && loading))
+      { ((notifications.length - 1 === (limit * page))
+        || (notifications.length - 1 === limit * (page - 1) && loading))
       && (
         <Menu.Item key="older">
           See older
@@ -164,7 +167,7 @@ const NotificationBadge = ({
     return (
       <Popover placement="bottomRight" title={renderTitle()} content={renderContent()} trigger="click" visible={popOverVisible} onVisibleChange={handleVisibleChange}>
         <Badge count={count}>
-          <Avatar shape="circle" icon={icon} />
+          <Avatar shape="circle" icon={icon} onClick={() => markAsSeen()} />
         </Badge>
       </Popover>
     );
