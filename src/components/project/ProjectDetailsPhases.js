@@ -11,7 +11,7 @@ import {
   InputNumber,
   Modal,
   Row,
-  Col
+  Col,
 } from 'antd';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 
@@ -19,10 +19,17 @@ import DefectsList from './defect/DefectsList';
 import DefectForm from './defect/DefectForm';
 import InputTooltip from '../common/InputTooltip';
 import {
-  createPhaseOnProjectVersion, createPhaseOnProjectVersionSuccess, createPhaseOnProjectVersionFailure,
-  editPhaseOnProjectVersion, editPhaseOnProjectVersionSuccess, editPhaseOnProjectVersionFailure,
-  deletePhaseOnProjectVersion, deletePhaseOnProjectVersionSuccess, deletePhaseOnProjectVersionFailure,
-  fetchProjectDetailsVersionPhaseDefects, fetchProjectDetailsVersionPhaseDefectsSuccess,
+  createPhaseOnProjectVersion,
+  createPhaseOnProjectVersionSuccess,
+  createPhaseOnProjectVersionFailure,
+  editPhaseOnProjectVersion,
+  editPhaseOnProjectVersionSuccess,
+  editPhaseOnProjectVersionFailure,
+  deletePhaseOnProjectVersion,
+  deletePhaseOnProjectVersionSuccess,
+  deletePhaseOnProjectVersionFailure,
+  fetchProjectDetailsVersionPhaseDefects,
+  fetchProjectDetailsVersionPhaseDefectsSuccess,
   fetchProjectDetailsVersionPhaseDefectsFailure,
 } from '../../actions/projectActions';
 
@@ -63,11 +70,10 @@ const ProjectDetailsPhases = ({
   const [messageDeleting, setMessageDeleting] = useState(false);
   const [messageCreating, setMessageCreating] = useState(false);
 
+  const [wasEdited, setWasEdited] = useState(false);
   const [canEdit, setCanEdit] = useState(version.status === 'working' && session.user.role !== 'professor');
   const [activePhase, setActivePhase] = useState(version.phases[version.phases.length - 1]);
   const [activeDefect, setActiveDefect] = useState(null);
-
-  let formTimeout = null;
 
   useEffect(() => {
     fetchProjectDetailsVersionPhaseDefectsProps(studentId, project.id, version.id, activePhase.id);
@@ -102,7 +108,7 @@ const ProjectDetailsPhases = ({
       setActivePhase(version.phases[version.phases.length - 1]);
       setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     } else if (messageEditing && edited) {
-      message.success('Phase details saved successfully', 2);
+      message.success({ content: 'Phase details saved successfully', key: 'saving', duration: 2 });
       setMessageEditing(false);
       setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     } else if (messageDeleting && deleted) {
@@ -133,7 +139,7 @@ const ProjectDetailsPhases = ({
     return [steps, (<Step key="new_phase" title="Start Phase" />)];
   };
 
-  const editPhase = (attr, value, interval = 2000) => {
+  const editPhase = (attr, value) => {
     const actualValue = activePhase[attr];
     if (typeof value === 'number' && parseInt(value, 10) === 0) value = '0';
     if (typeof actualValue === 'number' && parseInt(actualValue, 10) === parseInt(value, 10) && value !== '0') return;
@@ -143,32 +149,38 @@ const ProjectDetailsPhases = ({
       ['plan_loc', 'plan_time', 'actual_base_loc', 'deleted', 'modified', 'new_reusable', 'reused', 'total', 'pip_problem', 'pip_proposal', 'pip_notes']
         .map((item) => { newState = { ...newState, [item]: null }; });
       if (value.first) {
-        const original_phase = [...version.phases].reverse().find((o) => o.psp_phase && o.psp_phase.first);
+        const original_phase = [...version.phases].reverse()
+          .find((o) => o.psp_phase && o.psp_phase.first);
         if (original_phase) {
           ['plan_loc', 'plan_time', 'actual_base_loc'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
         }
       }
       if (value.last) {
-        const original_phase = [...version.phases].reverse().find((o) => o.psp_phase && o.psp_phase.last);
+        const original_phase = [...version.phases].reverse()
+          .find((o) => o.psp_phase && o.psp_phase.last);
         if (original_phase) {
           ['deleted', 'modified', 'new_reusable', 'reused', 'total'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
         }
       }
     }
-    setActivePhase(newState);
-
     if (typeof actualValue === 'string' && String(actualValue).trim() === String(value).trim()) return;
 
-    if (formTimeout) clearTimeout(formTimeout);
-    setMessageEditing(true);
-    formTimeout = setTimeout(() => {
-      if (messageEditing) {
-        message.success('Phase details saved successfully', 2);
-      }
-      setMessageEditing(false);
-      editPhaseProps(studentId, project.id, version.id, newState.id, newState);
-    }, interval);
+    setWasEdited(true);
+    setActivePhase(newState);
   };
+
+  useEffect(() => {
+    const saveData = setTimeout(() => {
+      if (!wasEdited) return; // not edited
+      setWasEdited(false);
+      message.loading({ content: 'Saving phase details', key: 'saving', duration: 2 });
+
+      editPhaseProps(studentId, project.id, version.id, activePhase.id, activePhase);
+      setMessageEditing(true);
+    }, 2000);
+
+    return () => clearTimeout(saveData);
+  }, [activePhase]);
 
   const printFormForActivePhase = () => {
     const inputs = [('')];
@@ -183,7 +195,8 @@ const ProjectDetailsPhases = ({
                 style={{ display: 'flex' }}
               >
                 <InputNumber
-                  min={0} value={activePhase.plan_time ? activePhase.plan_time : null}
+                  min={0}
+                  value={activePhase.plan_time ? activePhase.plan_time : null}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('plan_time', value)}
                 />
@@ -202,7 +215,8 @@ const ProjectDetailsPhases = ({
                 label="Plan LOCs (A+M)"
               >
                 <InputNumber
-                  min={0} value={activePhase.plan_loc ? activePhase.plan_loc : null}
+                  min={0}
+                  value={activePhase.plan_loc ? activePhase.plan_loc : null}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('plan_loc', value)}
                 />
@@ -334,28 +348,32 @@ const ProjectDetailsPhases = ({
           <button className="dot-button" type="button" onClick={() => selectPhase(version.phases[index])}>
             <span className="dot" />
           </button>
-        </Popover>);
+        </Popover>
+      );
     } if (status === 'finish' && !canEdit) {
       return (
         <Popover content="You are reviewing this phase.">
           <button className="dot-button" type="button" onClick={() => selectPhase(version.phases[index])}>
             <span className="dot cantedit" />
           </button>
-        </Popover>);
+        </Popover>
+      );
     } if (status === 'process') {
       return (
         <Popover content="Click to review this phase.">
           <button className="dot-button" type="button" onClick={() => selectPhase(version.phases[index])}>
             <span className="dot" />
           </button>
-        </Popover>);
+        </Popover>
+      );
     } if (status === 'wait' && canEdit) {
       return (
         <Popover content="Click to start a new phase.">
           <button className="dot-button" type="button" onClick={createPhase}>
             <PlusCircleTwoTone twoToneColor="#0dc0bb" />
           </button>
-        </Popover>);
+        </Popover>
+      );
     } if (status === 'wait' && !canEdit) {
       return (
         <PlusCircleTwoTone twoToneColor="#B1B1B1" />
@@ -400,12 +418,18 @@ const ProjectDetailsPhases = ({
                 label="Phase"
                 className="inputSelect"
               >
-                <Select 
-                  onChange={(value) => editPhase('psp_phase', psp_data.processes.find((o) => o.process.id == project.psp_project.process.id).process.phases.find((o) => o.id == value), 10)} 
-                  value={activePhase.psp_phase ? String(activePhase.psp_phase.id) : ''} 
+                <Select
+                  onChange={(value) => editPhase('psp_phase', psp_data.processes
+                    .find((o) => o.process.id == project.psp_project.process.id).process.phases
+                    .find((o) => o.id == value), 10)}
+                  value={activePhase.psp_phase ? String(activePhase.psp_phase.id) : ''}
                   disabled={(!canEdit)}
                 >
-                  {psp_data.processes.find((o) => o.process.id == project.psp_project.process.id).process.phases.map((item) => (<Option key={item.id} value={String(item.id)}>{item.name}</Option>))}
+                  {psp_data.processes
+                    .find((o) => o.process.id == project.psp_project.process.id).process.phases
+                    .map((item) => (
+                      <Option key={item.id} value={String(item.id)}>{item.name}</Option>
+                    ))}
                 </Select>
                 <InputTooltip input="project_details_phase_form_phase" />
               </FormItem>
@@ -465,7 +489,8 @@ const ProjectDetailsPhases = ({
                 label="Int. time"
               >
                 <InputNumber
-                  min={0} value={activePhase.interruption_time ? activePhase.interruption_time : null}
+                  min={0}
+                  value={activePhase.interruption_time ? activePhase.interruption_time : null}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('interruption_time', value)}
                 />
@@ -515,7 +540,12 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   fetchProjectDetailsVersionPhaseDefectsProps: (userid, projectid, versionid, phaseid) => {
-    dispatch(fetchProjectDetailsVersionPhaseDefects(userid, projectid, versionid, phaseid)).payload.then((result) => {
+    dispatch(fetchProjectDetailsVersionPhaseDefects(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+    )).payload.then((result) => {
       dispatch(fetchProjectDetailsVersionPhaseDefectsSuccess(result));
     }).catch((x) => {
       dispatch(fetchProjectDetailsVersionPhaseDefectsFailure(x));
@@ -530,14 +560,25 @@ const mapDispatchToProps = (dispatch) => ({
   },
   editPhaseProps: (userid, projectid, versionid, phaseid, phase) => {
     if (phase.psp_phase) phase.phase_id = phase.psp_phase.id;
-    dispatch(editPhaseOnProjectVersion(userid, projectid, versionid, phaseid, phase)).payload.then((result) => {
+    dispatch(editPhaseOnProjectVersion(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+      phase,
+    )).payload.then((result) => {
       dispatch(editPhaseOnProjectVersionSuccess(result));
     }).catch((x) => {
       dispatch(editPhaseOnProjectVersionFailure(x));
     });
   },
   deletePhaseProps: (userid, projectid, versionid, phaseid) => {
-    dispatch(deletePhaseOnProjectVersion(userid, projectid, versionid, phaseid)).payload.then((result) => {
+    dispatch(deletePhaseOnProjectVersion(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+    )).payload.then((result) => {
       dispatch(deletePhaseOnProjectVersionSuccess(result));
     }).catch((x) => {
       dispatch(deletePhaseOnProjectVersionFailure(x));
