@@ -11,7 +11,7 @@ export const LoginForm = (props) => {
   const {
     handleSubmit,
     error,
-    submitting
+    submitting,
   } = props;
 
   const navigate = useNavigate();
@@ -69,10 +69,10 @@ const { func, string } = PropTypes;
 
 LoginForm.propTypes = {
   handleSubmit: func.isRequired,
-  error: string
+  error: string,
 };
 
 export default reduxForm({
   form: 'login',
-  validate: constraints.validations(constraints.login)
+  validate: constraints.validations(constraints.login),
 })(LoginForm);

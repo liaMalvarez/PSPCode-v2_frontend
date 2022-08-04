@@ -5,8 +5,6 @@ import { connect } from 'react-redux';
 import { HomeOutlined } from '@ant-design/icons';
 import { Layout, Breadcrumb, Tabs } from 'antd';
 
-import CustomHeader from '../components/layout/CustomHeader';
-import CustomFooter from '../components/layout/CustomFooter';
 import UserProfile from '../components/user/UserProfile';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import CustomProgress from '../components/common/CustomProgress';
@@ -23,13 +21,13 @@ const UserDetailsPage = ({
   user_data,
   user_loading,
   session,
-  fetchUserDetailsProp
+  fetchUserDetailsProp,
 }) => {
   const { hash: location_hash, iduser: user_id, returntoprojectid } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user_data) {
+    if (!user_data || user_data.id != user_id) {
       if (session && (session.user.role === 'professor' || session.user.id == user_id)) {
         fetchUserDetailsProp(user_id);
       } else if (session) {
@@ -38,6 +36,8 @@ const UserDetailsPage = ({
           : `students/${session.user.id}/projects`);
       }
     }
+
+    return () => {};
   }, [user_data, session]);
 
   if (user_loading || !user_data) {
@@ -45,32 +45,26 @@ const UserDetailsPage = ({
   }
 
   return (
-    <Layout>
-      <CustomHeader />
-      <Layout className="userDetails ant-layout-has-sider">
-        <ProfessorSider selected="dashboard.students" />
-        <Content>
-          <Breadcrumb>
-            <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
-            {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
-            {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item>{user_data.first_name}</Breadcrumb.Item>}
-            {(session.user.id == user_id || session.user.role !== 'professor') && <Breadcrumb.Item>My Profile</Breadcrumb.Item>}
-          </Breadcrumb>
-          <h1>
-            {user_data.first_name}
-            {' '}
-            {user_data.last_name}
-          </h1>
-          <section>
-            <Tabs defaultActiveKey={location_hash === '#activity' ? '2' : '1'}>
-              <TabPane tab="PROFILE" key="1">
-                <UserProfile user={user_data} returnToProjectId={returntoprojectid} />
-              </TabPane>
-            </Tabs>
-          </section>
-          <CustomFooter />
-        </Content>
-      </Layout>
+    <Layout className="userDetails ant-layout-has-sider">
+      <ProfessorSider selected="dashboard.students" />
+      <Content className={session.user.role === 'professor' ? 'professorDashboard' : ''}>
+        <Breadcrumb>
+          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
+          {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
+          {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item>{user_data.first_name}</Breadcrumb.Item>}
+          {(session.user.id == user_id || session.user.role !== 'professor') && <Breadcrumb.Item>User Details</Breadcrumb.Item>}
+        </Breadcrumb>
+        <h1>
+          {`${user_data.first_name} ${user_data.last_name}`}
+        </h1>
+        <section>
+          <Tabs defaultActiveKey={location_hash === '#activity' ? '2' : '1'}>
+            <TabPane tab="PROFILE" key="1">
+              <UserProfile user={user_data} returnToProjectId={returntoprojectid} />
+            </TabPane>
+          </Tabs>
+        </section>
+      </Content>
     </Layout>
   );
 };

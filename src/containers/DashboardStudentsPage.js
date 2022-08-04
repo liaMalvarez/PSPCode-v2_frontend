@@ -4,8 +4,6 @@ import { connect } from 'react-redux';
 import { HomeOutlined } from '@ant-design/icons';
 import { Layout, Breadcrumb } from 'antd';
 
-import CustomHeader from '../components/layout/CustomHeader';
-import CustomFooter from '../components/layout/CustomFooter';
 import DashboardStudents from '../components/dashboard/DashboardStudents';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import SpanData from '../components/common/SpanData';
@@ -19,49 +17,45 @@ const DashboardStudentsPage = () => {
   const { idproject: projectId } = useParams();
 
   return (
-    <Layout>
-      <CustomHeader />
-      <Layout className="ant-layout-has-sider">
-        <ProfessorSider selected="dashboard.students" />
-        <Content className="professorDashboard">
-          <Breadcrumb>
-            <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
-            { projectId && <Breadcrumb.Item><Link to="/professor/dashboard/projects">Projects</Link></Breadcrumb.Item> }
-            { projectId && <Breadcrumb.Item><SpanData entityName="project" entityId={projectId} loading output="name" /></Breadcrumb.Item> }
-            { !projectId && <Breadcrumb.Item>Students</Breadcrumb.Item> }
-          </Breadcrumb>
-          {projectId && (
-            <div>
-              <h1>
-                <SpanData entityName="project" entityId={projectId} loading output="name" />
+    <Layout className="ant-layout-has-sider">
+      <ProfessorSider selected="dashboard.students" />
+      <Content className="professorDashboard">
+        <Breadcrumb>
+          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
+          { projectId && <Breadcrumb.Item><Link to="/professor/dashboard/projects">Projects</Link></Breadcrumb.Item> }
+          { projectId && <Breadcrumb.Item><SpanData entityName="project" entityId={projectId} loading output="name" /></Breadcrumb.Item> }
+          { !projectId && <Breadcrumb.Item>Students</Breadcrumb.Item> }
+        </Breadcrumb>
+        {projectId && (
+          <div>
+            <h1>
+              <SpanData entityName="project" entityId={projectId} loading output="name" />
+              {' '}
+              Dashboard
+            </h1>
+            <div className="filters">
+              <span>
+                Deadline:
                 {' '}
-                Dashboard
-              </h1>
-              <div className="filters">
-                <span>
-                  Deadline:
-                  {' '}
-                  <SpanData entityName="project" entityId={projectId} loading output="deadline" format="date" />
-                </span>
-                <div style={{ visibility: 'hidden' }}><SelectCourse /></div>
-              </div>
+                <SpanData entityName="project" entityId={projectId} loading output="deadline" format="date" />
+              </span>
+              <div style={{ visibility: 'hidden' }}><SelectCourse /></div>
             </div>
-          )}
-          {!projectId && (
-            <div>
-              <h1>Students Dashboard</h1>
-              <div className="filters">
-                <SelectCourse />
-              </div>
+          </div>
+        )}
+        {!projectId && (
+          <div>
+            <h1>Students Dashboard</h1>
+            <div className="filters">
+              <SelectCourse />
             </div>
-          )}
-          <section>
-            <DashboardStudents projectId={projectId} />
-          </section>
+          </div>
+        )}
+        <section>
+          <DashboardStudents projectId={projectId} />
+        </section>
 
-        </Content>
-      </Layout>
-      <CustomFooter />
+      </Content>
     </Layout>
   );
 };

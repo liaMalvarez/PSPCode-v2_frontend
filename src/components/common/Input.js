@@ -4,7 +4,7 @@ import { Popover } from 'antd';
 import { CloseCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 const Input = ({
-  input, label, type, placeholder, meta: { touched, error }
+  input, label, type, placeholder, meta: { touched, error },
 }) => (
   <div>
     {label && (
@@ -12,7 +12,7 @@ const Input = ({
         {label}
       </label>
     )}
-    <div>
+    <div style={{ display: 'flex' }}>
       <input {...input} {...{ placeholder, type }} />
       {touched && error && (
         <Popover content={error}>
@@ -33,7 +33,7 @@ Input.propTypes = {
   label: string,
   type: string.isRequired,
   placeholder: string,
-  meta: object
+  meta: object,
 };
 
 export default Input;

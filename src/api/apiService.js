@@ -7,7 +7,7 @@ const saveSessionHeaders = (headers) => {
     const sessionHeaders = {
       token: headers.get('access-token'),
       uid: headers.get('uid'),
-      client: headers.get('client')
+      client: headers.get('client'),
     };
     sessionService.saveSession(sessionHeaders);
   }
@@ -78,8 +78,8 @@ class Api {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store'
-      }
+        'Cache-Control': 'no-cache, no-store',
+      },
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));
@@ -91,9 +91,9 @@ class Api {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store'
+        'Cache-Control': 'no-cache, no-store',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));
@@ -105,9 +105,9 @@ class Api {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store'
+        'Cache-Control': 'no-cache, no-store',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));
@@ -119,9 +119,9 @@ class Api {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store'
+        'Cache-Control': 'no-cache, no-store',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));
@@ -137,7 +137,7 @@ class Api {
         client: headers.client,
         uid: headers.uid,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
     return this.performRequest(uri, apiUrl, requestData);
   }
@@ -149,7 +149,7 @@ class Api {
         Accept: 'application/json',
         // 'Content-Type': 'multipart/form-data'
       },
-      body: data
+      body: data,
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));
@@ -162,7 +162,7 @@ class Api {
         Accept: 'application/json',
         // 'Content-Type': 'multipart/form-data'
       },
-      body: data
+      body: data,
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));
@@ -173,9 +173,9 @@ class Api {
       method: 'patch',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     };
     return this.addTokenHeader(requestData)
       .then((data) => this.performRequest(uri, apiUrl, data));

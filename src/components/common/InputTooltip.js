@@ -11,7 +11,7 @@ const InputTooltip = ({ input }) => {
   }
 
   return (
-    <Popover content={TEXTS[input]}>
+    <Popover className="input-tooltip" content={TEXTS[input]}>
       <div>
         <InfoCircleOutlined />
       </div>

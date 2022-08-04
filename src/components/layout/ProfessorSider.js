@@ -6,35 +6,28 @@ import { CaretLeftOutlined } from '@ant-design/icons';
 
 const { Sider } = Layout;
 
-class ProfessorSider extends Component {
-  constructor(props) {
-    super(props);
+const ProfessorSider = ({ session, selected }) => {
+  if (session.user.role !== 'professor') {
+    return (<div />);
   }
 
-  render() {
-    if (this.props.session.user.role !== 'professor') {
-      return (<div />);
-    }
-    return (
-      <Sider className="professorSider">
-        <Link to="/professor/dashboard/projects">
-          <span>
-            Projects Dashboard
-            {' '}
-            {this.props.selected === 'dashboard.projects' && <CaretLeftOutlined />}
-          </span>
-        </Link>
-        <Link to="/professor/dashboard/students">
-          <span>
-            Students Dashboard
-            {' '}
-            {this.props.selected === 'dashboard.students' && <CaretLeftOutlined />}
-          </span>
-        </Link>
-      </Sider>
-    );
-  }
-}
+  return (
+    <Sider className="professorSider sider">
+      <Link to="/professor/dashboard/projects">
+        <span>
+          Projects Dashboard
+          {selected === 'dashboard.projects' && <CaretLeftOutlined />}
+        </span>
+      </Link>
+      <Link to="/professor/dashboard/students">
+        <span>
+          Students Dashboard
+          {selected === 'dashboard.students' && <CaretLeftOutlined />}
+        </span>
+      </Link>
+    </Sider>
+  );
+};
 
 const mapStateToProps = (state, ownState) => ({
   session: state.session,
@@ -45,4 +38,3 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfessorSider);
-
