@@ -11,8 +11,6 @@ import SelectCourse from '../components/common/SelectCourse';
 
 const { Content } = Layout;
 
-require('antd/dist/antd.css');
-
 const DashboardStudentsPage = () => {
   const { idproject: projectId } = useParams();
 

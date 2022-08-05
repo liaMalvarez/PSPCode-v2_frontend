@@ -13,8 +13,6 @@ import SpanData from '../components/common/SpanData';
 const { Content } = Layout;
 const { TabPane } = Tabs;
 
-require('antd/dist/antd.css');
-
 const ProjectListPage = ({ session }) => {
   const { idstudent: studentId } = useParams();
 

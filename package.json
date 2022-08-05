@@ -8,6 +8,7 @@
   },
   "scripts": {
     "preinstall": "node tools/nodeVersionCheck.js",
+    "postinstall": "npx patch-package",
     "start-message": "babel-node tools/startMessage.js",
     "start": "webpack serve --open",
     "open:src": "babel-node tools/srcServer.js",

@@ -11,8 +11,6 @@ import CustomProgress from '../components/common/CustomProgress';
 
 import { fetchUserDetails, fetchUserDetailsSuccess } from '../actions/userActions';
 
-require('antd/dist/antd.css');
-
 const { Content } = Layout;
 
 const { TabPane } = Tabs;

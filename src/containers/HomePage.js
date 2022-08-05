@@ -14,7 +14,7 @@ import CustomHeader from '../components/layout/CustomHeader';
 
 import routes from '../constants/routesPaths';
 
-require('antd/dist/antd.css');
+require('antd/dist/result.css');
 
 const HomePage = ({ session }) => {
   const { pathname } = useLocation();

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Layout } from 'antd';
@@ -16,13 +16,23 @@ const ProfessorSider = ({ session, selected }) => {
       <Link to="/professor/dashboard/projects">
         <span>
           Projects Dashboard
-          {selected === 'dashboard.projects' && <CaretLeftOutlined />}
+          {selected === 'dashboard.projects' && (
+          <CaretLeftOutlined style={{
+            border: 'none', fontSize: '200%', display: 'flex', alignItems: 'center',
+          }}
+          />
+          )}
         </span>
       </Link>
       <Link to="/professor/dashboard/students">
         <span>
           Students Dashboard
-          {selected === 'dashboard.students' && <CaretLeftOutlined />}
+          {selected === 'dashboard.students' && (
+          <CaretLeftOutlined style={{
+            border: 'none', fontSize: '200%', display: 'flex', alignItems: 'center',
+          }}
+          />
+          )}
         </span>
       </Link>
     </Sider>

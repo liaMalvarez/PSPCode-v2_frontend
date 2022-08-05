@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Tag, Popover } from 'antd';
 
-require('antd/dist/antd.css');
 
 class TagVersion extends Component {
   constructor(props) {

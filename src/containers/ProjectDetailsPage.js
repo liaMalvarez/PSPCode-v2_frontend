@@ -53,8 +53,6 @@ import {
 } from '../actions/projectActions';
 import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
-require('antd/dist/antd.css');
-
 const { Content, Sider } = Layout;
 const { TextArea } = Input;
 const { TabPane } = Tabs;

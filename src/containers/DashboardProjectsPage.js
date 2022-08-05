@@ -12,7 +12,6 @@ import SelectCourse from '../components/common/SelectCourse';
 
 const { Content } = Layout;
 
-require('antd/dist/antd.css');
 
 const DashboardProjectsPage = () => (
   <Layout>

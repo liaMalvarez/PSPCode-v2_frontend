@@ -10,7 +10,6 @@ import * as sessionActions from '../actions/sessionActions';
 import PasswordForgotForm from '../components/session/PasswordForgotForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-require('antd/dist/antd.css');
 
 const { Content } = Layout;
 

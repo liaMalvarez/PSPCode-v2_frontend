@@ -10,7 +10,6 @@ import * as sessionActions from '../actions/sessionActions';
 import LoginForm from '../components/session/LoginForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-require('antd/dist/antd.css');
 
 const { Content } = Layout;
 

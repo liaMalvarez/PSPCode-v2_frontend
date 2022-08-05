@@ -56,5 +56,5 @@ render(
       </AppContainer>
     </ConfigProvider>
   </HashRouter>,
-  document.getElementById('app')
+  document.getElementById('app'),
 );
