@@ -47,10 +47,20 @@ const UserDetailsPage = ({
       <ProfessorSider selected="dashboard.students" />
       <Content className={session.user.role === 'professor' ? 'professorDashboard' : ''}>
         <Breadcrumb>
-          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
-          {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
-          {(session.user.id != user_id && session.user.role === 'professor') && <Breadcrumb.Item>{user_data.first_name}</Breadcrumb.Item>}
-          {(session.user.id == user_id || session.user.role !== 'professor') && <Breadcrumb.Item>User Details</Breadcrumb.Item>}
+          <Breadcrumb.Item>
+            <Link to={session.user.role === 'professor'
+              ? '/professor/dashboard/projects'
+              : `/students/${session.user.id}/projects`}
+            >
+              <HomeOutlined />
+            </Link>
+          </Breadcrumb.Item>
+          {(session.user.id != user_id && session.user.role === 'professor')
+          && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
+          {(session.user.id != user_id && session.user.role === 'professor')
+          && <Breadcrumb.Item>{user_data.first_name}</Breadcrumb.Item>}
+          {(session.user.id == user_id || session.user.role !== 'professor')
+          && <Breadcrumb.Item>User Details</Breadcrumb.Item>}
         </Breadcrumb>
         <h1>
           {`${user_data.first_name} ${user_data.last_name}`}

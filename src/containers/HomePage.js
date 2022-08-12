@@ -11,6 +11,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 
 import CustomFooter from '../components/layout/CustomFooter';
 import CustomHeader from '../components/layout/CustomHeader';
+import ProfessorSider from '../components/layout/ProfessorSider';
 
 import routes from '../constants/routesPaths';
 
@@ -57,6 +58,7 @@ const HomePage = ({ session }) => {
   return (
     <Layout>
       <CustomHeader />
+      {session.user.role === 'professor' && <ProfessorSider />}
       <Outlet />
       <CustomFooter />
     </Layout>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   Popover,
@@ -36,6 +36,8 @@ const DashboardStudents = ({
   const [messagePoking, setMessagePoking] = useState('');
   const [messageAssigning, setMessageAssigning] = useState('');
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     setSortedInfo(sortedInfo || { columnKey: 'status', order: true });
     setFilteredInfo(filteredInfo || { professor: [String(session.user.id)] });
@@ -44,7 +46,6 @@ const DashboardStudents = ({
   }, []);
 
   useEffect(() => {
-    console.log(projectId);
     if (course) {
       fetchStudents(course.id, projectId);
     }
@@ -62,11 +63,6 @@ const DashboardStudents = ({
       fetchStudents(course.id, projectId);
     }
   }, [finished_poke, finished_assign]);
-
-  const handleChange = (filters, sorter) => {
-    setSortedInfo(sorter);
-    setFilteredInfo(filters);
-  };
 
   const assign = (student, project) => {
     Modal.confirm({
@@ -172,18 +168,15 @@ const DashboardStudents = ({
     title: 'STUDENT NAME',
     dataIndex: 'first_name',
     key: 'first_name',
+    width: projectId ? '32%' : '20%',
     render: (_, record) => {
       const status = statusOfProject(record);
       return (
-        <div className={`line ${status.color}`}>
+        <div className={`line ${status.color} h-50`}>
           <span className="projectName">
             {record.first_name}
             {' '}
             {record.last_name}
-          </span>
-          <br />
-          <span className="projectProcess">
-            <Link to={`/students/${record.id}/projects`}>View Activity</Link>
           </span>
         </div>
       );
@@ -192,16 +185,17 @@ const DashboardStudents = ({
     title: 'TUTOR',
     dataIndex: 'professor',
     key: 'professor',
+    width: projectId ? '32%' : '20%',
     filters: students ? students
       .map((o) => ({ text: o.professor.first_name, value: o.professor.id }))
       .reduce((x, y) => (x.some((o) => o.value === y.value)
         ? x : [...x, y]), []) : [],
-    filteredValue: filteredInfo?.professor,
     onFilter: (value, record) => String(record.professor.id) === String(value),
     render: (text) => text.first_name,
   }, {
     title: 'CURRENT PROJECT',
     key: 'project',
+    width: '20%',
     className: projectId ? 'displayNone' : '',
     sorter: (a, b) => a.id - b.id,
     render: (_, record) => projectOfRecord(record).name,
@@ -210,35 +204,89 @@ const DashboardStudents = ({
     title: 'STATUS',
     dataIndex: 'status',
     key: 'status',
+    width: projectId ? '32%' : '20%',
     sorter: (a, b) => statusOfProject(a).status > statusOfProject(b).status,
     sortOrder: sortedInfo?.columnKey === 'status' && sortedInfo.order,
     render: (_, record) => {
       const status = statusOfProject(record);
 
       return status.status ? (
-        <Popover content={(<span style={{ maxWidth: '250px', display: 'block' }}>{status.msg}</span>)}>
-          <span>
-            <span className={`dot ${status.color}`} />
-            {status.status}
+        <Popover content={(
+          <span style={{ maxWidth: '250px', display: 'block' }}>
+            {status.msg}
           </span>
+        )}
+        >
+          <div>
+            <div className={`dot ${status.color}`} />
+            {status.status}
+          </div>
         </Popover>
-      ) : (<span />);
+      ) : (<div />);
     },
   }, {
     title: 'ACTION',
     key: 'action',
+    width: '10%',
     render: (_, record) => {
       const status = statusOfProject(record);
       let btn = (<span />);
 
       if (status.action === 'correct') {
-        btn = (<Link to={`/students/${record.id}/projects/${projectOfRecord(record).assigned_project_id}`}><Button type="boton1">Correct</Button></Link>);
+        btn = (
+          <Button
+            onClick={() => navigate(`/students/${record.id}/projects/${projectOfRecord(record).assigned_project_id}`)}
+            type="boton1"
+          >
+            Correct
+          </Button>
+        );
       } else if (status.action === 'poke_this') {
-        btn = (<button type="button" onClick={() => poke({ id: record.id, name: record.first_name }, projectOfRecord(record))}><Button type="boton1" disabled={messagePoking}>Poke</Button></button>);
+        btn = (
+          <Button
+            type="boton1"
+            onClick={() => poke(
+              { id: record.id, name: record.first_name },
+              projectOfRecord(record),
+            )}
+            disabled={messagePoking}
+          >
+            Poke
+          </Button>
+        );
       } else if (status.action === 'poke_current') {
-        btn = (<button type="button" onClick={() => poke({ id: record.id, name: record.first_name }, record.current_project)}><Button type="boton1" disabled={messagePoking}>Poke</Button></button>);
+        btn = (
+          <Button
+            type="boton1"
+            onClick={() => poke({ id: record.id, name: record.first_name }, record.current_project)}
+            disabled={messagePoking}
+          >
+            Poke
+          </Button>
+        );
       } else if (status.action === 'assign') {
-        btn = (<button type="button" onClick={() => assign({ id: record.id, name: record.first_name }, projectOfRecord(record))}><Button type="boton1" disabled={messageAssigning}>Assign</Button></button>);
+        btn = (
+          <Button
+            type="boton1"
+            onClick={() => assign(
+              { id: record.id, name: record.first_name },
+              projectOfRecord(record),
+            )}
+            disabled={messageAssigning}
+          >
+            Assign
+          </Button>
+        );
+      } else {
+        btn = (
+          <Button
+            onClick={() => navigate(`/students/${record.id}/projects/${(projectId && projectOfRecord(record).assigned_project_id) ? projectOfRecord(record).assigned_project_id : ''}`)}
+            type="boton1"
+            disabled={messageAssigning}
+          >
+            {`View Project${!projectId || status.status === 'Pending' ? 's' : ''}`}
+          </Button>
+        );
       }
 
       return btn;
@@ -251,9 +299,15 @@ const DashboardStudents = ({
       className="projectsListTable"
       columns={columns}
       dataSource={students}
-      onChange={handleChange}
       loading={loading}
       pagination={false}
+      onRow={(record) => ({
+        onClick: () => { navigate(`/students/${record.id}/projects/${(projectId && projectOfRecord(record).assigned_project_id) ? projectOfRecord(record).assigned_project_id : ''}`); }, // click row
+        style: {
+          height: '70px',
+          cursor: 'pointer',
+        },
+      })}
     />
   );
 };

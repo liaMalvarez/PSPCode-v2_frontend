@@ -12,15 +12,19 @@ import SelectCourse from '../components/common/SelectCourse';
 
 const { Content } = Layout;
 
-
-const DashboardProjectsPage = () => (
+const DashboardProjectsPage = ({ session }) => (
   <Layout>
-    <CustomHeader />
     <Layout className="ant-layout-has-sider">
-      <ProfessorSider selected="dashboard.projects" />
       <Content className="professorDashboard">
         <Breadcrumb>
-          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to={session.user.role === 'professor'
+              ? '/professor/dashboard/projects'
+              : `/students/${session.user.id}/projects`}
+            >
+              <HomeOutlined />
+            </Link>
+          </Breadcrumb.Item>
           <Breadcrumb.Item>Projects</Breadcrumb.Item>
         </Breadcrumb>
         <h1>Projects Dashboard</h1>
@@ -30,15 +34,13 @@ const DashboardProjectsPage = () => (
         <section>
           <DashboardProjects />
         </section>
-
       </Content>
     </Layout>
-    <CustomFooter />
   </Layout>
 );
 
 const mapStateToProps = (state) => ({
-  session: state.session
+  session: state.session,
 });
 
 const mapDispatchToProps = () => ({

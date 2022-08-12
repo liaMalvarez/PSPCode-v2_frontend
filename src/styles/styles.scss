@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:regular,bold,italic,light');
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Arvo&display=swap');
 
 $color_header: #393e3f;
@@ -13,10 +13,8 @@ $color_background: #f9f9f9;
 $color_professor_sider: rgb(2, 110, 107);
 $almost_gray: #92b0af;
 
-
 $color_1: #0dc0bb;
 $color_1_hover: #0F9692;
-
 
 /*****************************/
 /** UTILS ********************/
@@ -93,6 +91,7 @@ form .ant-input-number {
 }
 
 .custom-progress {
+  z-index: 1;
   .ant-progress-inner {
     vertical-align: top;
     position: fixed;
@@ -119,7 +118,7 @@ form .ant-input-number {
 .logo {
   display:block;
   color: $color_1;
-  font-family: 'Arvo', sans-serif;
+  font-family: "Arvo", sans-serif;
   span {
     color: $color_dos;
   }
@@ -202,11 +201,13 @@ form .ant-input-number {
 
 /*****************************/
 
-/*****************************/
-/** LAYOUT *******************/
-
 .ant-layout {
-  overflow: hidden;
+  min-height: 100vh;
+  font-weight: 300;
+  font-size: 18px;
+  font-family: 'Quicksand', sans-serif;
+  color: $color_header;
+  display: flex;
   a {
     font-weight: 300;
     color: $color_1;
@@ -220,20 +221,10 @@ form .ant-input-number {
     margin: 30px auto;
     border-top: 1px solid #CCC5;
   }
-}
-
-/*****************************/
-
-.ant-layout {
-  min-height: 100vh;
-  font-weight: 300;
-  font-size: 18px;
-  font-family: 'Quicksand', sans-serif;
-  color: $color_header;
-
   &:not(.darkLayout) {
     /*HEADER*/
     .ant-layout-header {
+      box-shadow: -1px -1px 20px 2px rgba(0, 0, 0, 0.24);
       color: $color_1;
       background: $color_header;
       height: 70px;
@@ -283,11 +274,20 @@ form .ant-input-number {
       }
     }
 
+    .studentsDashboard {
+      display: flex;
+      flex-direction: column;
+      max-width: 80% !important;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: -1px -1px 28px 5px rgba(0, 0, 0, 0.132);
+    }
+
     /* LEFT SIDER FOR PROFESSORS */
     .professorSider {
       background: $color_professor_sider;
       height: 100%;
-
+      z-index: 2;
       a {
         color: #fff;
         span {
@@ -302,7 +302,7 @@ form .ant-input-number {
           display: flex;
           align-items: center;
           &:hover {
-            background-color: #0c7572;
+            background-color: #13817e;
           }
           .anticon {
             position: absolute;
@@ -317,9 +317,10 @@ form .ant-input-number {
     /* CONTENT */
     .ant-layout-content {
       max-width: 100%;
-      padding: 85px 40px 20px 40px;
+      padding: 100px 40px 20px 40px;
       background-color: $color_background;
       transition: all 0.6s ease;
+
       h1 {
         margin-top: 10px;
         font-size: 20px;
@@ -366,6 +367,10 @@ form .ant-input-number {
 
 
 .projectsListTable {
+  box-shadow: -1px -1px 5px 1px rgba(165,183,190,0.22);
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 10px;
   .projectName {
     font-size: 16px;
   }
@@ -889,7 +894,7 @@ padding: 0;
 }
 
 .defect-alert {
-  width: 30%;
+  width: 35%;
   margin-top: 15px;
 }
 
@@ -936,4 +941,29 @@ padding: 0;
 
 .content-professor {
   margin-left: 200px;
+}
+
+.title {
+  font-weight: 500 !important;
+}
+
+.h-50 {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+.ant-table-column-sort {
+  background: none !important;
+  &hover {
+    background: #fafafa !important;
+  }
+}
+
+.ant-table-row {
+  background: white !important;
+}
+
+.ant-table-cell-row-hover {
+  background: #e7eff0b9 !important;
 }
