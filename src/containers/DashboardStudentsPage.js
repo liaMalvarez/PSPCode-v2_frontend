@@ -11,9 +11,7 @@ import SelectCourse from '../components/common/SelectCourse';
 
 const { Content } = Layout;
 
-require('antd/dist/antd.css');
-
-const DashboardStudentsPage = () => {
+const DashboardStudentsPage = ({ session }) => {
   const { idproject: projectId } = useParams();
 
   return (
@@ -21,9 +19,25 @@ const DashboardStudentsPage = () => {
       <ProfessorSider selected="dashboard.students" />
       <Content className="professorDashboard">
         <Breadcrumb>
-          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to={session.user.role === 'professor'
+              ? '/professor/dashboard/projects'
+              : `/students/${session.user.id}/projects`}
+            >
+              <HomeOutlined />
+            </Link>
+          </Breadcrumb.Item>
           { projectId && <Breadcrumb.Item><Link to="/professor/dashboard/projects">Projects</Link></Breadcrumb.Item> }
-          { projectId && <Breadcrumb.Item><SpanData entityName="project" entityId={projectId} loading output="name" /></Breadcrumb.Item> }
+          { projectId && (
+            <Breadcrumb.Item>
+              <SpanData
+                entityName="project"
+                entityId={projectId}
+                loading
+                output="name"
+              />
+            </Breadcrumb.Item>
+          )}
           { !projectId && <Breadcrumb.Item>Students</Breadcrumb.Item> }
         </Breadcrumb>
         {projectId && (
@@ -60,7 +74,8 @@ const DashboardStudentsPage = () => {
   );
 };
 
-const mapStateToProps = () => ({
+const mapStateToProps = (state) => ({
+  session: state.session,
 });
 
 const mapDispatchToProps = () => ({

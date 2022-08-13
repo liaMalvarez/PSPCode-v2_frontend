@@ -44,6 +44,7 @@ class DashboardProjects extends Component {
   render() {
     this.state.sortedInfo = this.state.sortedInfo || {};
     this.state.filteredInfo = this.state.filteredInfo || {};
+
     const columns = [{
       title: 'PROJECT NAME',
       dataIndex: 'name',

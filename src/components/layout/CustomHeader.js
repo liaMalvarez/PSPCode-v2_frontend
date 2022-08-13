@@ -67,7 +67,12 @@ const CustomHeader = ({
   return (
     <Header>
       <div className="logoBar">
-        <Link to="/"><Logo /></Link>
+        <Link to={session.user.role === 'professor'
+          ? '/professor/dashboard/projects'
+          : `students/${session.user.id}/projects`}
+        >
+          <Logo />
+        </Link>
       </div>
       <div className="notificationBar">
         <div className="item">

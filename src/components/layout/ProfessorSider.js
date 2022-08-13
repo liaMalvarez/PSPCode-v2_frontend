@@ -1,12 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { Layout } from 'antd';
 import { CaretLeftOutlined } from '@ant-design/icons';
 
 const { Sider } = Layout;
 
-const ProfessorSider = ({ session, selected }) => {
+const ProfessorSider = ({ session }) => {
+  const { pathname } = useLocation();
+  const { idproject: projectId } = useParams();
+
   if (session.user.role !== 'professor') {
     return (<div />);
   }
@@ -16,13 +20,29 @@ const ProfessorSider = ({ session, selected }) => {
       <Link to="/professor/dashboard/projects">
         <span>
           Projects Dashboard
-          {selected === 'dashboard.projects' && <CaretLeftOutlined />}
+          {!pathname.includes('students') && (
+          <CaretLeftOutlined style={{
+            border: 'none',
+            fontSize: '200%',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          />
+          )}
         </span>
       </Link>
       <Link to="/professor/dashboard/students">
         <span>
           Students Dashboard
-          {selected === 'dashboard.students' && <CaretLeftOutlined />}
+          {pathname.includes('students') && !projectId && (
+          <CaretLeftOutlined style={{
+            border: 'none',
+            fontSize: '200%',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          />
+          )}
         </span>
       </Link>
     </Sider>

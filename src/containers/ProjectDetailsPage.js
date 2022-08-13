@@ -53,8 +53,6 @@ import {
 } from '../actions/projectActions';
 import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
-require('antd/dist/antd.css');
-
 const { Content, Sider } = Layout;
 const { TextArea } = Input;
 const { TabPane } = Tabs;
@@ -657,7 +655,14 @@ const ProjectDetailsPage = ({
         : ''}
       >
         <Breadcrumb>
-          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to={session.user.role === 'professor'
+              ? '/professor/dashboard/projects'
+              : `/students/${session.user.id}/projects`}
+            >
+              <HomeOutlined />
+            </Link>
+          </Breadcrumb.Item>
           {session.user.role !== 'professor' && <Breadcrumb.Item><Link to={`/students/${studentId}/projects`}>Projects</Link></Breadcrumb.Item>}
           {session.user.role === 'professor' && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
           {session.user.role === 'professor' && <Breadcrumb.Item><Link to={`/users/${studentId}`}><SpanData entityName="student" entityId={studentId} loading output="first_name" /></Link></Breadcrumb.Item>}
@@ -712,7 +717,7 @@ const ProjectDetailsPage = ({
 
       <Sider className={`sider ${isOpenSider ? 'sider-open' : 'sider-close'}`}>
         <div className="box">
-          <h2>Project Timeline</h2>
+          <h2 className="title">Project Timeline</h2>
           <Timeline>
             {printTimeLine()}
           </Timeline>

@@ -1,15 +1,13 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import {
   Table,
-  Button,
   Popover,
 } from 'antd';
 
 import {
   fetchProjects,
-  fetchProjectsFailure,
   fetchProjectsSuccess,
   resetProjectsList,
 } from '../../actions/projectActions';
@@ -17,116 +15,115 @@ import { PROJECT_STATUS } from '../../constants/constants';
 
 const moment = require('moment/moment');
 
-class ProjectList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { sortedInfo: null, filteredInfo: null };
-  }
+const ProjectList = ({
+  studentId,
+  reset,
+  fetchProjectsProp,
+  projects,
+  loading,
+}) => {
+  const [sortedInfo, setSortedInfo] = useState({});
+  const [filteredInfo, setFilteredInfo] = useState({});
 
-  componentDidMount() {
-    this.props.fetchProjects(this.props.studentId);
-  }
+  const navigate = useNavigate();
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
+  useEffect(() => {
+    fetchProjectsProp(studentId);
+    return reset;
+  }, []);
 
-  handleChange = (_, filters, sorter) => {
-    this.setState({ sortedInfo: sorter, filteredInfo: filters });
+  const handleChange = (_, filters, sorter) => {
+    setFilteredInfo(filters);
+    setSortedInfo(sorter);
   };
 
-  render() {
-    this.state.sortedInfo = this.state.sortedInfo || {};
-    this.state.filteredInfo = this.state.filteredInfo || {};
-    const columns = [{
-      title: 'PROJECT NAME',
-      dataIndex: 'name',
-      key: 'name',
-      width: '22%',
-      render: (_, record) => {
-        const status = (moment.duration(moment(record.deadline).diff(moment()))
-          .asMilliseconds() < 0
-        && record.status != 'approved') ? 'dued' : record.status;
+  const columns = [{
+    title: 'PROJECT NAME',
+    dataIndex: 'name',
+    key: 'name',
+    width: '22%',
+    render: (_, record) => {
+      const status = (moment.duration(moment(record.deadline).diff(moment()))
+        .asMilliseconds() < 0
+        && record.status !== 'approved') ? 'dued' : record.status;
 
-        return (
-          <div className={`line ${status}`}>
-            <span className="projectName">{record.name}</span>
-            <br />
-            <span className="projectProcess">
-              Process:
-              {' '}
-              {record.process.name}
-            </span>
-          </div>
-        );
-      },
-    }, {
-      title: 'ASSIGNED DATE',
-      dataIndex: 'assigned',
-      key: 'assigned',
-      width: '22%',
-      sorter: (a, b) => moment.duration(moment(b.assigned).diff(moment(a.assigned))).asMilliseconds(),
-      render: (text) => moment(text).format('DD/MM/YYYY'),
-      sortOrder: this.state.sortedInfo.columnKey === 'assigned' && this.state.sortedInfo.order,
-    }, {
-      title: 'DEADLINE',
-      dataIndex: 'deadline',
-      key: 'deadline',
-      width: '22%',
-      sorter: (a, b) => moment.duration(moment(b.deadline).diff(moment(a.deadline))).asMilliseconds(),
-      render: (text) => moment(text).format('DD/MM/YYYY'),
-      sortOrder: this.state.sortedInfo.columnKey === 'deadline' && this.state.sortedInfo.order,
-    }, {
-      title: 'STATUS',
-      dataIndex: 'status',
-      key: 'status',
-      width: '22%',
-      filters: [
-        { text: 'Approved', value: 'approved' },
-        { text: 'Working', value: 'working' },
-        { text: 'Assigned', value: 'assigned' },
-        { text: 'Being Corrected', value: 'being_corrected' },
-      ],
-      filteredValue: this.state.filteredInfo.status,
-      onFilter: (value, record) => record.status.includes(value),
-      render: (text, record, index) => {
-        const status = (moment.duration(moment(record.deadline).diff(moment()))
-          .asMilliseconds() < 0
-        && record.status != 'approved') ? 'dued' : record.status;
-
-        const span = (
-          <span>
-            <span className={`dot ${status}`} />
-            {PROJECT_STATUS[text].name}
+      return (
+        <div className={`line ${status}`}>
+          <span className="projectName">{record.name}</span>
+          <br />
+          <span className="projectProcess">
+            Process:
+            {' '}
+            {record.process.name}
           </span>
-        );
-        if (status === 'dued') {
-          return (<Popover content="This project is dued, harry up!">{span}</Popover>);
-        }
-        return span;
-      },
-    }, {
-      title: 'ACTION',
-      key: 'action',
-      render: (_, record) => (
-        <Link to={`/students/${this.props.studentId}/projects/${record.key}`}>
-          <Button type="boton1">View Project</Button>
-        </Link>
-      ),
-    }];
+        </div>
+      );
+    },
+  }, {
+    title: 'ASSIGNED DATE',
+    dataIndex: 'assigned',
+    key: 'assigned',
+    width: '22%',
+    sorter: (a, b) => moment.duration(moment(b.assigned).diff(moment(a.assigned))).asMilliseconds(),
+    render: (text) => moment(text).format('DD/MM/YYYY'),
+    sortOrder: sortedInfo.columnKey === 'assigned' && sortedInfo.order,
+  }, {
+    title: 'DEADLINE',
+    dataIndex: 'deadline',
+    key: 'deadline',
+    width: '22%',
+    sorter: (a, b) => moment.duration(moment(b.deadline).diff(moment(a.deadline))).asMilliseconds(),
+    render: (text) => moment(text).format('DD/MM/YYYY'),
+    sortOrder: sortedInfo.columnKey === 'deadline' && sortedInfo.order,
+  }, {
+    title: 'STATUS',
+    dataIndex: 'status',
+    key: 'status',
+    width: '22%',
+    filters: [
+      { text: 'Approved', value: 'approved' },
+      { text: 'Working', value: 'working' },
+      { text: 'Assigned', value: 'assigned' },
+      { text: 'Being Corrected', value: 'being_corrected' },
+    ],
+    filteredValue: filteredInfo.status,
+    onFilter: (value, record) => record.status.includes(value),
+    render: (text, record, index) => {
+      const status = (moment.duration(moment(record.deadline).diff(moment()))
+        .asMilliseconds() < 0
+        && record.status != 'approved') ? 'dued' : record.status;
 
-    return (
-      <Table
-        className="projectsListTable"
-        columns={columns}
-        dataSource={this.props.projects}
-        onChange={this.handleChange}
-        loading={this.props.loading}
-        pagination={false}
-      />
-    );
-  }
-}
+      const span = (
+        <span>
+          <span className={`dot ${status}`} />
+          {PROJECT_STATUS[text].name}
+        </span>
+      );
+      if (status === 'dued') {
+        return (<Popover content="This project is dued, harry up!">{span}</Popover>);
+      }
+      return span;
+    },
+  }];
+
+  return (
+    <Table
+      className="projectsListTable"
+      columns={columns}
+      dataSource={projects}
+      onChange={handleChange}
+      loading={loading}
+      onRow={(record) => ({
+        onClick: () => { navigate(`/students/${studentId}/projects/${record.key}`); }, // click row
+        style: {
+          height: '70px',
+          cursor: 'pointer',
+        },
+      })}
+      pagination={false}
+    />
+  );
+};
 
 const mapStateToProps = (state) => ({
   projects: state.projects.list.projects,
@@ -135,7 +132,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  fetchProjects: (userid) => {
+  fetchProjectsProp: (userid) => {
     dispatch(fetchProjects(userid)).payload.then((result) => {
       dispatch(fetchProjectsSuccess(result));
     });

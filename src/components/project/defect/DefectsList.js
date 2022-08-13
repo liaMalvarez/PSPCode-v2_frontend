@@ -6,7 +6,9 @@ import {
   Button,
   Table,
 } from 'antd';
-import { InfoCircleOutlined, EditOutlined, DeleteOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  InfoCircleOutlined, EditOutlined, DeleteOutlined, CloseOutlined,
+} from '@ant-design/icons';
 
 import {
   deleteDefectOnProjectVersionPhase, deleteDefectOnProjectVersionPhaseFailure, deleteDefectOnProjectVersionPhaseSuccess,
@@ -102,7 +104,7 @@ class DefectsList extends Component {
           r = text;
         }
         return r;
-      }
+      },
     }, {
       title: 'DESCRIPTION',
       dataIndex: 'description',
@@ -116,19 +118,39 @@ class DefectsList extends Component {
             <span><InfoCircleOutlined /></span>
           </Popover>
         );
-      }
+      },
     }, {
       title: 'ACTION',
       key: 'action',
       render: (text, record, index) => (
         <span>
-          <Button onClick={() => this.props.onEdit(record)} icon={<EditOutlined />} disabled={!this.props.canEdit} />
-&nbsp;
-          <Button onClick={() => this.deleteDefect(record.id)} icon={<CloseOutlined />} disabled={!this.props.canEdit} />
-        </span>)
+          <Button
+            onClick={() => this.props.onEdit(record)}
+            icon={<EditOutlined />}
+            disabled={!this.props.canEdit}
+          />
+          &nbsp;
+          <Button
+            onClick={() => this.deleteDefect(record.id)}
+            icon={<CloseOutlined />}
+            disabled={!this.props.canEdit}
+          />
+        </span>
+      ),
     }];
     return (
-      <Table columns={columns} rowKey="id" loading={this.props.loading || this.props.deleting || this.props.creating || this.props.editing} dataSource={this.props.defects} onChange={this.handleChange} pagination={false} />
+      <Table
+        className="projectsListTable"
+        columns={columns}
+        rowKey="id"
+        loading={this.props.loading
+          || this.props.deleting
+          || this.props.creating
+          || this.props.editing}
+        dataSource={this.props.defects}
+        onChange={this.handleChange}
+        pagination={false}
+      />
     );
   }
 }
@@ -137,20 +159,22 @@ const mapStateToProps = (state) => ({
   loading: state.projects.project_version_defects_loading,
   deleting: state.projects.project_version_phase_defect_deleting,
   creating: state.projects.project_version_phase_defect_creating,
-  editing: state.projects.project_version_phase_defect_editing
+  editing: state.projects.project_version_phase_defect_editing,
 });
 
 const mapDispatchToProps = (dispatch) => ({
 
   deleteDefect: (userid, projectid, versionid, phaseid, defectid) => {
-    dispatch(deleteDefectOnProjectVersionPhase(userid, projectid, versionid, phaseid, defectid)).payload.then((result) => {
-      if (true) {
-        dispatch(deleteDefectOnProjectVersionPhaseSuccess(result));
-      } else {
-        dispatch(deleteDefectOnProjectVersionPhaseFailure(result.error));
-      }
+    dispatch(deleteDefectOnProjectVersionPhase(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+      defectid,
+    )).payload.then((result) => {
+      dispatch(deleteDefectOnProjectVersionPhaseSuccess(result));
     });
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DefectsList);

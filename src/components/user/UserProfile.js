@@ -18,8 +18,6 @@ import InputTooltip from '../common/InputTooltip';
 import { ROLES } from '../../constants/constants';
 import { updateUser, updateUserSuccess, updateUserFailure } from '../../actions/userActions';
 
-require('antd/dist/antd.css');
-
 const FormItem = Form.Item;
 const { Option } = Select;
 
@@ -30,7 +28,7 @@ const UserProfile = ({
   returnToProjectId,
   updateUserProp,
   user,
-  loading
+  loading,
 }) => {
   const navigate = useNavigate();
 
