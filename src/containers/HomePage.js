@@ -3,11 +3,15 @@ import {
   Navigate,
   Outlet,
   useLocation,
-  matchPath
+  matchPath,
 } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Layout } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
-import CustomProgress from '../components/common/CustomProgress';
+import CustomFooter from '../components/layout/CustomFooter';
+import CustomHeader from '../components/layout/CustomHeader';
+
 import routes from '../constants/routesPaths';
 
 require('antd/dist/antd.css');
@@ -36,8 +40,9 @@ const HomePage = ({ session }) => {
     );
   }
 
-  if ((!session.authenticated && !hasUpdated) || (session.authenticated && !Object.keys(session.user).length)) {
-    return (<CustomProgress />);
+  if ((!session.authenticated && !hasUpdated)
+  || (session.authenticated && !Object.keys(session.user).length)) {
+    return (<LoadingOutlined size="large" />);
   }
 
   if (pathname === '/' || pathname === '/session/login' || !allowedRoute) {
@@ -50,7 +55,11 @@ const HomePage = ({ session }) => {
   }
 
   return (
-    <Outlet />
+    <Layout>
+      <CustomHeader />
+      <Outlet />
+      <CustomFooter />
+    </Layout>
   );
 };
 

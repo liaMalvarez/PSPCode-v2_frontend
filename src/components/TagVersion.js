@@ -37,7 +37,7 @@ class TagVersion extends Component {
 
   render() {
     if (this.props.timeline.reduce((x, y) => (x.some((o) => o.version.id === y.version.id) ? x : [...x, y]), []).length === 1) {
-      return (<span />);
+      return (<div />);
     }
 
     return (

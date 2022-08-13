@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Progress } from 'antd';
 
 const CustomProgress = () => (
-  <div className="customProgress">
-    <Progress strokeWidth={5} status="active" percent={100} showInfo={false} />
+  <div className="custom-progress">
+    <Progress
+      strokeWidth={10}
+      strokeColor={{
+        '0%': '#92b0af',
+        '100%': '#0dc0bb',
+      }}
+      status="active"
+      percent={100}
+      showInfo={false}
+      strokeLinecap="square"
+    />
   </div>
 );
 

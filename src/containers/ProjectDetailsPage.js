@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import cs from 'classnames';
 import {
   CloudUploadOutlined,
   CheckCircleOutlined,
@@ -11,7 +12,7 @@ import {
   CloseOutlined,
   LoadingOutlined,
   UploadOutlined,
-  RightOutlined
+  RightOutlined,
 } from '@ant-design/icons';
 import {
   Layout,
@@ -25,13 +26,20 @@ import {
   Popover,
   Upload,
   Form,
-  Input
+  Input,
 } from 'antd';
 
-import CustomHeader from '../components/layout/CustomHeader';
-import CustomFooter from '../components/layout/CustomFooter';
 import TagVersion from '../components/TagVersion';
 import CustomTag from '../components/CustomTag';
+import ProjectDetailsSummary from '../components/project/ProjectDetailsSummary';
+import ProjectDetailsPhases from '../components/project/ProjectDetailsPhases';
+import ProjectDetailsMessages from '../components/project/ProjectDetailsMessages';
+import ProjectDetailsFiles from '../components/project/ProjectDetailsFiles';
+import WorkingTime from '../components/project/detail/WorkingTime';
+import ProfessorSider from '../components/layout/ProfessorSider';
+import SpanData from '../components/common/SpanData';
+import CustomProgress from '../components/common/CustomProgress';
+
 import projectApi from '../api/projectApi';
 import { PROJECT_STATUS, TEXTS } from '../constants/constants';
 import {
@@ -41,16 +49,8 @@ import {
   submitProjectVersionSuccess, professorProjectApprove,
   professorProjectApproveSuccess, professorProjectReject,
   professorProjectRejectSuccess, startProject, startProjectSuccess,
-  continueProject, continueProjectSuccess, resetProjectDetails, resetProjectDetailsVersion
+  continueProject, continueProjectSuccess, resetProjectDetails, resetProjectDetailsVersion,
 } from '../actions/projectActions';
-import ProjectDetailsSummary from '../components/project/ProjectDetailsSummary';
-import ProjectDetailsPhases from '../components/project/ProjectDetailsPhases';
-import ProjectDetailsMessages from '../components/project/ProjectDetailsMessages';
-import ProjectDetailsFiles from '../components/project/ProjectDetailsFiles';
-import WorkingTime from '../components/project/detail/WorkingTime';
-import ProfessorSider from '../components/layout/ProfessorSider';
-import SpanData from '../components/common/SpanData';
-import CustomProgress from '../components/common/CustomProgress';
 import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
 require('antd/dist/antd.css');
@@ -83,13 +83,11 @@ const ProjectDetailsPage = ({
   project_error,
   finished_continueing,
   finished_approving,
-  fetchProjectDetailsVersionSummaryProp
+  fetchProjectDetailsVersionSummaryProp,
 }) => {
   const navigate = useNavigate();
   const { idstudent: studentId, idproject: project_id, tab } = useParams();
-  const params = useParams();
 
-  console.log('paraaaams', params);
   const [defaultActiveKey, setDefaultActiveKey] = useState(tab || 'summary');
   const [modalUpdateLOCs, setModalUpdateLOCs] = useState({ total: '', new_reusable: '' });
   const [redeliver, setRedeliver] = useState(false);
@@ -100,13 +98,13 @@ const ProjectDetailsPage = ({
   const [messageApproving, setMessageApproving] = useState(false);
   const [inputModalUpdateLOCsAdded, setInputModalUpdateLOCsAdded] = useState(null);
   const [inputModalUpdateLOCsAM, setInputModalUpdateLOCsAM] = useState(null);
+  const [isOpenSider, setIsOpenSider] = useState(false);
 
   const changeTab = (key) => {
     const allowed_tabs = ['summary', 'phases', 'files', 'messages'];
     key = allowed_tabs.some((x) => x === key) ? key : allowed_tabs[0];
 
     if (key === 'summary' && version_data) {
-      console.log('VERSION DATA', version_data);
       fetchProjectDetailsVersionSummaryProp(studentId, project_id, version_data.id);
     }
     setDefaultActiveKey(key);
@@ -116,6 +114,8 @@ const ProjectDetailsPage = ({
     if (!psp_data) {
       fetchPSPData();
     }
+
+    setTimeout(() => setIsOpenSider(true), 1100);
 
     return () => {
       reset();
@@ -141,7 +141,12 @@ const ProjectDetailsPage = ({
       }
     }
 
-    if (project_data && !project_loading && !project_error && !version_loading && !version_error && !version_data) {
+    if (project_data
+      && !project_loading
+      && !project_error
+      && !version_loading
+      && !version_error
+      && !version_data) {
       const lastVersionID = project_data.timeline[project_data.timeline.length - 1].version.id;
       fetchProjectDetailsVersionProp(studentId, project_id, lastVersionID);
     }
@@ -180,7 +185,7 @@ const ProjectDetailsPage = ({
     finished_rejecting,
     finished_starting,
     finished_continueing,
-    finished_approving
+    finished_approving,
   ]);
 
   const correctProjectFunc = (verdict) => {
@@ -200,7 +205,10 @@ const ProjectDetailsPage = ({
           <br />
           <b>Attach Grading Checklist: </b>
           <br />
-          <Upload {...uploaderProps} customRequest={(x) => setCorrectProject({ ...correctProject, file: x.file })}>
+          <Upload
+            {...uploaderProps}
+            customRequest={(x) => setCorrectProject({ ...correctProject, file: x.file })}
+          >
             <Button>
               <CloudUploadOutlined />
               {' '}
@@ -212,7 +220,6 @@ const ProjectDetailsPage = ({
           <b>Message: </b>
         </div>
         <Form onSubmit={() => {}}>
-
           <TextArea autosize={{ minRows: 4 }} placeholder={verdict === 'approved' ? TEXTS.project_details_modal_correctproject_veredict_placeholder_approved : TEXTS.project_details_modal_correctproject_veredict_placeholder_not_approved} onChange={(e) => setCorrectProject({ ...correctProject, message: e.target.value })} />
         </Form>
       </div>
@@ -232,10 +239,20 @@ const ProjectDetailsPage = ({
         }
         if (verdict === 'approved') {
           setMessageApproving(true);
-          approveProject(project_data.course.id, project_data.course_project_instance.id, project_data.id, correctProject);
+          approveProject(
+            project_data.course.id,
+            project_data.course_project_instance.id,
+            project_data.id,
+            correctProject,
+          );
         } else {
           setMessageRejecting(true);
-          rejectProject(project_data.course.id, project_data.course_project_instance.id, project_data.id, correctProject);
+          rejectProject(
+            project_data.course.id,
+            project_data.course_project_instance.id,
+            project_data.id,
+            correctProject,
+          );
         }
       },
       onCancel() {
@@ -254,37 +271,50 @@ const ProjectDetailsPage = ({
   const submissionChecklist = () => {
     const checklist = [];
 
-    if (psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.some((o) => o && o.first)) {
+    if (psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id)
+      .process.phases.some((o) => o && o.first)) {
       checklist.push({
         key: 'first_phase',
-        message: `The first phase is ${psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.first).name}`,
-        valid: (version_data.phases.length > 0 && version_data.phases[0].psp_phase && version_data.phases[0].psp_phase.id === psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.first).id)
+        message: `The first phase is 
+        ${psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.first).name}`,
+        valid: (version_data.phases.length > 0
+          && version_data.phases[0].psp_phase
+          && version_data.phases[0].psp_phase.id === psp_data.processes
+            .find((o) => o.process.id == project_data.psp_project.process.id)
+            .process.phases.find((o) => o && o.first).id),
       });
     }
 
-    if (project_data.timeline[project_data.timeline.length - 1].version.version === 1 && psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.some((o) => o && o.last)) {
+    if (project_data.timeline[project_data.timeline.length - 1].version.version === 1
+      && psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id)
+        .process.phases.some((o) => o && o.last)) {
       checklist.push({
         key: 'last_phase',
         message: `The last phase is ${psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.last).name}`,
-        valid: (version_data.phases.length > 0 && version_data.phases[version_data.phases.length - 1].psp_phase && version_data.phases[version_data.phases.length - 1].psp_phase.id === psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.last).id)
+        valid: (version_data.phases.length > 0
+          && version_data.phases[version_data.phases.length - 1].psp_phase
+          && version_data.phases[version_data.phases.length - 1].psp_phase.id === psp_data.processes
+            .find((o) => o.process.id == project_data.psp_project.process.id)
+            .process.phases.find((o) => o && o.last).id),
       });
     }
 
     checklist.push({
       key: 'all_phase_have_time',
       message: 'All the phases have start and end time',
-      valid: version_data.phases.reduce((acc, x) => acc && x.start_time !== null && x.end_time !== null, true)
+      valid: version_data.phases.reduce((acc, x) => acc
+        && x.start_time !== null && x.end_time !== null, true),
     });
 
     checklist.push({
       key: 'zip_uploaded',
       message: 'You have attached the zip file',
-      valid: (version_data.file)
+      valid: (version_data.file),
     });
 
     return {
       list: checklist,
-      canSubmit: (typeof checklist.find((o) => !o.valid) === 'undefined')
+      canSubmit: (typeof checklist.find((o) => !o.valid) === 'undefined'),
     };
   };
 
@@ -311,19 +341,37 @@ const ProjectDetailsPage = ({
       </FormItem>
 
       <FormItem label="Added (A)">
-        <InputNumber min={0} ref={(input) => setInputModalUpdateLOCsAdded(input.inputNumberRef)} disabled />
+        <InputNumber
+          min={0}
+          ref={(input) => setInputModalUpdateLOCsAdded(input.inputNumberRef)}
+          disabled
+        />
       </FormItem>
 
       <FormItem label="Added + Modified (A&M)">
-        <InputNumber min={0} ref={(input) => setInputModalUpdateLOCsAM(input.inputNumberRef)} disabled />
+        <InputNumber
+          min={0}
+          ref={(input) => setInputModalUpdateLOCsAM(input.inputNumberRef)}
+          disabled
+        />
       </FormItem>
 
       <FormItem label="* Total (T)">
-        <InputNumber min={0} onChange={(v) => { inputModalUpdateLOCsAdded.setValue(v); inputModalUpdateLOCsAM.setValue(v); setModalUpdateLOCs({ ...modalUpdateLOCs, total: v }); }} />
+        <InputNumber
+          min={0}
+          onChange={(v) => {
+            inputModalUpdateLOCsAdded.setValue(v);
+            inputModalUpdateLOCsAM.setValue(v);
+            setModalUpdateLOCs({ ...modalUpdateLOCs, total: v });
+          }}
+        />
       </FormItem>
 
       <FormItem label="* New Reusable (NR)">
-        <InputNumber min={0} onChange={(value) => setModalUpdateLOCs({ ...modalUpdateLOCs, new_reusable: value })} />
+        <InputNumber
+          min={0}
+          onChange={(value) => setModalUpdateLOCs({ ...modalUpdateLOCs, new_reusable: value })}
+        />
       </FormItem>
     </Form>
   );
@@ -336,7 +384,9 @@ const ProjectDetailsPage = ({
     projectApi.first_project(studentId).then((data) => {
       message.loading('Validating, wait a second', 4);
 
-      const need_to_update_locs = data.phase_instance && (data.phase_instance.total == null || data.phase_instance.total == 0);
+      const need_to_update_locs = data.phase_instance
+      && (data.phase_instance.total == null || data.phase_instance.total == 0);
+
       if (!need_to_update_locs) {
         Modal.confirm({
           title: 'Confirmation Required',
@@ -359,18 +409,30 @@ const ProjectDetailsPage = ({
           cancelText: 'Cancel',
           onOk() {
             // Required Inputs
-            if (!modalUpdateLOCs.total > 0
-              || modalUpdateLOCs.new_reusable === ''
-            ) {
+            if (!modalUpdateLOCs.total > 0 || modalUpdateLOCs.new_reusable === '') {
               message.warning('You must fill all the required inputs (marked with *)', 7);
               return true;
             }
-            projectApi.assigned_project_version_phases_update(studentId, data.id, data.project_delivery_id, data.phase_instance.id, {
-              modified: 0, deleted: 0, reused: 0, new_reusable: modalUpdateLOCs.new_reusable, total: modalUpdateLOCs.total
-            }).then(() => {
+
+            projectApi.assigned_project_version_phases_update(
+              studentId,
+              data.id,
+              data.project_delivery_id,
+              data.phase_instance.id,
+              {
+                modified: 0,
+                deleted: 0,
+                reused: 0,
+                new_reusable:
+                modalUpdateLOCs.new_reusable,
+                total: modalUpdateLOCs.total,
+              },
+            ).then(() => {
               message.loading('Updating, wait a second', 4);
               submitProject();
             });
+
+            return false;
           },
           onCancel() {
           },
@@ -378,19 +440,18 @@ const ProjectDetailsPage = ({
       }
     }).catch((data) => {
       console.log('Something went wrong fetching user');
-      console.log(data);
     });
   };
 
   const startProjectFunc = () => {
     const required_attrs = ['academic_experience', 'collegue_career_progress', 'programming_experience', 'programming_language'];
-    const background_ok = required_attrs.reduce((x, y) => x && session.user[y] && session.user[y].length > 0, true);
+    const background_ok = required_attrs
+      .reduce((x, y) => x && session.user[y] && session.user[y].length > 0, true);
 
     if (background_ok) {
       setMessageStarting(true);
       startProjectProp(studentId, project_id);
       message.destroy();
-      console.log('SALE');
     } else {
       Modal.confirm({
         title: 'Action Required',
@@ -407,7 +468,7 @@ const ProjectDetailsPage = ({
     }
   };
 
-  const continueProject = () => {
+  const onContinueProject = () => {
     setMessageContinueing(true);
     continueProjectProp(studentId, project_id);
     setRedeliver(true);
@@ -474,7 +535,7 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here, make your corrections and submit it again" placement="leftBottom">
-            <Button onClick={continueProject} icon={<RightOutlined />} type="boton1">
+            <Button onClick={onContinueProject} icon={<RightOutlined />} type="boton1">
               Continue
               {project_data.psp_project.name}
             </Button>
@@ -505,7 +566,17 @@ const ProjectDetailsPage = ({
     );
     return (
       <Popover title="Working Time" content={popOverText} placement="bottom">
-        <div className="projectTime"><WorkingTime phases={version_data.phases} working={(version_data.status === 'working')} actualTime={version_data.summary && version_data.summary.phases && version_data.summary.phases.some((o) => o.metric == 'TOTAL') ? version_data.summary.phases.find((o) => o.metric == 'TOTAL').actual : 0} /></div>
+        <div className="projectTime">
+          <WorkingTime
+            phases={version_data.phases}
+            working={(version_data.status === 'working')}
+            actualTime={version_data.summary
+              && version_data.summary.phases
+              && version_data.summary.phases
+                .some((o) => o.metric == 'TOTAL') ? version_data.summary.phases
+                .find((o) => o.metric == 'TOTAL').actual : 0}
+          />
+        </div>
       </Popover>
     );
   };
@@ -514,16 +585,11 @@ const ProjectDetailsPage = ({
     navigate(`/students/${studentId}/projects/${project_id}/${key}`);
   };
 
-  if (project_loading || !project_data) {
-    return (<CustomProgress />);
-  }
-  if (!version_loading && !version_error && !version_data) {
-    return (<CustomProgress />);
-  }
-  if (version_loading || !version_data) {
-    return (<CustomProgress />);
-  }
-  if (session.user.role !== 'professor' && session.user.id != studentId) {
+  if ((project_loading || !project_data)
+    || (!version_loading && !version_error && !version_data)
+    || (version_loading || !version_data)
+    || (session.user.role !== 'professor' && session.user.id != studentId)
+  ) {
     return (<CustomProgress />);
   }
 
@@ -550,12 +616,12 @@ const ProjectDetailsPage = ({
             to submit this project.
           </span>
         </div>
-      )
+      ),
     },
     {
       name: project_data.psp_project.process.name,
       title: 'PSP Process',
-      description: tagBasicDescription(`This projects follows ${project_data.psp_project.process.name}`)
+      description: tagBasicDescription(`This projects follows ${project_data.psp_project.process.name}`),
     },
     {
       name: project_data.professor.first_name,
@@ -571,65 +637,88 @@ const ProjectDetailsPage = ({
             <a href={`to:${project_data.professor.email}`}>{project_data.professor.email}</a>
           </span>
         </div>
-      )
+      ),
     },
     {
       name: project_data.language,
       title: 'Programming Language',
-      description: tagBasicDescription(`You have chosen to develop this project in ${project_data.language}`)
+      description: tagBasicDescription(`You have chosen to develop this project in ${project_data.language}`),
     },
   ];
-  
+
   return (
-    <Layout>
-      <CustomHeader />
-      <Layout className="projectDetails">
-        <ProfessorSider selected="dashboard.students" />
-        <Content>
-          <Breadcrumb>
-            <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
-            {session.user.role !== 'professor' && <Breadcrumb.Item><Link to={`/students/${studentId}/projects`}>Projects</Link></Breadcrumb.Item>}
-            {session.user.role === 'professor' && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
-            {session.user.role === 'professor' && <Breadcrumb.Item><Link to={`/users/${studentId}`}><SpanData entityName="student" entityId={studentId} loading output="first_name" /></Link></Breadcrumb.Item>}
-            {session.user.role === 'professor' && <Breadcrumb.Item><Link to={`/students/${studentId}/projects`}>Projects</Link></Breadcrumb.Item>}
-            <Breadcrumb.Item>{project_data.psp_project.name}</Breadcrumb.Item>
-          </Breadcrumb>
-          <h1>{project_data.psp_project.name}</h1>
-          <section style={{ textAlign: 'right' }}>
-            {tagsInfo.map((tagInfo) => <CustomTag key={tagInfo.name} {...tagInfo} />)}
-            <TagVersion active={version_data} timeline={project_data.timeline} onChange={fetchProjectDetailsVersionProp} idstudent={studentId} idproject={project_id} />
-          </section>
-          <section>
-            <Tabs tabBarExtraContent={renderWorkingTime()} activeKey={defaultActiveKey} onChange={(key) => goToTab(key)}>
-              <TabPane tab="SUMMARY" key="summary">
-                <ProjectDetailsSummary studentId={studentId} project={project_data} version={version_data} />
-              </TabPane>
-              <TabPane tab="PHASES" key="phases">
-                <ProjectDetailsPhases studentId={studentId} project={project_data} version={version_data} />
-              </TabPane>
-              <TabPane tab="FILES" key="files">
-                <ProjectDetailsFiles studentId={studentId} project={project_data} version={version_data} />
-              </TabPane>
-              <TabPane tab="MESSAGES" key="messages">
-                <ProjectDetailsMessages studentId={studentId} project={project_data} />
-              </TabPane>
-            </Tabs>
-          </section>
+    <Layout className="projectDetails">
+      <ProfessorSider selected="dashboard.students" />
+      <Content className={isOpenSider || session.user.role === 'professor'
+        ? `content-with-sider ${cs(
+          { 'content-double-sider': isOpenSider && session.user.role === 'professor' },
+          { 'content-professor': session.user.role === 'professor' },
+        )}`
+        : ''}
+      >
+        <Breadcrumb>
+          <Breadcrumb.Item><Link to="/"><HomeOutlined /></Link></Breadcrumb.Item>
+          {session.user.role !== 'professor' && <Breadcrumb.Item><Link to={`/students/${studentId}/projects`}>Projects</Link></Breadcrumb.Item>}
+          {session.user.role === 'professor' && <Breadcrumb.Item><Link to="/professor/dashboard/students">Students</Link></Breadcrumb.Item>}
+          {session.user.role === 'professor' && <Breadcrumb.Item><Link to={`/users/${studentId}`}><SpanData entityName="student" entityId={studentId} loading output="first_name" /></Link></Breadcrumb.Item>}
+          {session.user.role === 'professor' && <Breadcrumb.Item><Link to={`/students/${studentId}/projects`}>Projects</Link></Breadcrumb.Item>}
+          <Breadcrumb.Item>{project_data.psp_project.name}</Breadcrumb.Item>
+        </Breadcrumb>
+        <h1>{project_data.psp_project.name}</h1>
+        <section style={{ textAlign: 'right' }}>
+          {tagsInfo.map((tagInfo) => <CustomTag key={tagInfo.name} {...tagInfo} />)}
+          <TagVersion
+            active={version_data}
+            timeline={project_data.timeline}
+            onChange={fetchProjectDetailsVersionProp}
+            idstudent={studentId}
+            idproject={project_id}
+          />
+        </section>
+        <section>
+          <Tabs
+            tabBarExtraContent={renderWorkingTime()}
+            activeKey={defaultActiveKey}
+            onChange={(key) => goToTab(key)}
+          >
+            <TabPane tab="SUMMARY" key="summary">
+              <ProjectDetailsSummary
+                studentId={studentId}
+                project={project_data}
+                version={version_data}
+              />
+            </TabPane>
+            <TabPane tab="PHASES" key="phases">
+              <ProjectDetailsPhases
+                studentId={studentId}
+                project={project_data}
+                version={version_data}
+              />
+            </TabPane>
+            <TabPane tab="FILES" key="files">
+              <ProjectDetailsFiles
+                studentId={studentId}
+                project={project_data}
+                version={version_data}
+              />
+            </TabPane>
+            <TabPane tab="MESSAGES" key="messages">
+              <ProjectDetailsMessages studentId={studentId} project={project_data} />
+            </TabPane>
+          </Tabs>
+        </section>
 
-          <CustomFooter />
+      </Content>
 
-        </Content>
-
-        <Sider>
-          <div className="box">
-            <h2>Project Timeline</h2>
-            <Timeline>
-              {printTimeLine()}
-            </Timeline>
-          </div>
-          {printStatusButtons()}
-        </Sider>
-      </Layout>
+      <Sider className={`sider ${isOpenSider ? 'sider-open' : 'sider-close'}`}>
+        <div className="box">
+          <h2>Project Timeline</h2>
+          <Timeline>
+            {printTimeLine()}
+          </Timeline>
+        </div>
+        {printStatusButtons()}
+      </Sider>
     </Layout>
   );
 };
@@ -672,9 +761,10 @@ const mapDispatchToProps = (dispatch) => ({
     });
   },
   fetchProjectDetailsVersionSummaryProp: (userid, projectid, versionid) => {
-    dispatch(fetchProjectDetailsVersionSummary(userid, projectid, versionid)).payload.then((result) => {
-      dispatch(fetchProjectDetailsVersionSummarySuccess(result));
-    });
+    dispatch(fetchProjectDetailsVersionSummary(userid, projectid, versionid))
+      .payload.then((result) => {
+        dispatch(fetchProjectDetailsVersionSummarySuccess(result));
+      });
   },
   startProjectProp: (userid, projectid) => {
     dispatch(startProject(userid, projectid)).payload.then((result) => {
@@ -692,19 +782,21 @@ const mapDispatchToProps = (dispatch) => ({
     });
   },
   approveProject: (courseId, projectId, assignedProjectId, data) => {
-    dispatch(professorProjectApprove(courseId, projectId, assignedProjectId, data)).payload.then((result) => {
-      dispatch(professorProjectApproveSuccess(result));
-    });
+    dispatch(professorProjectApprove(courseId, projectId, assignedProjectId, data))
+      .payload.then((result) => {
+        dispatch(professorProjectApproveSuccess(result));
+      });
   },
   rejectProject: (courseId, projectId, assignedProjectId, data) => {
-    dispatch(professorProjectReject(courseId, projectId, assignedProjectId, data)).payload.then((result) => {
-      dispatch(professorProjectRejectSuccess(result));
-    });
+    dispatch(professorProjectReject(courseId, projectId, assignedProjectId, data))
+      .payload.then((result) => {
+        dispatch(professorProjectRejectSuccess(result));
+      });
   },
   reset: () => {
     dispatch(resetProjectDetails());
     dispatch(resetProjectDetailsVersion());
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectDetailsPage);

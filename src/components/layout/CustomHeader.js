@@ -27,7 +27,7 @@ import {
   updateNotiMessages,
   updateNotiMessagesSuccess,
   fetchOlderNotiMessages,
-  fetchOlderNotiMessagesSuccess
+  fetchOlderNotiMessagesSuccess,
 } from '../../actions/notificationActions';
 
 const { Header } = Layout;
@@ -42,7 +42,7 @@ const CustomHeader = ({
   updateNotificationsProp,
   fetchOlderNotificationsProp,
   fetchOlderNotiMessagesProp,
-  updateNotiMessagesProp
+  updateNotiMessagesProp,
 }) => {
   useEffect(() => {
     fetchNotificationsProp();
@@ -149,7 +149,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(updateNotiMessages(role)).payload.then((result) => {
       dispatch(updateNotiMessagesSuccess(result));
     });
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomHeader);

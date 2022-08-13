@@ -8,7 +8,7 @@ export const login = (user) => () => sessionApi.login({ user }).then((user) => {
   return user;
 }).catch((err) => {
   throw new SubmissionError({
-    _error: err.errors[0]
+    _error: err.errors[0],
   });
 });
 
@@ -49,4 +49,3 @@ export const reset = (user) => () => {
     }
   });
 };
-

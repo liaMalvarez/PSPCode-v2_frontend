@@ -12,6 +12,7 @@ import {
   Modal,
   Row,
   Col,
+  Alert,
 } from 'antd';
 import { PlusCircleTwoTone } from '@ant-design/icons';
 
@@ -75,6 +76,22 @@ const ProjectDetailsPhases = ({
   const [activePhase, setActivePhase] = useState(version.phases[version.phases.length - 1]);
   const [activeDefect, setActiveDefect] = useState(null);
 
+  const {
+    break_time,
+    elapsed_time,
+    fix_time,
+    empty_loc,
+    plan_time,
+    empty_total,
+  } = activePhase.observations ? activePhase.observations : {
+    break_time: null,
+    elapsed_time: null,
+    fix_time: null,
+    empty_loc: null,
+    plan_time: null,
+    empty_total: null,
+  };
+
   useEffect(() => {
     fetchProjectDetailsVersionPhaseDefectsProps(studentId, project.id, version.id, activePhase.id);
   }, [activePhase]);
@@ -120,6 +137,10 @@ const ProjectDetailsPhases = ({
       setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     }
   }, [created, edited, deleted, messageCreating, messageEditing, messageDeleting]);
+
+  useEffect(() => {
+    setCanEdit(version.status === 'working' && session.user.role !== 'professor');
+  }, [version.status]);
 
   const selectPhase = (phase) => {
     setActivePhase(phase);
@@ -192,9 +213,13 @@ const ProjectDetailsPhases = ({
               <FormItem
                 {...formItemLayout}
                 label="Plan Time"
+                validateStatus={plan_time ? 'warning' : ''}
+                hasFeedback={plan_time}
+                help={plan_time}
                 style={{ display: 'flex' }}
               >
                 <InputNumber
+                  controls={false}
                   min={0}
                   value={activePhase.plan_time ? activePhase.plan_time : null}
                   disabled={(!canEdit || !activePhase.start_time)}
@@ -211,10 +236,13 @@ const ProjectDetailsPhases = ({
           <Col span={12} key="section_plan_loc">
             <section>
               <FormItem
-                {...formItemLayout}
                 label="Plan LOCs (A+M)"
+                validateStatus={empty_loc ? 'warning' : ''}
+                hasFeedback={empty_loc}
+                help={empty_loc}
               >
                 <InputNumber
+                  controls={false}
                   min={0}
                   value={activePhase.plan_loc ? activePhase.plan_loc : null}
                   disabled={(!canEdit || !activePhase.start_time)}
@@ -223,10 +251,15 @@ const ProjectDetailsPhases = ({
                 <InputTooltip input="project_details_phase_form_plan_loc" />
               </FormItem>
               <FormItem
-                {...formItemLayout}
                 label="Actual Base LOCs"
               >
-                <InputNumber min={0} onChange={(value) => editPhase('actual_base_loc', value)} value={activePhase.actual_base_loc ? activePhase.actual_base_loc : null} disabled={(!canEdit || !activePhase.start_time)} />
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('actual_base_loc', value)}
+                  value={activePhase.actual_base_loc ? activePhase.actual_base_loc : null}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
                 <InputTooltip input="project_details_phase_form_actual_base_loc" />
 
               </FormItem>
@@ -236,54 +269,78 @@ const ProjectDetailsPhases = ({
     } else if (activePhase.psp_phase && activePhase.psp_phase.last) {
       if (project.psp_project.process.has_plan_loc) {
         inputs.push((
-          <div key="section_pm_loc">
-            <Row>
-              <Col span={12}>
-                <FormItem
-                  {...formItemLayout}
-                  label="Modified (M)"
-                >
-                  <InputNumber min={0} onChange={(value) => editPhase('modified', value)} value={activePhase.modified ? activePhase.modified : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_loc_m" />
+          <Row className="complete-width">
+            <Col span={12}>
+              <FormItem
+                label="Modified (M)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('modified', value)}
+                  value={activePhase.modified ? activePhase.modified : null}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_m" />
 
-                </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                  label="Deleted (D)"
-                >
-                  <InputNumber min={0} onChange={(value) => editPhase('deleted', value)} value={activePhase.deleted ? activePhase.deleted : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_loc_d" />
+              </FormItem>
+              <FormItem
+                label="Deleted (D)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('deleted', value)}
+                  value={activePhase.deleted ? activePhase.deleted : null}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_d" />
 
-                </FormItem>
-              </Col>
-              <Col span={12}>
-                <FormItem
-                  {...formItemLayout}
-                  label="Reused (R)"
-                >
-                  <InputNumber min={0} onChange={(value) => editPhase('reused', value)} value={activePhase.reused ? activePhase.reused : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_loc_r" />
+              </FormItem>
+            </Col>
+            <Col span={12}>
+              <FormItem
+                label="Reused (R)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('reused', value)}
+                  value={activePhase.reused ? activePhase.reused : null}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_r" />
 
-                </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                  label="New Reusable (NR)"
-                >
-                  <InputNumber min={0} onChange={(value) => editPhase('new_reusable', value)} value={activePhase.new_reusable ? activePhase.new_reusable : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_loc_nr" />
-                </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                  label="Total (T)"
-                >
-                  <InputNumber min={0} onChange={(value) => editPhase('total', value)} value={activePhase.total ? activePhase.total : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_loc_t" />
-
-                </FormItem>
-              </Col>
-            </Row>
-            <div className="separator" />
-          </div>
+              </FormItem>
+              <FormItem
+                label="New Reusable (NR)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('new_reusable', value)}
+                  value={activePhase.new_reusable ? activePhase.new_reusable : null}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_nr" />
+              </FormItem>
+              <FormItem
+                label="Total (T)"
+                validateStatus={empty_total ? 'warning' : ''}
+                hasFeedback={empty_total}
+                help={empty_total}
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('total', value)}
+                  value={activePhase.total ? activePhase.total : null}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_t" />
+              </FormItem>
+            </Col>
+          </Row>
         ));
       }
       if (project.psp_project.process.has_pip) {
@@ -404,13 +461,15 @@ const ProjectDetailsPhases = ({
 
   return (
     <div className="projectDetailsPhases">
+      <Steps
+        className="project-steps"
+        current={version.phases.indexOf(activePhase)}
+        progressDot={customDot}
+      >
+        { printPhasesSteps()}
+      </Steps>
       <section>
-        <Steps current={version.phases.indexOf(activePhase)} progressDot={customDot}>
-          { printPhasesSteps()}
-        </Steps>
-      </section>
-      <section>
-        <Form onSubmit={() => {}}>
+        <Form>
           <Row>
             <Col span={12}>
               <FormItem
@@ -471,6 +530,15 @@ const ProjectDetailsPhases = ({
                     />
                   </Col>
                 </Row>
+                {fix_time && (
+                  <Alert
+                    className="defect-alert"
+                    message={fix_time}
+                    type="warning"
+                    showIcon
+                    closable
+                  />
+                )}
                 <div className="separator" />
               </div>
             )}
@@ -480,15 +548,31 @@ const ProjectDetailsPhases = ({
                 {...formItemLayout}
                 label="End Time"
                 className="inputDatepicker"
+                validateStatus={elapsed_time ? 'warning' : ''}
+                hasFeedback={elapsed_time}
+                help={elapsed_time}
               >
-                <DatePicker disabledDate={(date) => noFutureDate(date) || noSmallerThanDate(date, activePhase.start_time)} value={activePhase.end_time ? moment(activePhase.end_time) : null} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss" onChange={(value) => editPhase('end_time', value)} disabled={(!canEdit || !activePhase.start_time)} />
+                <DatePicker
+                  disabledDate={(date) => noFutureDate(date)
+                    || noSmallerThanDate(date, activePhase.start_time)}
+                  value={activePhase.end_time ? moment(activePhase.end_time) : null}
+                  placeholder="Select date and time"
+                  showTime
+                  format="DD/MM/YYYY HH:mm:ss"
+                  onChange={(value) => editPhase('end_time', value)}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
                 <InputTooltip input="project_details_phase_form_end_time" />
               </FormItem>
               <FormItem
                 {...formItemLayout}
                 label="Int. time"
+                validateStatus={break_time ? 'warning' : ''}
+                hasFeedback={break_time}
+                help={break_time}
               >
                 <InputNumber
+                  controls={false}
                   min={0}
                   value={activePhase.interruption_time ? activePhase.interruption_time : null}
                   disabled={(!canEdit || !activePhase.start_time)}

@@ -1,17 +1,16 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import {
-  Button
+  Button,
 } from 'antd';
 import * as sessionActions from '../../actions/sessionActions';
 
 const LogoutButton = ({ actions: { logout } }) => {
   const navigate = useNavigate();
-  const logoutHandler = () => {
-    logout();
+  const logoutHandler = async () => {
+    await logout();
     navigate('/session/login');
   };
 
@@ -22,14 +21,12 @@ const LogoutButton = ({ actions: { logout } }) => {
   );
 };
 
-const { object } = PropTypes;
-
 LogoutButton.propTypes = {
-  actions: object.isRequired
+  actions: Object.isRequired,
 };
 
 const mapDispatch = (dispatch) => ({
-  actions: bindActionCreators(sessionActions, dispatch)
+  actions: bindActionCreators(sessionActions, dispatch),
 });
 
 export default connect(null, mapDispatch)(LogoutButton);

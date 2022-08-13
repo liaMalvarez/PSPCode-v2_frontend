@@ -8,8 +8,10 @@ import {
 } from 'antd';
 
 import {
-  fetchProjects, fetchProjectsFailure, fetchProjectsSuccess,
-  resetProjectsList
+  fetchProjects,
+  fetchProjectsFailure,
+  fetchProjectsSuccess,
+  resetProjectsList,
 } from '../../actions/projectActions';
 import { PROJECT_STATUS } from '../../constants/constants';
 
@@ -21,15 +23,15 @@ class ProjectList extends Component {
     this.state = { sortedInfo: null, filteredInfo: null };
   }
 
-  componentWillUnmount() {
-    this.props.reset();
-  }
-
   componentDidMount() {
     this.props.fetchProjects(this.props.studentId);
   }
 
-  handleChange = (pagination, filters, sorter) => {
+  componentWillUnmount() {
+    this.props.reset();
+  }
+
+  handleChange = (_, filters, sorter) => {
     this.setState({ sortedInfo: sorter, filteredInfo: filters });
   };
 
@@ -40,8 +42,12 @@ class ProjectList extends Component {
       title: 'PROJECT NAME',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record, index) => {
-        const status = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status != 'approved') ? 'dued' : record.status;
+      width: '22%',
+      render: (_, record) => {
+        const status = (moment.duration(moment(record.deadline).diff(moment()))
+          .asMilliseconds() < 0
+        && record.status != 'approved') ? 'dued' : record.status;
+
         return (
           <div className={`line ${status}`}>
             <span className="projectName">{record.name}</span>
@@ -58,22 +64,23 @@ class ProjectList extends Component {
       title: 'ASSIGNED DATE',
       dataIndex: 'assigned',
       key: 'assigned',
+      width: '22%',
       sorter: (a, b) => moment.duration(moment(b.assigned).diff(moment(a.assigned))).asMilliseconds(),
-      render: (text, record, index) => moment(text).format('DD/MM/YYYY'),
+      render: (text) => moment(text).format('DD/MM/YYYY'),
       sortOrder: this.state.sortedInfo.columnKey === 'assigned' && this.state.sortedInfo.order,
     }, {
       title: 'DEADLINE',
       dataIndex: 'deadline',
       key: 'deadline',
+      width: '22%',
       sorter: (a, b) => moment.duration(moment(b.deadline).diff(moment(a.deadline))).asMilliseconds(),
-      render: (text, record, index) =>
-        // const dued = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status !='approved' );
-        moment(text).format('DD/MM/YYYY'),
+      render: (text) => moment(text).format('DD/MM/YYYY'),
       sortOrder: this.state.sortedInfo.columnKey === 'deadline' && this.state.sortedInfo.order,
     }, {
       title: 'STATUS',
       dataIndex: 'status',
       key: 'status',
+      width: '22%',
       filters: [
         { text: 'Approved', value: 'approved' },
         { text: 'Working', value: 'working' },
@@ -83,24 +90,40 @@ class ProjectList extends Component {
       filteredValue: this.state.filteredInfo.status,
       onFilter: (value, record) => record.status.includes(value),
       render: (text, record, index) => {
-        const status = (moment.duration(moment(record.deadline).diff(moment())).asMilliseconds() < 0 && record.status != 'approved') ? 'dued' : record.status;
-        const span = (<span>
-          <span className={`dot ${status}`} />
-          {' '}
-          {PROJECT_STATUS[text].name}
-                      </span>);
+        const status = (moment.duration(moment(record.deadline).diff(moment()))
+          .asMilliseconds() < 0
+        && record.status != 'approved') ? 'dued' : record.status;
+
+        const span = (
+          <span>
+            <span className={`dot ${status}`} />
+            {PROJECT_STATUS[text].name}
+          </span>
+        );
         if (status === 'dued') {
           return (<Popover content="This project is dued, harry up!">{span}</Popover>);
         }
         return span;
-      }
+      },
     }, {
       title: 'ACTION',
       key: 'action',
-      render: (text, record, index) => (<Link to={`/students/${this.props.studentId}/projects/${record.key}`}><Button type="boton1">View Project</Button></Link>)
+      render: (_, record) => (
+        <Link to={`/students/${this.props.studentId}/projects/${record.key}`}>
+          <Button type="boton1">View Project</Button>
+        </Link>
+      ),
     }];
+
     return (
-      <Table className="projectsListTable" columns={columns} dataSource={this.props.projects} onChange={this.handleChange} loading={this.props.loading} pagination={false} />
+      <Table
+        className="projectsListTable"
+        columns={columns}
+        dataSource={this.props.projects}
+        onChange={this.handleChange}
+        loading={this.props.loading}
+        pagination={false}
+      />
     );
   }
 }
@@ -114,16 +137,12 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchProjects: (userid) => {
     dispatch(fetchProjects(userid)).payload.then((result) => {
-      if (true) {
-        dispatch(fetchProjectsSuccess(result));
-      } else {
-        dispatch(fetchProjectsFailure(result.error));
-      }
+      dispatch(fetchProjectsSuccess(result));
     });
   },
   reset: () => {
     dispatch(resetProjectsList());
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectList);

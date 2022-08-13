@@ -8,7 +8,9 @@ import {
 } from 'antd';
 
 import {
-  dashboardProjectsList, dashboardProjectsListFailure, dashboardProjectsListSuccess, dashboardProjectsListReset
+  dashboardProjectsList,
+  dashboardProjectsListSuccess,
+  dashboardProjectsListReset,
 } from '../../actions/dashboardActions';
 
 const moment = require('moment/moment');
@@ -17,10 +19,6 @@ class DashboardProjects extends Component {
   constructor(props) {
     super(props);
     this.state = { sortedInfo: null, filteredInfo: null };
-  }
-
-  componentWillUnmount() {
-    this.props.reset();
   }
 
   componentDidMount() {
@@ -33,6 +31,10 @@ class DashboardProjects extends Component {
     if (nextProps.course && (!this.props.course || this.props.course.id != nextProps.course.id)) {
       this.props.fetchProjects(nextProps.course.id);
     }
+  }
+
+  componentWillUnmount() {
+    this.props.reset();
   }
 
   handleChange = (pagination, filters, sorter) => {
@@ -50,8 +52,6 @@ class DashboardProjects extends Component {
         let status = 'colorless';
         if (record.to_correct > 0) {
           status = 'danger';
-        // } else if (record.not_assigned > 0 && (record.working + record.to_correct + record.approved > 0)) {
-        //  status = 'warning';
         } else if (record.working > 0) {
           status = 'success';
         }
@@ -61,34 +61,31 @@ class DashboardProjects extends Component {
             <br />
             <span className="projectProcess">
               Process:
-              {' '}
               {record.process.name}
-              {' '}
               <br />
-              {' '}
               Deadline:
-              {' '}
               {moment(record.deadline).format('DD/MM/YYYY')}
             </span>
           </div>
         );
-      }
+      },
     }, {
       title: 'NOT ASSIGNED',
       dataIndex: 'not_assigned',
       key: 'not_assigned',
-      render: (text, record, index) => {
-        // const msg = text > 0 && (record.working + record.to_correct + record.finished > 0) ? (<b className="warning">{text}</b>) : (<span>{text}</span>);
-        const content = text == 1 ? (<span>
-          {text}
-          {' '}
-          student hasn't this project assigned
-                                     </span>)
-          : (<span>
+      render: (text) => {
+        const content = text == 1 ? (
+          <span>
             {text}
-            {' '}
-            students haven't this project assigned
-          </span>);
+            student hasn't this project assigned
+          </span>
+        )
+          : (
+            <span>
+              {text}
+              students haven't this project assigned
+            </span>
+          );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{text}</Popover>);
       },
     }, {
@@ -96,33 +93,37 @@ class DashboardProjects extends Component {
       dataIndex: 'working',
       key: 'working',
       render: (text, record, index) => {
-        const content = text == 1 ? (<span>
-          {text}
-          {' '}
-          student is working on this project
-                                     </span>)
-          : (<span>
+        const content = text == 1 ? (
+          <span>
             {text}
-            {' '}
-            students are working on this project
-             </span>);
+            student is working on this project
+          </span>
+        )
+          : (
+            <span>
+              {text}
+              students are working on this project
+            </span>
+          );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{text}</Popover>);
       },
     }, {
       title: 'APPROVED',
       dataIndex: 'approved',
       key: 'approved',
-      render: (text, record, index) => {
-        const content = text == 1 ? (<span>
-          {text}
-          {' '}
-          student has finished this project successfully
-                                     </span>)
-          : (<span>
+      render: (text) => {
+        const content = text == 1 ? (
+          <span>
             {text}
-            {' '}
-            students have finished this project successfully
-             </span>);
+            student has finished this project successfully
+          </span>
+        )
+          : (
+            <span>
+              {text}
+              students have finished this project successfully
+            </span>
+          );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{text}</Popover>);
       },
     }, {
@@ -131,23 +132,26 @@ class DashboardProjects extends Component {
       key: 'to_correct',
       render: (text, record, index) => {
         const msg = text > 0 ? (<b className="danger">{text}</b>) : 0;
-        const content = text == 1 ? (<span>
-          {text}
-          {' '}
-          student is awaiting your correction
-                                     </span>)
-          : (<span>
+        const content = text == 1 ? (
+          <span>
             {text}
-            {' '}
-            students are awaiting your correction
-             </span>);
+            student is awaiting your correction
+          </span>
+        )
+          : (
+            <span>
+              {text}
+              students are awaiting your correction
+            </span>
+          );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{msg}</Popover>);
       },
     }, {
       title: 'ACTION',
       key: 'action',
-      render: (text, record, index) => (<Link to={`/professor/dashboard/projects/${record.id}`}><Button type="boton1">View Details</Button></Link>)
+      render: (_, record) => (<Link to={`/professor/dashboard/projects/${record.id}`}><Button type="boton1">View Details</Button></Link>),
     }];
+
     return (
       <Table rowKey="id" className="projectsListTable" columns={columns} dataSource={this.props.projects} onChange={this.handleChange} loading={this.props.loading} pagination={false} />
     );
@@ -164,16 +168,12 @@ const mapStateToProps = (state, ownState) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchProjects: (courseId) => {
     dispatch(dashboardProjectsList(courseId)).payload.then((result) => {
-      if (true) {
-        dispatch(dashboardProjectsListSuccess(result));
-      } else {
-        dispatch(dashboardProjectsListFailure(result.error));
-      }
+      dispatch(dashboardProjectsListSuccess(result));
     });
   },
   reset: () => {
     dispatch(dashboardProjectsListReset());
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardProjects);

@@ -7,13 +7,13 @@ import {
   Table,
   Spin,
   message,
-  Modal
+  Modal,
 } from 'antd';
 
 import {
   dashboardStudentsList, dashboardStudentsListSuccess, dashboardStudentsListReset,
   dashboardStudentsAssign, dashboardStudentsAssignSuccess,
-  dashboardStudentsPoke, dashboardStudentsPokeSuccess
+  dashboardStudentsPoke, dashboardStudentsPokeSuccess,
 } from '../../actions/dashboardActions';
 
 const moment = require('moment/moment');
@@ -29,20 +29,23 @@ const DashboardStudents = ({
   students,
   loading,
   finished_poke,
-  finished_assign
+  finished_assign,
 }) => {
   const [sortedInfo, setSortedInfo] = useState(null);
   const [filteredInfo, setFilteredInfo] = useState(null);
   const [messagePoking, setMessagePoking] = useState('');
   const [messageAssigning, setMessageAssigning] = useState('');
 
-  useEffect(
-    () => reset(), // on unmount
-    []
-  );
+  useEffect(() => {
+    setSortedInfo(sortedInfo || { columnKey: 'status', order: true });
+    setFilteredInfo(filteredInfo || { professor: [String(session.user.id)] });
+
+    return reset();
+  }, []);
 
   useEffect(() => {
-    if (course && projectId) {
+    console.log(projectId);
+    if (course) {
       fetchStudents(course.id, projectId);
     }
   }, [course, projectId]);
@@ -83,9 +86,12 @@ const DashboardStudents = ({
 
   const projectOfRecord = (record) => {
     let project = null;
-    if (projectId) {
-      project = record.project;
-      project.assigned_project_id = project.id;
+
+    if (projectId && record.project) {
+      project = {
+        ...record.project,
+        assigned_project_id: record.project.id,
+      };
     } else {
       project = record.current_project;
     }
@@ -119,15 +125,12 @@ const DashboardStudents = ({
         msg: (
           <span>
             {record.first_name}
-            {' '}
             hasn&apos;t this project assigned and is still working on
-            {' '}
             {record.current_project.name}
             .
-            {' '}
             <button type="button" onClick={() => assign({ id: record.id, name: record.first_name }, projectOfRecord(record))}>Assign anyway</button>
           </span>
-        )
+        ),
       };
     }
 
@@ -142,7 +145,6 @@ const DashboardStudents = ({
       content: (
         <span>
           This will send the following message to
-          {' '}
           {student.name}
           :
           <br />
@@ -165,8 +167,6 @@ const DashboardStudents = ({
   if (!session.user || !session.user.id) {
     return (<div><Spin size="large" /></div>);
   }
-  setSortedInfo(sortedInfo || { columnKey: 'status', order: true });
-  setFilteredInfo(filteredInfo || { professor: [String(session.user.id)] });
 
   const columns = [{
     title: 'STUDENT NAME',
@@ -174,7 +174,6 @@ const DashboardStudents = ({
     key: 'first_name',
     render: (_, record) => {
       const status = statusOfProject(record);
-
       return (
         <div className={`line ${status.color}`}>
           <span className="projectName">
@@ -184,17 +183,20 @@ const DashboardStudents = ({
           </span>
           <br />
           <span className="projectProcess">
-            <Link to={`/students/${record.id}/projects`}>view activity</Link>
+            <Link to={`/students/${record.id}/projects`}>View Activity</Link>
           </span>
         </div>
       );
-    }
+    },
   }, {
     title: 'TUTOR',
     dataIndex: 'professor',
     key: 'professor',
-    filters: students ? students.map((o) => ({ text: o.professor.first_name, value: o.professor.id })).reduce((x, y) => (x.some((o) => o.value === y.value) ? x : [...x, y]), []) : {},
-    filteredValue: filteredInfo.professor,
+    filters: students ? students
+      .map((o) => ({ text: o.professor.first_name, value: o.professor.id }))
+      .reduce((x, y) => (x.some((o) => o.value === y.value)
+        ? x : [...x, y]), []) : [],
+    filteredValue: filteredInfo?.professor,
     onFilter: (value, record) => String(record.professor.id) === String(value),
     render: (text) => text.first_name,
   }, {
@@ -203,13 +205,13 @@ const DashboardStudents = ({
     className: projectId ? 'displayNone' : '',
     sorter: (a, b) => a.id - b.id,
     render: (_, record) => projectOfRecord(record).name,
-    sortOrder: sortedInfo.columnKey === 'project' && sortedInfo.order,
+    sortOrder: sortedInfo?.columnKey === 'project' && sortedInfo.order,
   }, {
     title: 'STATUS',
     dataIndex: 'status',
     key: 'status',
     sorter: (a, b) => statusOfProject(a).status > statusOfProject(b).status,
-    sortOrder: sortedInfo.columnKey === 'status' && sortedInfo.order,
+    sortOrder: sortedInfo?.columnKey === 'status' && sortedInfo.order,
     render: (_, record) => {
       const status = statusOfProject(record);
 
@@ -221,7 +223,7 @@ const DashboardStudents = ({
           </span>
         </Popover>
       ) : (<span />);
-    }
+    },
   }, {
     title: 'ACTION',
     key: 'action',
@@ -240,10 +242,19 @@ const DashboardStudents = ({
       }
 
       return btn;
-    }
+    },
   }];
+
   return (
-    <Table rowKey="id" className="projectsListTable" columns={columns} dataSource={students} onChange={handleChange} loading={loading} pagination={false} />
+    <Table
+      rowKey="id"
+      className="projectsListTable"
+      columns={columns}
+      dataSource={students}
+      onChange={handleChange}
+      loading={loading}
+      pagination={false}
+    />
   );
 };
 
@@ -258,7 +269,6 @@ const mapStateToProps = (state) => ({
   finished_assign: state.dashboard.finished_assign,
 
   session: state.session,
-
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -267,7 +277,7 @@ const mapDispatchToProps = (dispatch) => ({
       dispatch(dashboardStudentsListSuccess(result));
     });
   },
-  pokeStudent: (studentId, projectId, message) => {
+  pokeStudent: (studentId, projectId) => {
     dispatch(dashboardStudentsPoke(studentId, projectId, message)).payload.then((result) => {
       dispatch(dashboardStudentsPokeSuccess(result));
     });
@@ -279,7 +289,7 @@ const mapDispatchToProps = (dispatch) => ({
   },
   reset: () => {
     dispatch(dashboardStudentsListReset());
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardStudents);

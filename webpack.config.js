@@ -5,12 +5,12 @@ const Dotenv = require('dotenv-webpack');
 module.exports = {
   mode: 'development',
   resolve: {
-    extensions: ['*', '.js', '.jsx', '.json']
+    extensions: ['*', '.js', '.jsx', '.json'],
   },
   devtool: 'inline-source-map', // more info:https://webpack.github.io/docs/build-performance.html#sourcemaps and https://webpack.github.io/docs/configuration.html#devtool
   entry: [
     'react-hot-loader/patch',
-    path.resolve(__dirname, 'src/index.js') // Defining path seems necessary for this to work consistently on Windows machines.
+    path.resolve(__dirname, 'src/index.js'), // Defining path seems necessary for this to work consistently on Windows machines.
   ],
   target: 'web', // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
   output: {
@@ -23,12 +23,12 @@ module.exports = {
       template: 'src/index.html',
       minify: {
         removeComments: true,
-        collapseWhitespace: true
+        collapseWhitespace: true,
       },
       inject: true,
-      favicon: 'src/favicon.ico'
+      favicon: 'src/favicon.ico',
     }),
-    new Dotenv()
+    new Dotenv(),
   ],
   module: {
     rules: [
@@ -41,7 +41,7 @@ module.exports = {
           babelrc: false,
           presets: [['@babel/preset-env', { modules: false }], '@babel/preset-react'],
           plugins: ['react-hot-loader/babel'],
-        }
+        },
       },
       { test: /\.eot(\?v=\d+.\d+.\d+)?$/, loader: 'file-loader' },
       {
@@ -49,36 +49,36 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
-          mimetype: 'application/font-woff'
-        }
+          mimetype: 'application/font-woff',
+        },
       },
       {
         test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          mimetype: 'application/octet-stream'
-        }
+          mimetype: 'application/octet-stream',
+        },
       },
       {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          mimetype: 'image/svg+xml'
-        }
+          mimetype: 'image/svg+xml',
+        },
       },
       {
         test: /\.(jpe?g|png|gif|ico)$/i,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]'
-        }
+          name: '[name].[ext]',
+        },
       },
       {
         test: /(\.css|\.scss)$/,
         use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
       },
-    ]
-  }
+    ],
+  },
 };
