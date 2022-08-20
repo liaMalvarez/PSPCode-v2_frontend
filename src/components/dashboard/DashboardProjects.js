@@ -49,7 +49,7 @@ class DashboardProjects extends Component {
       title: 'PROJECT NAME',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record, index) => {
+      render: (_, record) => {
         let status = 'colorless';
         if (record.to_correct > 0) {
           status = 'danger';
@@ -80,14 +80,13 @@ class DashboardProjects extends Component {
             {text}
             student hasn't this project assigned
           </span>
-        )
-          : (
-            <span>
-              {text}
-              students haven't this project assigned
-            </span>
-          );
-        return text == 0 ? (<span>0</span>) : (<Popover content={content}>{text}</Popover>);
+        ) : (
+          <span>
+            {text}
+            students haven't this project assigned
+          </span>
+        );
+        return text == 0 ? 0 : (<Popover content={content}>{text}</Popover>);
       },
     }, {
       title: 'WORKING',

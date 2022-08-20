@@ -786,7 +786,6 @@ form .ant-input-number {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 3px;
   }
   .anticon {
     margin-right: 5px;
@@ -887,7 +886,7 @@ padding: 0;
   display: flex;
 }
 
-.ant-form-item-explain-warning {
+.ant-form-item-explain {
   width: 300px;
   margin-bottom: 15px;
   margin-top: 5px;
@@ -965,5 +964,14 @@ padding: 0;
 }
 
 .ant-table-cell-row-hover {
-  background: #e7eff0b9 !important;
+  background: #e7eff0a8 !important;
+}
+
+.time-conflict-alert {
+  margin-top: 30px;
+  width: 435px;
+}
+
+.info_saved {
+  width: 300px;
 }

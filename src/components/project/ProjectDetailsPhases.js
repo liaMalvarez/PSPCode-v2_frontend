@@ -83,15 +83,18 @@ const ProjectDetailsPhases = ({
     empty_loc,
     plan_time,
     empty_total,
-  } = activePhase.observations ? activePhase.observations : {
+    time_conflict,
+  } = activePhase.observations || {
     break_time: null,
     elapsed_time: null,
     fix_time: null,
     empty_loc: null,
     plan_time: null,
     empty_total: null,
+    time_conflict: null,
   };
 
+  console.log(time_conflict);
   useEffect(() => {
     fetchProjectDetailsVersionPhaseDefectsProps(studentId, project.id, version.id, activePhase.id);
   }, [activePhase]);
@@ -502,6 +505,15 @@ const ProjectDetailsPhases = ({
               </FormItem>
             </Col>
           </Row>
+          {['eeje eje sinnnisismlepp ', 'hhheksioo1 jdbu ejebdu']?.map((time_conflict_error) => (
+            <Alert
+              className="time-conflict-alert"
+              message={['eeje eje sinnnisismlepp ', 'hhheksioo1 jdbu ejebdu']}
+              type="warning"
+              showIcon
+              closable
+            />
+          ))}
           <div className="separator" />
           { printFormForActivePhase()}
           {version.activePhaseDefects
@@ -544,42 +556,44 @@ const ProjectDetailsPhases = ({
             )}
           <Row>
             <Col span={12}>
-              <FormItem
-                {...formItemLayout}
-                label="End Time"
-                className="inputDatepicker"
-                validateStatus={elapsed_time ? 'warning' : ''}
-                hasFeedback={elapsed_time}
-                help={elapsed_time}
-              >
-                <DatePicker
-                  disabledDate={(date) => noFutureDate(date)
+              <section>
+                <FormItem
+                  {...formItemLayout}
+                  label="End Time"
+                  className="inputDatepicker"
+                  validateStatus={elapsed_time ? 'warning' : ''}
+                  hasFeedback={elapsed_time}
+                  help={elapsed_time}
+                >
+                  <DatePicker
+                    disabledDate={(date) => noFutureDate(date)
                     || noSmallerThanDate(date, activePhase.start_time)}
-                  value={activePhase.end_time ? moment(activePhase.end_time) : null}
-                  placeholder="Select date and time"
-                  showTime
-                  format="DD/MM/YYYY HH:mm:ss"
-                  onChange={(value) => editPhase('end_time', value)}
-                  disabled={(!canEdit || !activePhase.start_time)}
-                />
-                <InputTooltip input="project_details_phase_form_end_time" />
-              </FormItem>
-              <FormItem
-                {...formItemLayout}
-                label="Int. time"
-                validateStatus={break_time ? 'warning' : ''}
-                hasFeedback={break_time}
-                help={break_time}
-              >
-                <InputNumber
-                  controls={false}
-                  min={0}
-                  value={activePhase.interruption_time ? activePhase.interruption_time : null}
-                  disabled={(!canEdit || !activePhase.start_time)}
-                  onChange={(value) => editPhase('interruption_time', value)}
-                />
-                <InputTooltip input="project_details_phase_form_int" />
-              </FormItem>
+                    value={activePhase.end_time ? moment(activePhase.end_time) : null}
+                    placeholder="Select date and time"
+                    showTime
+                    format="DD/MM/YYYY HH:mm:ss"
+                    onChange={(value) => editPhase('end_time', value)}
+                    disabled={(!canEdit || !activePhase.start_time)}
+                  />
+                  <InputTooltip input="project_details_phase_form_end_time" />
+                </FormItem>
+                <FormItem
+                  {...formItemLayout}
+                  label="Int. time"
+                  validateStatus={break_time ? 'warning' : ''}
+                  hasFeedback={break_time}
+                  help={break_time}
+                >
+                  <InputNumber
+                    controls={false}
+                    min={0}
+                    value={activePhase.interruption_time ? activePhase.interruption_time : null}
+                    disabled={(!canEdit || !activePhase.start_time)}
+                    onChange={(value) => editPhase('interruption_time', value)}
+                  />
+                  <InputTooltip input="project_details_phase_form_int" />
+                </FormItem>
+              </section>
             </Col>
             <Col span={12}>
               <FormItem
@@ -595,7 +609,13 @@ const ProjectDetailsPhases = ({
         </Form>
         <div className="separator" />
         <div>
-          <span>Phase data is automatically saved.</span>
+          <Alert
+            message="Phase data is automatically saved."
+            type="info"
+            showIcon
+            closable
+            className="info_saved"
+          />
           {canEdit && version.phases.length > 1 && (
             <span>
               <br />
