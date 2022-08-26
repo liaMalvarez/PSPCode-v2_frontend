@@ -83,6 +83,7 @@ const DefectForm = ({
   const modalCancel = () => {
     setShowModal(false);
     setDefectState(null);
+    setFixDefectsList([]);
     onEdit(null);
   };
 
@@ -163,28 +164,25 @@ const DefectForm = ({
         </Select>
         <InputTooltip input="project_details_phase_defect_form_defect_type" />
       </FormItem>
-      <FormItem
-        label="&nbsp;&nbsp;Fix Defect"
-      >
-        <Select
-          value={defectState?.fix_defect ? defectState?.fix_defect : null}
-          onChange={(value) => handleChange('fix_defect', value)}
-          disabled={!fixDefectsReady}
+      {fixDefectsList.length !== 0 && (
+        <FormItem
+          label="&nbsp;&nbsp;Fix Defect"
         >
-          <Option key="null" value="">&nbsp;</Option>
-          {fixDefectsList.map((item) => (
-            <Option key={item.id} value={String(item.id)}>
-              {item.id}
-              {' '}
-              (
-              {item.defect_type}
-              )
-            </Option>
-          ))}
-        </Select>
-        {fixDefectsLoading && <LoadingOutlined style={{ marginLeft: '15px' }} />}
-        {!fixDefectsLoading && <InputTooltip input="project_details_phase_defect_form_fix_defect" />}
-      </FormItem>
+          <Select
+            value={defectState?.fix_defect ? defectState?.fix_defect : null}
+            onChange={(value) => handleChange('fix_defect', value)}
+            disabled={!fixDefectsReady}
+          >
+            {fixDefectsList.map((item) => (
+              <Option key={item.id} value={String(item.id)}>
+                {`#${item.id} ${item.defect_type}`}
+              </Option>
+            ))}
+          </Select>
+          {fixDefectsLoading && <LoadingOutlined style={{ marginLeft: '15px' }} />}
+          {!fixDefectsLoading && <InputTooltip input="project_details_phase_defect_form_fix_defect" />}
+        </FormItem>
+      )}
       <FormItem
         label="* Fixed Time"
       >

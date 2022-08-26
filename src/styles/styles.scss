@@ -539,13 +539,13 @@ form .ant-input-number {
         display: block;
         width: 6px;
         position: relative;
-        z-index:999;
+        z-index: 5;
         height: 6px;
         bottom: 1px;
       }
       .icon {
         position: relative;
-        z-index: 999;
+        z-index: 5;
         background-color: transparent;
         border: none;
         top: 1px;
@@ -753,7 +753,7 @@ form .ant-input-number {
       }
       .ant-select, .ant-calendar-picker, .ant-input-number, .ant-input {
         width: calc(100% - 30px);
-        max-width: 220px;
+        max-width: 300px;
       }
       textarea.ant-input {
         max-width: unset;
@@ -786,7 +786,6 @@ form .ant-input-number {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-bottom: 3px;
   }
   .anticon {
     margin-right: 5px;
@@ -806,7 +805,7 @@ form .ant-input-number {
   }
   .ant-select, .ant-calendar-picker, .ant-input-number {
     width: calc(100% - 30px);
-    max-width: 220px;
+    max-width: 224px;
   }
   textarea.ant-input {
     max-width: unset;
@@ -887,7 +886,7 @@ padding: 0;
   display: flex;
 }
 
-.ant-form-item-explain-warning {
+.ant-form-item-explain {
   width: 300px;
   margin-bottom: 15px;
   margin-top: 5px;
@@ -965,5 +964,19 @@ padding: 0;
 }
 
 .ant-table-cell-row-hover {
-  background: #e7eff0b9 !important;
+  background: #e7eff0a8 !important;
+}
+
+.time-conflict-alert {
+  margin-top: 30px;
+  width: 435px;
+}
+
+.info_saved {
+  width: 300px;
+}
+
+.ant-picker {
+  width: calc(100% - 30px);
+  max-width: 224px;
 }
