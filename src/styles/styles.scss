@@ -539,13 +539,13 @@ form .ant-input-number {
         display: block;
         width: 6px;
         position: relative;
-        z-index:999;
+        z-index: 5;
         height: 6px;
         bottom: 1px;
       }
       .icon {
         position: relative;
-        z-index: 999;
+        z-index: 5;
         background-color: transparent;
         border: none;
         top: 1px;
@@ -753,7 +753,7 @@ form .ant-input-number {
       }
       .ant-select, .ant-calendar-picker, .ant-input-number, .ant-input {
         width: calc(100% - 30px);
-        max-width: 220px;
+        max-width: 300px;
       }
       textarea.ant-input {
         max-width: unset;
@@ -805,7 +805,7 @@ form .ant-input-number {
   }
   .ant-select, .ant-calendar-picker, .ant-input-number {
     width: calc(100% - 30px);
-    max-width: 220px;
+    max-width: 224px;
   }
   textarea.ant-input {
     max-width: unset;
@@ -974,4 +974,9 @@ padding: 0;
 
 .info_saved {
   width: 300px;
+}
+
+.ant-picker {
+  width: calc(100% - 30px);
+  max-width: 224px;
 }
