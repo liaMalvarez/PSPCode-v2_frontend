@@ -68,33 +68,31 @@ const DefectsList = ({
     <span style={{ maxWidth: '250px', display: 'block' }}>{text}</span>
   );
 
-  // const defectErrorsList = ({
-  //   observations:
-  //   { discovered_time_fit, inyection_phase },
-  // })
-
-  const defectErrorsList = (hey) => (
+  const defectErrorsList = ({
+    discovered_time_fit,
+    inyection_phase,
+  }) => (
     <div className="submission-checklist">
-      {true && (
-        <span style={{ marginBottom: '3px' }}>
-          <CloseCircleTwoTone twoToneColor="#bd3931" />
-          {' '}
-          Este es un error del defecto con las fases de inyeccion
-        </span>
+      {discovered_time_fit && (
+      <span style={{ marginBottom: '3px' }}>
+        <CloseCircleTwoTone twoToneColor="#bd3931" />
+        {' '}
+        {discovered_time_fit}
+      </span>
       )}
-      {true && (
-        <span>
-          <CloseCircleTwoTone twoToneColor="#bd3931" />
-          {' '}
-          Este es un error del defecto con el tiempo
-        </span>
+      {inyection_phase && (
+      <span>
+        <CloseCircleTwoTone twoToneColor="#bd3931" />
+        {' '}
+        {inyection_phase}
+      </span>
       )}
-      {!(true || false) && (
-        <span>
-          <CheckCircleTwoTone twoToneColor="#87d068" />
-          {' '}
-          No observations
-        </span>
+      {!(inyection_phase || discovered_time_fit) && (
+      <span>
+        <CheckCircleTwoTone twoToneColor="#87d068" />
+        {' '}
+        No observations
+      </span>
       )}
     </div>
   );
@@ -183,10 +181,13 @@ const DefectsList = ({
     ) : (
       <Popover
         title="Observations List"
-        content={defectErrorsList(record)}
+        content={defectErrorsList(record.observations || {
+          discovered_time_fit: null,
+          inyection_phase: null,
+        })}
         placement="leftBottom"
       >
-        {true ? (
+        {record.observations?.discovered_time_fit || record.observations?.inyection_phase ? (
           <ExclamationCircleTwoTone
             twoToneColor="#faad14"
             style={{ fontSize: '16px' }}

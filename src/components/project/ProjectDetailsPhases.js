@@ -83,7 +83,8 @@ const ProjectDetailsPhases = ({
     empty_loc,
     plan_time,
     empty_total,
-    time_conflict,
+    time_conflict_start,
+    time_conflict_end,
   } = activePhase.observations || {
     break_time: null,
     elapsed_time: null,
@@ -91,12 +92,17 @@ const ProjectDetailsPhases = ({
     empty_loc: null,
     plan_time: null,
     empty_total: null,
-    time_conflict: null,
+    time_conflict_start: null,
+    time_conflict_end: null,
   };
 
-  console.log(time_conflict);
   useEffect(() => {
-    fetchProjectDetailsVersionPhaseDefectsProps(studentId, project.id, version.id, activePhase.id);
+    fetchProjectDetailsVersionPhaseDefectsProps(
+      studentId,
+      project.id,
+      version.id,
+      activePhase.id,
+    );
   }, [activePhase]);
 
   useEffect(() => {
@@ -505,15 +511,15 @@ const ProjectDetailsPhases = ({
               </FormItem>
             </Col>
           </Row>
-          {['eeje eje sinnnisismlepp ', 'hhheksioo1 jdbu ejebdu']?.map((time_conflict_error) => (
+          {time_conflict_start && (
             <Alert
               className="time-conflict-alert"
-              message={['eeje eje sinnnisismlepp ', 'hhheksioo1 jdbu ejebdu']}
+              message={time_conflict_start}
               type="warning"
               showIcon
               closable
             />
-          ))}
+          )}
           <div className="separator" />
           { printFormForActivePhase()}
           {version.activePhaseDefects
@@ -594,6 +600,15 @@ const ProjectDetailsPhases = ({
                   <InputTooltip input="project_details_phase_form_int" />
                 </FormItem>
               </section>
+              {time_conflict_end && (
+                <Alert
+                  className="time-conflict-alert"
+                  message={time_conflict_end}
+                  type="warning"
+                  showIcon
+                  closable
+                />
+              )}
             </Col>
             <Col span={12}>
               <FormItem
