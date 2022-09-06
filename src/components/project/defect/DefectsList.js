@@ -70,7 +70,7 @@ const DefectsList = ({
 
   const defectErrorsList = ({
     discovered_time_fit,
-    inyection_phase,
+    phase_injected,
   }) => (
     <div className="submission-checklist">
       {discovered_time_fit && (
@@ -80,14 +80,14 @@ const DefectsList = ({
         {discovered_time_fit}
       </span>
       )}
-      {inyection_phase && (
+      {phase_injected && (
       <span>
         <CloseCircleTwoTone twoToneColor="#bd3931" />
         {' '}
-        {inyection_phase}
+        {phase_injected}
       </span>
       )}
-      {!(inyection_phase || discovered_time_fit) && (
+      {!(phase_injected || discovered_time_fit) && (
       <span>
         <CheckCircleTwoTone twoToneColor="#87d068" />
         {' '}
@@ -183,11 +183,11 @@ const DefectsList = ({
         title="Observations List"
         content={defectErrorsList(record.observations || {
           discovered_time_fit: null,
-          inyection_phase: null,
+          phase_injected: null,
         })}
         placement="leftBottom"
       >
-        {record.observations?.discovered_time_fit || record.observations?.inyection_phase ? (
+        {record.observations?.discovered_time_fit || record.observations?.phase_injected ? (
           <ExclamationCircleTwoTone
             twoToneColor="#faad14"
             style={{ fontSize: '16px' }}
