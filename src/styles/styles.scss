@@ -20,6 +20,7 @@ $color_1_hover: #0F9692;
 /** UTILS ********************/
 body {
   overflow-x: hidden;
+  background-color: #393e3f;
 }
 .centredContent {
   align-items: center;
@@ -317,7 +318,7 @@ form .ant-input-number {
     /* CONTENT */
     .ant-layout-content {
       max-width: 100%;
-      padding: 100px 40px 20px 40px;
+      padding: 100px 40px 30px 40px;
       background-color: $color_background;
       transition: all 0.6s ease;
 
@@ -519,6 +520,7 @@ form .ant-input-number {
     }
   }
   .projectDetailsPhases {
+    position: relative;
     .dot-button {
       background: none;
       border: none;
@@ -910,7 +912,7 @@ padding: 0;
 }
 
 .project-steps {
-  margin-bottom: 90px !important;
+  margin-bottom: 80px !important;
   margin-left: 40px;
   width: 95%;
 }
@@ -923,7 +925,7 @@ padding: 0;
   position: fixed;
   top: 70px;
   &-open {
-    right: 0px;
+    right: 0;
   }
   &-close {
     right: -200px;
@@ -974,9 +976,22 @@ padding: 0;
 
 .info_saved {
   width: 300px;
+  margin-bottom: 40px;
 }
 
 .ant-picker {
   width: calc(100% - 30px);
   max-width: 224px;
+}
+
+.not-required {
+  .ant-form-item-label {
+    padding-left: 10px;
+  }
+}
+
+.right-order-steps {
+  position: absolute;
+  top: 3px;
+  right: 0;
 }

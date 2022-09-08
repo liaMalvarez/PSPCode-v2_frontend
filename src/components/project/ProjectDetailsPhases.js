@@ -14,7 +14,7 @@ import {
   Col,
   Alert,
 } from 'antd';
-import { PlusCircleTwoTone } from '@ant-design/icons';
+import { PlusCircleTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
 import DefectsList from './defect/DefectsList';
 import DefectForm from './defect/DefectForm';
@@ -203,11 +203,9 @@ const ProjectDetailsPhases = ({
     const saveData = setTimeout(() => {
       if (!wasEdited) return; // not edited
       setWasEdited(false);
-      message.loading({ content: 'Saving phase details', key: 'saving', duration: 2 });
-
       editPhaseProps(studentId, project.id, version.id, activePhase.id, activePhase);
       setMessageEditing(true);
-    }, 2000);
+    }, 1000);
 
     return () => clearTimeout(saveData);
   }, [activePhase]);
@@ -477,6 +475,13 @@ const ProjectDetailsPhases = ({
       >
         { printPhasesSteps()}
       </Steps>
+      <Alert
+        message="Phase data is automatically saved."
+        type="info"
+        showIcon
+        closable
+        className="info_saved"
+      />
       <section>
         <Form>
           <Row>
@@ -616,7 +621,12 @@ const ProjectDetailsPhases = ({
                 label="Comments"
                 className="inputTextarea2"
               >
-                <TextArea autosize={{ minRows: 3 }} onChange={(e) => editPhase('comments', e.target.value, 3000)} value={activePhase.comments} disabled={(!canEdit || !activePhase.start_time)} />
+                <TextArea
+                  autosize={{ minRows: 3 }}
+                  onChange={(e) => editPhase('comments', e.target.value, 3000)}
+                  value={activePhase.comments}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
                 <InputTooltip input="project_details_phase_form_comments" />
               </FormItem>
             </Col>
@@ -624,25 +634,18 @@ const ProjectDetailsPhases = ({
         </Form>
         <div className="separator" />
         <div>
-          <Alert
-            message="Phase data is automatically saved."
-            type="info"
-            showIcon
-            closable
-            className="info_saved"
-          />
           {canEdit && version.phases.length > 1 && (
-            <span>
-              <br />
-              If you want to delete this phase,
-              {' '}
-              <button type="button" className="dangerLink" onClick={deletePhase}>click here</button>
-              .
+            <span style={{ color: '#bd3931', display: 'flex', alignItems: 'center' }}>
+              Delete Phase
+              <DeleteTwoTone
+                style={{ fontSize: '20px', marginLeft: '6px' }}
+                twoToneColor="#bd3931"
+                onClick={deletePhase}
+              />
             </span>
           )}
         </div>
       </section>
-
     </div>
   );
 };
