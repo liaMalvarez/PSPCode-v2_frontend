@@ -87,16 +87,24 @@ const DefectForm = ({
     onEdit(null);
   };
 
-  const modalOk = () => {
-    // Required Inputs
-    if (!defectState
+  const isFixDefectReq = ['COMPILE', 'UNIT TEST'].includes(defectState?.phase_injected
+  && fixDefectsList.length
+  && version.phases.map(({ psp_phase: { id, name } }) => ({ id, name }))
+    .find(({ id }) => String(id) === defectState?.phase_injected.id)?.name);
+
+  const isSaveDisabled = (!defectState
       || !defectState?.discovered_time
       || !defectState?.phase_injected
       || !defectState?.defect_type
       || !defectState?.fixed_time
       || !defectState?.description
+    || (isFixDefectReq && !defectState?.fix_defect)
       || String(defectState?.description).trim() === ''
-    ) {
+  );
+
+  const modalOk = () => {
+    // Required Inputs
+    if (isSaveDisabled) {
       message.warning('You must fill all the required inputs (marked with *)', 5);
       return;
     }
@@ -122,7 +130,8 @@ const DefectForm = ({
         </FormItem>
         )}
       <FormItem
-        label="* Discovered Time"
+        label="Discovered Time"
+        required
       >
         <DatePicker
           disabledDate={(date) => noFutureDate(date)}
@@ -137,7 +146,8 @@ const DefectForm = ({
         <InputTooltip input="project_details_phase_defect_form_discovered_time" />
       </FormItem>
       <FormItem
-        label="* Phase Injected"
+        label="Phase Injected"
+        required
       >
         <Select
           value={defectState?.phase_injected
@@ -154,7 +164,8 @@ const DefectForm = ({
         <InputTooltip input="project_details_phase_defect_form_phase_injected" />
       </FormItem>
       <FormItem
-        label="* Defect Type"
+        label="Defect Type"
+        required
       >
         <Select
           value={defectState?.defect_type ? defectState?.defect_type : null}
@@ -166,7 +177,9 @@ const DefectForm = ({
       </FormItem>
       {fixDefectsList.length !== 0 && (
         <FormItem
-          label="&nbsp;&nbsp;Fix Defect"
+          label={isFixDefectReq ? 'Fix Defect' : `${' '.repeat(3)}Fix Defect`}
+          required={isFixDefectReq}
+          className={!isFixDefectReq ? 'not-required' : ''}
         >
           <Select
             value={defectState?.fix_defect ? defectState?.fix_defect : null}
@@ -184,7 +197,8 @@ const DefectForm = ({
         </FormItem>
       )}
       <FormItem
-        label="* Fixed Time"
+        label="Fixed Time"
+        required
       >
         <DatePicker
           placement={navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'bottomLeft' : 'topLeft'}
@@ -200,7 +214,8 @@ const DefectForm = ({
         <InputTooltip input="project_details_phase_defect_form_fixed_time" />
       </FormItem>
       <FormItem
-        label="* Description"
+        label="Description"
+        required
       >
         <TextArea
           autosize={{ minRows: 3 }}
@@ -232,6 +247,7 @@ const DefectForm = ({
           visible={showModal}
           okText="Save"
           onOk={modalOk}
+          okButtonProps={{ disabled: isSaveDisabled }}
           onCancel={modalCancel}
           okType="primary"
         >

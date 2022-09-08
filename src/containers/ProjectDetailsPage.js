@@ -13,6 +13,7 @@ import {
   LoadingOutlined,
   UploadOutlined,
   RightOutlined,
+  WarningTwoTone,
 } from '@ant-design/icons';
 import {
   Layout,
@@ -97,6 +98,7 @@ const ProjectDetailsPage = ({
   const [inputModalUpdateLOCsAdded, setInputModalUpdateLOCsAdded] = useState(null);
   const [inputModalUpdateLOCsAM, setInputModalUpdateLOCsAM] = useState(null);
   const [isOpenSider, setIsOpenSider] = useState(false);
+  const [checklist, setChecklist] = useState([]);
 
   const changeTab = (key) => {
     const allowed_tabs = ['summary', 'phases', 'files', 'messages'];
@@ -266,55 +268,46 @@ const ProjectDetailsPage = ({
     </Timeline.Item>
   ));
 
-  const submissionChecklist = () => {
-    const checklist = [];
-
-    if (psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id)
-      .process.phases.some((o) => o && o.first)) {
-      checklist.push({
-        key: 'first_phase',
-        message: `The first phase is 
-        ${psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.first).name}`,
-        valid: (version_data.phases.length > 0
-          && version_data.phases[0].psp_phase
-          && version_data.phases[0].psp_phase.id === psp_data.processes
-            .find((o) => o.process.id == project_data.psp_project.process.id)
-            .process.phases.find((o) => o && o.first).id),
-      });
+  useEffect(() => {
+    if (!version_data?.phases?.length) {
+      return;
     }
 
-    if (project_data.timeline[project_data.timeline.length - 1].version.version === 1
-      && psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id)
-        .process.phases.some((o) => o && o.last)) {
-      checklist.push({
-        key: 'last_phase',
-        message: `The last phase is ${psp_data.processes.find((o) => o.process.id == project_data.psp_project.process.id).process.phases.find((o) => o && o.last).name}`,
-        valid: (version_data.phases.length > 0
-          && version_data.phases[version_data.phases.length - 1].psp_phase
-          && version_data.phases[version_data.phases.length - 1].psp_phase.id === psp_data.processes
-            .find((o) => o.process.id == project_data.psp_project.process.id)
-            .process.phases.find((o) => o && o.last).id),
-      });
-    }
+    setChecklist([
 
-    checklist.push({
-      key: 'all_phase_have_time',
-      message: 'All the phases have start and end time',
-      valid: version_data.phases.reduce((acc, x) => acc
-        && x.start_time !== null && x.end_time !== null, true),
-    });
-
-    checklist.push({
-      key: 'zip_uploaded',
-      message: 'You have attached the zip file',
-      valid: (version_data.file),
-    });
-
-    return {
-      list: checklist,
-      canSubmit: (typeof checklist.find((o) => !o.valid) === 'undefined'),
-    };
-  };
+      {
+        key: 'phases_named',
+        message: 'All phases are named',
+        valid: !version_data.phases.some(({ psp_phase }) => (
+          !psp_phase
+        )),
+      },
+      {
+        key: 'right_order',
+        message: 'The phases are correctly ordered',
+        valid: !version_data.phases.some(({ psp_phase }, index, phases) => (
+          !psp_phase
+          || (!index ? !psp_phase.first : psp_phase.first)
+          || (!phases[index + 1] ? !psp_phase.last : psp_phase.last)
+          || (psp_phase.first && phases[index + 1]?.psp_phase.name !== 'DESIGN') // no hay un design inicial
+          || (psp_phase.last && phases[index - 1]?.psp_phase.name !== 'UNIT TEST') // no hay un test final
+          || (psp_phase.name === 'DESIGN' && !['CODE', 'DESIGN'].includes(phases[index + 1]?.psp_phase.name))
+          || (psp_phase.name === 'COMPILE' && phases[index - 1]?.psp_phase.name !== 'CODE')
+        )),
+      },
+      {
+        key: 'all_phase_have_time',
+        message: 'All the phases have start and end time',
+        valid: version_data.phases.reduce((acc, x) => acc
+          && x.start_time !== null && x.end_time !== null, true),
+      },
+      {
+        key: 'zip_uploaded',
+        message: 'You have attached the zip file',
+        valid: (version_data.file),
+      },
+    ]);
+  }, [JSON.stringify(version_data?.phases)]);
 
   const modalUpdateLOCsFunc = (data) => (
     <Form className="modalUpdateLOCs" onSubmit={() => {}}>
@@ -492,12 +485,12 @@ const ProjectDetailsPage = ({
           </Popover>
         </div>
       );
-    } if (session.user.role === 'student' && version_data.status === 'working') {
-      const checklist = submissionChecklist();
+    }
 
+    if (session.user.role === 'student' && version_data.status === 'working') {
       const submissionChecklistPopover = (
         <div className="submission-checklist">
-          {checklist.list.map((value) => (
+          {checklist.map((value) => (
             <span key={value.key} className={value.valid ? 'success' : 'danger'}>
               {value.valid
                 ? (<CheckCircleOutlined />)
@@ -510,15 +503,17 @@ const ProjectDetailsPage = ({
 
       return (
         <div className="submitProjectBtn">
-          <Popover title="Submission checklist" content={submissionChecklistPopover} placement="leftBottom">
-            <Button onClick={submitProject} icon={submitting ? <LoadingOutlined /> : <UploadOutlined />} type="boton1" disabled={!checklist.canSubmit}>
+          <Popover title="Submission Checklist" content={submissionChecklistPopover} placement="leftBottom">
+            <Button onClick={submitProject} icon={submitting ? <LoadingOutlined /> : <UploadOutlined />} type="boton1" disabled={checklist.some(({ valid }) => !valid)}>
               Submit to
               {` ${project_data.professor.first_name}`}
             </Button>
           </Popover>
         </div>
       );
-    } if (session.user.role === 'student' && version_data.status === 'assigned') {
+    }
+
+    if (session.user.role === 'student' && version_data.status === 'assigned') {
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here to allow phases recording" placement="leftBottom">
@@ -529,7 +524,9 @@ const ProjectDetailsPage = ({
           </Popover>
         </div>
       );
-    } if (session.user.role === 'student' && version_data.status === 'need_correction') {
+    }
+
+    if (session.user.role === 'student' && version_data.status === 'need_correction') {
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here, make your corrections and submit it again" placement="leftBottom">
@@ -541,8 +538,6 @@ const ProjectDetailsPage = ({
         </div>
       );
     }
-
-    // Submit for review. Approve. Needs Correction.
   };
 
   const renderWorkingTime = () => {
@@ -644,6 +639,45 @@ const ProjectDetailsPage = ({
     },
   ];
 
+  const descriptionPopover = () => (
+    <ol style={{ maxWidth: '400px', display: 'block', marginLeft: '15px' }}>
+      <li>
+        <strong>Plan </strong>
+        must be the first phase.
+      </li>
+      <li>
+        Always needs to be a
+        <strong> Design </strong>
+        phase right after
+        <strong> Plan</strong>
+        .
+      </li>
+      <li>
+        <strong>Design </strong>
+        phase(s) always has to be followed by
+        <strong> Code </strong>
+        phase.
+      </li>
+      <li>
+        <strong>Compile </strong>
+        phase always comes after
+        <strong> Code </strong>
+        Phase(s).
+      </li>
+      <li>
+        Always needs to be a
+        <strong> Test </strong>
+        phase right before
+        <strong> Post Mortem</strong>
+        .
+      </li>
+      <li>
+        <strong>Post Mortem </strong>
+        must be the last phase.
+      </li>
+    </ol>
+  );
+
   return (
     <Layout className="projectDetails">
       <ProfessorSider selected="dashboard.students" />
@@ -693,7 +727,25 @@ const ProjectDetailsPage = ({
                 version={version_data}
               />
             </TabPane>
-            <TabPane tab="PHASES" key="phases">
+            <TabPane
+              tab={(
+                <Popover
+                  title={!checklist[1]?.valid ? 'Phases must comply with the following:' : ''}
+                  content={!checklist[1]?.valid ? descriptionPopover() : ''}
+                  placement="rightTop"
+                >
+                  {!checklist[1]?.valid && (
+                    <WarningTwoTone
+                      twoToneColor="#ffbc5a"
+                      style={{ fontSize: '14px', margin: 0 }}
+                    />
+                  )}
+                  {' '}
+                  PHASES
+                </Popover>
+              )}
+              key="phases"
+            >
               <ProjectDetailsPhases
                 studentId={studentId}
                 project={project_data}

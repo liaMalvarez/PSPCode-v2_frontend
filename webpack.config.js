@@ -65,6 +65,7 @@ module.exports = {
         loader: 'url-loader',
         options: {
           limit: 10000,
+          esModule: false,
           mimetype: 'image/svg+xml',
         },
       },
@@ -73,6 +74,7 @@ module.exports = {
         loader: 'file-loader',
         options: {
           name: '[name].[ext]',
+          esModule: false,
         },
       },
       {
