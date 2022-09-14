@@ -7,7 +7,6 @@
     "node": ">5"
   },
   "scripts": {
-    "preinstall": "node tools/nodeVersionCheck.js",
     "postinstall": "npx patch-package",
     "start-message": "babel-node tools/startMessage.js",
     "start": "webpack serve --open --config webpack.dev.js",
