@@ -153,7 +153,15 @@ class DashboardProjects extends Component {
     }];
 
     return (
-      <Table rowKey="id" className="projectsListTable" columns={columns} dataSource={this.props.projects} onChange={this.handleChange} loading={this.props.loading} pagination={false} />
+      <Table
+        rowKey="id"
+        className="projectsListTable"
+        columns={columns}
+        dataSource={this.props.projects}
+        onChange={this.handleChange}
+        loading={this.props.loading}
+        pagination={false}
+      />
     );
   }
 }

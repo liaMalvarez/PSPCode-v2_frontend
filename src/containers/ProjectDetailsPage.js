@@ -36,6 +36,7 @@ import ProjectDetailsSummary from '../components/project/ProjectDetailsSummary';
 import ProjectDetailsPhases from '../components/project/ProjectDetailsPhases';
 import ProjectDetailsMessages from '../components/project/ProjectDetailsMessages';
 import ProjectDetailsFiles from '../components/project/ProjectDetailsFiles';
+import ProjectDetailsCorrection from '../components/project/ProjectDetailsCorrection';
 import WorkingTime from '../components/project/detail/WorkingTime';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import SpanData from '../components/common/SpanData';
@@ -101,12 +102,13 @@ const ProjectDetailsPage = ({
   const [checklist, setChecklist] = useState([]);
 
   const changeTab = (key) => {
-    const allowed_tabs = ['summary', 'phases', 'files', 'messages'];
+    const allowed_tabs = ['summary', 'phases', 'files', 'messages', 'correction'];
     key = allowed_tabs.some((x) => x === key) ? key : allowed_tabs[0];
 
     if (key === 'summary' && version_data) {
       fetchProjectDetailsVersionSummaryProp(studentId, project_id, version_data.id);
     }
+
     setDefaultActiveKey(key);
   };
 
@@ -254,8 +256,6 @@ const ProjectDetailsPage = ({
             correctProject,
           );
         }
-      },
-      onCancel() {
       },
     });
   };
@@ -735,10 +735,10 @@ const ProjectDetailsPage = ({
                   placement="rightTop"
                 >
                   {!checklist[1]?.valid && (
-                    <WarningTwoTone
-                      twoToneColor="#ffbc5a"
-                      style={{ fontSize: '14px', margin: 0 }}
-                    />
+                  <WarningTwoTone
+                    twoToneColor="#ffbc5a"
+                    style={{ fontSize: '14px', margin: 0 }}
+                  />
                   )}
                   {' '}
                   PHASES
@@ -761,6 +761,9 @@ const ProjectDetailsPage = ({
             </TabPane>
             <TabPane tab="MESSAGES" key="messages">
               <ProjectDetailsMessages studentId={studentId} project={project_data} />
+            </TabPane>
+            <TabPane tab="CORRECTION" key="correction">
+              <ProjectDetailsCorrection studentId={studentId} project={project_data} />
             </TabPane>
           </Tabs>
         </section>

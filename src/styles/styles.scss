@@ -12,6 +12,9 @@ $color_colorless: #8fa1a8;
 $color_background: #f9f9f9;
 $color_professor_sider: rgb(2, 110, 107);
 $almost_gray: #92b0af;
+$light_green: rgba(236, 247, 236, 0.466);
+$dark_green: #0c5c0b;
+$medium_green: #228320;
 
 $color_1: #0dc0bb;
 $color_1_hover: #0F9692;
@@ -953,20 +956,22 @@ padding: 0;
   align-items: center;
   height: 40px;
 }
-
-.ant-table-column-sort {
-  background: none !important;
-  &hover {
-    background: #fafafa !important;
-  }
-}
-
+  
 .ant-table-row {
   background: white !important;
 }
 
-.ant-table-cell-row-hover {
-  background: #e7eff0a8 !important;
+.projectsListTable {
+  .ant-table-column-sort {
+    background: none !important;
+    &hover {
+      background: #fafafa !important;
+    }
+  }
+  
+  .ant-table-cell-row-hover {
+    background: #e7eff0a8 !important;
+  }
 }
 
 .time-conflict-alert {
@@ -995,3 +1000,63 @@ padding: 0;
   top: 3px;
   right: 0;
 }
+
+.correction-table-comment {
+  padding: 0;
+  padding-right: 25px;
+}
+
+.correction-table {
+  box-shadow: -1px -1px 5px 1px rgba(165,183,190,0.22);
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 10px;
+
+  .ant-table-row-selected-hover  {
+    background-color: $light_green !important;
+  }
+  
+  .ant-table-row-selected  {
+    background-color: $light_green !important;
+    td {
+      background-color: $light_green !important;
+    }
+  }
+  
+  .table-row-disapproved:hover .ant-table-cell-row-hover{
+    background-color: rgb(255, 246, 230) !important;
+  } 
+  
+  .ant-checkbox-checked {
+    .ant-checkbox-inner {
+      border-color: $dark_green !important;
+      background-color: $medium_green !important;
+    }
+  }
+
+  .ant-checkbox:hover {
+    .ant-checkbox-inner {
+      border-color: $medium_green !important;
+      background-color: $light_green;
+    }
+  }
+
+  .ant-checkbox-input:focus + .ant-checkbox-inner { 
+      border-color: $dark_green !important;
+  }
+
+  .obs_icon {
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    padding-left: 10px;
+    font-weight: 500;
+    font-size: 12px;
+  }
+}
+
+
