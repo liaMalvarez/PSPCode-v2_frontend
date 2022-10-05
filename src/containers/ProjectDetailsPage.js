@@ -763,7 +763,11 @@ const ProjectDetailsPage = ({
               <ProjectDetailsMessages studentId={studentId} project={project_data} />
             </TabPane>
             <TabPane tab="CORRECTION" key="correction">
-              <ProjectDetailsCorrection studentId={studentId} project={project_data} />
+              <ProjectDetailsCorrection
+                studentId={studentId}
+                project={project_data}
+                version={version_data}
+              />
             </TabPane>
           </Tabs>
         </section>

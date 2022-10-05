@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, generatePath, useParams } from 'react-router';
 import { connect } from 'react-redux';
 import {
   Table,
@@ -7,12 +8,18 @@ import {
 
 import { WarningTwoTone } from '@ant-design/icons';
 
+import routesPaths from '../../../constants/routesPaths';
+
 const { TextArea } = Input;
 
-const CorrectionTable = ({ data }) => {
+const CorrectionTable = ({ data, sectionName, setSection }) => {
   const [comments, setComments] = useState([]);
   const [status, setStatus] = useState([]);
+
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const { idstudent, idproject } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let statusVar = [];
@@ -33,6 +40,18 @@ const CorrectionTable = ({ data }) => {
       [],
     ));
   }, []);
+
+  useEffect(() => {
+    if (status.length) {
+      setSection(sectionName, 'approved', status);
+    }
+  }, [selectedRowKeys]);
+
+  useEffect(() => {
+    if (comments.length) {
+      setSection(sectionName, 'comment', comments);
+    }
+  }, [comments]);
 
   const columns = [
     {
@@ -60,12 +79,29 @@ const CorrectionTable = ({ data }) => {
         />
       ),
     },
+    Table.EXPAND_COLUMN,
     Table.SELECTION_COLUMN,
   ];
 
   const expandedRowRender = ({ phases }) => (
     <div style={{ margin: 0 }}>
-      <div>{`Las fases: ${phases.join(', ')} no cumplen con este requerimiento del PSP.`}</div>
+      <div>
+        {phases.length > 1 ? 'Las siguientes fases no cumplen este requerimiento: ' : 'La siguiente fase no cumple este requerimiento: '}
+        {
+          phases.map(({ index, name }, i) => (
+            <button
+              className="phaseLinkButton"
+              onClick={() => {
+                const path = generatePath(routesPaths.studentProjectDetailsTab, { idstudent, idproject, tab: 'phases' });
+                navigate(`/${path}`, { state: { phaseIndex: index } });
+              }}
+            >
+              {name}
+              {i !== phases.length - 1 && ', '}
+            </button>
+          ))
+        }
+      </div>
     </div>
   );
 
@@ -94,6 +130,7 @@ const CorrectionTable = ({ data }) => {
           && expandIcon({ expanded, onExpand, record }),
         expandedRowRender,
         childrenColumnName: 'Description',
+        showExpandColumn: data.some(({ phases }) => phases.length),
       }}
       rowSelection={{
         columnTitle: 'Approved',
@@ -113,7 +150,7 @@ const CorrectionTable = ({ data }) => {
         },
         selectedRowKeys,
       }}
-      dataSource={data}
+      dataSource={data.map((record, key) => ({ ...record, key }))}
     />
   );
 };
