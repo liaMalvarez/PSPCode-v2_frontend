@@ -669,7 +669,8 @@ form .ant-input-number {
       }
 
       .ant-steps-item-finish .dot.cantedit {
-        background-color: #393e3f;
+        background-color: $color_header;
+        opacity: 0.8;
 
         &:hover {
           background-color: $color_header;
@@ -782,6 +783,12 @@ form .ant-input-number {
 
   .projectDetailsFiles {
     .ant-upload {
+      &.ant-upload-drag {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       &.ant-upload-drag p.ant-upload-drag-icon .anticon {
         color: $color_1;
 
@@ -881,7 +888,6 @@ form .ant-input-number {
 
     .generalFeedbackRow {
       width: 100%;
-      padding: 0 1%;
       display: flex;
       flex-direction: row;
       margin-bottom: 35px;
@@ -897,6 +903,31 @@ form .ant-input-number {
       flex-direction: column;
       align-items: flex-start;
       gap: 20px;
+    }
+
+    .projectDates {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .projectDate {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14px;
+    }
+
+    .dateRow {
+      display: flex;
+      flex-direction: row;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .projectDateTitle {
+      font-weight: 500;
+      font-size: 16px;
     }
 
     .switchRow {
@@ -926,7 +957,9 @@ form .ant-input-number {
 
     .general-comment {
       padding: 15px;
-      width: 60%;
+      width: 65%;
+      max-width: 600px;
+      min-width: 500px;
       font-weight: 300;
     }
 
@@ -1314,7 +1347,7 @@ ol {
   border-radius: 5px;
 
   &:hover {
-    background-color: #eefafad8;
+    text-shadow: 1px 1px 2px #bfe6e4;
   }
 }
 

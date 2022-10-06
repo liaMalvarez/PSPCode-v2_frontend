@@ -488,13 +488,15 @@ const ProjectDetailsPhases = ({
       >
         { printPhasesSteps()}
       </Steps>
-      <Alert
-        message="Phase data is automatically saved."
-        type="info"
-        showIcon
-        closable
-        className="info_saved"
-      />
+      {session.user.role !== 'professor' && (
+        <Alert
+          message="Phase data is automatically saved."
+          type="info"
+          showIcon
+          closable
+          className="info_saved"
+        />
+      )}
       <section>
         <Form>
           <Row>

@@ -274,7 +274,6 @@ const ProjectDetailsPage = ({
     }
 
     setChecklist([
-
       {
         key: 'phases_named',
         message: 'All phases are named',
@@ -289,8 +288,8 @@ const ProjectDetailsPage = ({
           !psp_phase
           || (!index ? !psp_phase.first : psp_phase.first)
           || (!phases[index + 1] ? !psp_phase.last : psp_phase.last)
-          || (psp_phase.first && phases[index + 1]?.psp_phase.name !== 'DESIGN') // no hay un design inicial
-          || (psp_phase.last && phases[index - 1]?.psp_phase.name !== 'UNIT TEST') // no hay un test final
+          || (psp_phase.first && phases[index + 1]?.psp_phase?.name !== 'DESIGN') // no hay un design inicial
+          || (psp_phase.last && phases[index - 1]?.psp_phase?.name !== 'UNIT TEST') // no hay un test final
           || (psp_phase.name === 'DESIGN' && !['CODE', 'DESIGN'].includes(phases[index + 1]?.psp_phase.name))
           || (psp_phase.name === 'COMPILE' && phases[index - 1]?.psp_phase.name !== 'CODE')
         )),
@@ -307,7 +306,7 @@ const ProjectDetailsPage = ({
         valid: (version_data.file),
       },
     ]);
-  }, [JSON.stringify(version_data?.phases)]);
+  }, [JSON.stringify(version_data?.phases), version_data?.file]);
 
   const modalUpdateLOCsFunc = (data) => (
     <Form className="modalUpdateLOCs" onSubmit={() => {}}>
@@ -477,12 +476,14 @@ const ProjectDetailsPage = ({
     if (session.user.role === 'professor' && version_data.status === 'being_corrected') {
       return (
         <div className="submitProjectBtn">
-          <Popover content="Approve this project" placement="topLeft">
-            <Button type="boton1" icon={<CheckOutlined />} shape="circle" onClick={() => correctProjectFunc('approved')} />
-          </Popover>
-          <Popover content="This project needs correction" placement="topLeft">
-            <Button type="danger" icon={<CloseOutlined />} shape="circle" onClick={() => correctProjectFunc('need_correction')} />
-          </Popover>
+          <Button
+            onClick={() => {}} // TO DO: SUBMIT CORRECTION
+            icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
+            type="boton1"
+            disabled={checklist.some(({ valid }) => !valid)}
+          >
+            Submit Correction
+          </Button>
         </div>
       );
     }

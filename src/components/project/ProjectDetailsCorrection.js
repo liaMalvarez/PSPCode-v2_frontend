@@ -5,7 +5,9 @@ import { Collapse, Input, Switch } from 'antd';
 import {
   ExclamationCircleOutlined,
   CheckCircleOutlined,
-  CheckOutlined, CloseOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  CalendarOutlined,
 } from '@ant-design/icons';
 
 import {
@@ -23,8 +25,8 @@ const ProjectDetailsCorrection = ({ project, version }) => {
     {
       approved: false,
       comment: 'General comment',
-      fechaEntrega: 'una fecha',
-      fechaCorrección: 'otra fecha',
+      delivered_date: '20 Jun 2022',
+      reviewed_date: '',
       sections: [{
         name: 'Programa y Resultado de Test',
         corrections: [{
@@ -114,7 +116,6 @@ const ProjectDetailsCorrection = ({ project, version }) => {
   };
 
   const setGeneralAttribute = (attribute, newValue) => {
-    console.log(newValue);
     setProjectFeedback({ ...projectFeedback, [attribute]: newValue });
   };
 
@@ -144,16 +145,31 @@ const ProjectDetailsCorrection = ({ project, version }) => {
           />
         </div>
         <div className="projectDates">
-          hola
+          {projectFeedback.delivered_date && (
+            <div className="projectDate">
+              <div className="projectDateTitle">Project delivered on:</div>
+              <div className="dateRow">
+                <CalendarOutlined style={{ color: '#585d5e', marginBottom: '2px' }} />
+                {projectFeedback.delivered_date}
+              </div>
+            </div>
+          )}
+          {projectFeedback.reviewed_date && (
+            <div className="projectDate">
+              <div className="projectDateTitle">Project reviewed on:</div>
+              <div className="dateRow">
+                <CalendarOutlined style={{ color: '#585d5e', marginBottom: '2px' }} />
+                {projectFeedback.reviewed_date}
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="separator" />
       <div className="title">
         Project Grading
       </div>
-      <Collapse
-        ghost
-      >
+      <Collapse ghost>
         {projectFeedback.sections.map(({ name, corrections }, index) => (
           <Panel header={panelHeader(corrections, name)} key={index}>
             <CorrectionTable data={corrections} sectionName={name} setSection={setSection} />
