@@ -14,6 +14,8 @@ import {
   Col,
   Alert,
 } from 'antd';
+import { useLocation } from 'react-router';
+
 import { PlusCircleTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
 import DefectsList from './defect/DefectsList';
@@ -67,6 +69,8 @@ const ProjectDetailsPhases = ({
   deleted,
   fetchProjectDetailsVersionPhaseDefectsProps,
 }) => {
+  const { state } = useLocation();
+
   const [messageEditing, setMessageEditing] = useState(false);
   const [messageDeleting, setMessageDeleting] = useState(false);
   const [messageCreating, setMessageCreating] = useState(false);
@@ -74,6 +78,7 @@ const ProjectDetailsPhases = ({
   const [wasEdited, setWasEdited] = useState(false);
   const [canEdit, setCanEdit] = useState(version.status === 'working' && session.user.role !== 'professor');
   const [activePhase, setActivePhase] = useState(version.phases[version.phases.length - 1]);
+
   const [activeDefect, setActiveDefect] = useState(null);
 
   const {
@@ -95,6 +100,7 @@ const ProjectDetailsPhases = ({
     time_conflict_start: null,
     time_conflict_end: null,
   };
+  window.history.replaceState({}, document.title);
 
   useEffect(() => {
     fetchProjectDetailsVersionPhaseDefectsProps(
@@ -104,6 +110,13 @@ const ProjectDetailsPhases = ({
       activePhase.id,
     );
   }, [activePhase]);
+
+  useEffect(() => {
+    if ((state?.phaseIndex || state?.phaseIndex === 0)
+    && version.phases[state.phaseIndex]) {
+      setActivePhase(version.phases[state.phaseIndex]);
+    }
+  }, [state, state?.phaseIndex]);
 
   useEffect(() => {
     if (error) {
@@ -475,13 +488,15 @@ const ProjectDetailsPhases = ({
       >
         { printPhasesSteps()}
       </Steps>
-      <Alert
-        message="Phase data is automatically saved."
-        type="info"
-        showIcon
-        closable
-        className="info_saved"
-      />
+      {session.user.role !== 'professor' && (
+        <Alert
+          message="Phase data is automatically saved."
+          type="info"
+          showIcon
+          closable
+          className="info_saved"
+        />
+      )}
       <section>
         <Form>
           <Row>

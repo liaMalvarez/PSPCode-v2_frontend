@@ -7,9 +7,7 @@ import {
   CloudUploadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  CheckOutlined,
   HomeOutlined,
-  CloseOutlined,
   LoadingOutlined,
   UploadOutlined,
   RightOutlined,
@@ -36,6 +34,7 @@ import ProjectDetailsSummary from '../components/project/ProjectDetailsSummary';
 import ProjectDetailsPhases from '../components/project/ProjectDetailsPhases';
 import ProjectDetailsMessages from '../components/project/ProjectDetailsMessages';
 import ProjectDetailsFiles from '../components/project/ProjectDetailsFiles';
+import ProjectDetailsCorrection from '../components/project/ProjectDetailsCorrection';
 import WorkingTime from '../components/project/detail/WorkingTime';
 import ProfessorSider from '../components/layout/ProfessorSider';
 import SpanData from '../components/common/SpanData';
@@ -101,12 +100,13 @@ const ProjectDetailsPage = ({
   const [checklist, setChecklist] = useState([]);
 
   const changeTab = (key) => {
-    const allowed_tabs = ['summary', 'phases', 'files', 'messages'];
+    const allowed_tabs = ['summary', 'phases', 'files', 'messages', 'correction'];
     key = allowed_tabs.some((x) => x === key) ? key : allowed_tabs[0];
 
     if (key === 'summary' && version_data) {
       fetchProjectDetailsVersionSummaryProp(studentId, project_id, version_data.id);
     }
+
     setDefaultActiveKey(key);
   };
 
@@ -255,8 +255,6 @@ const ProjectDetailsPage = ({
           );
         }
       },
-      onCancel() {
-      },
     });
   };
 
@@ -274,7 +272,6 @@ const ProjectDetailsPage = ({
     }
 
     setChecklist([
-
       {
         key: 'phases_named',
         message: 'All phases are named',
@@ -289,8 +286,8 @@ const ProjectDetailsPage = ({
           !psp_phase
           || (!index ? !psp_phase.first : psp_phase.first)
           || (!phases[index + 1] ? !psp_phase.last : psp_phase.last)
-          || (psp_phase.first && phases[index + 1]?.psp_phase.name !== 'DESIGN') // no hay un design inicial
-          || (psp_phase.last && phases[index - 1]?.psp_phase.name !== 'UNIT TEST') // no hay un test final
+          || (psp_phase.first && phases[index + 1]?.psp_phase?.name !== 'DESIGN') // no hay un design inicial
+          || (psp_phase.last && phases[index - 1]?.psp_phase?.name !== 'UNIT TEST') // no hay un test final
           || (psp_phase.name === 'DESIGN' && !['CODE', 'DESIGN'].includes(phases[index + 1]?.psp_phase.name))
           || (psp_phase.name === 'COMPILE' && phases[index - 1]?.psp_phase.name !== 'CODE')
         )),
@@ -307,7 +304,7 @@ const ProjectDetailsPage = ({
         valid: (version_data.file),
       },
     ]);
-  }, [JSON.stringify(version_data?.phases)]);
+  }, [JSON.stringify(version_data?.phases), version_data?.file]);
 
   const modalUpdateLOCsFunc = (data) => (
     <Form className="modalUpdateLOCs" onSubmit={() => {}}>
@@ -477,12 +474,14 @@ const ProjectDetailsPage = ({
     if (session.user.role === 'professor' && version_data.status === 'being_corrected') {
       return (
         <div className="submitProjectBtn">
-          <Popover content="Approve this project" placement="topLeft">
-            <Button type="boton1" icon={<CheckOutlined />} shape="circle" onClick={() => correctProjectFunc('approved')} />
-          </Popover>
-          <Popover content="This project needs correction" placement="topLeft">
-            <Button type="danger" icon={<CloseOutlined />} shape="circle" onClick={() => correctProjectFunc('need_correction')} />
-          </Popover>
+          <Button
+            onClick={() => {}} // TO DO: SUBMIT CORRECTION
+            icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
+            type="boton1"
+            disabled={checklist.some(({ valid }) => !valid)}
+          >
+            Submit Correction
+          </Button>
         </div>
       );
     }
@@ -735,10 +734,10 @@ const ProjectDetailsPage = ({
                   placement="rightTop"
                 >
                   {!checklist[1]?.valid && (
-                    <WarningTwoTone
-                      twoToneColor="#ffbc5a"
-                      style={{ fontSize: '14px', margin: 0 }}
-                    />
+                  <WarningTwoTone
+                    twoToneColor="#ffbc5a"
+                    style={{ fontSize: '14px', margin: 0 }}
+                  />
                   )}
                   {' '}
                   PHASES
@@ -761,6 +760,13 @@ const ProjectDetailsPage = ({
             </TabPane>
             <TabPane tab="MESSAGES" key="messages">
               <ProjectDetailsMessages studentId={studentId} project={project_data} />
+            </TabPane>
+            <TabPane tab="CORRECTION" key="correction">
+              <ProjectDetailsCorrection
+                studentId={studentId}
+                project={project_data}
+                version={version_data}
+              />
             </TabPane>
           </Tabs>
         </section>

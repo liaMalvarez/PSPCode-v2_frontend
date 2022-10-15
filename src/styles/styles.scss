@@ -8,10 +8,14 @@ $color_danger: #f04134;
 $color_danger_hover: #bd3931;
 $color_success: #87d068;
 $color_warning: #ffbc5a;
+$color_light_warning: rgb(255, 246, 230);
 $color_colorless: #8fa1a8;
 $color_background: #f9f9f9;
 $color_professor_sider: rgb(2, 110, 107);
 $almost_gray: #92b0af;
+$light_green: rgba(236, 247, 236, 0.466);
+$dark_green: #0c5c0b;
+$medium_green: #228320;
 
 $color_1: #0dc0bb;
 $color_1_hover: #0F9692;
@@ -21,17 +25,21 @@ $color_1_hover: #0F9692;
 body {
   overflow-x: hidden;
   background-color: #393e3f;
+  min-height: 101vh;
 }
+
 .centredContent {
   align-items: center;
   display: flex;
   justify-content: center;
 }
-.ant-avatar{
+
+.ant-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .displayNone {
   display: none;
 }
@@ -40,9 +48,11 @@ b {
   &.warning {
     color: $color_warning;
   }
+
   &.danger {
     color: $color_danger;
   }
+
   &.success {
     color: $color_success;
   }
@@ -51,15 +61,19 @@ b {
 .hCenter {
   text-align: center;
 }
+
 .ant-layout a.dangerLink {
   color: $color_danger;
+
   &:hover {
     color: $color_danger_hover;
   }
 }
+
 form .ant-input-number {
   margin: 0;
 }
+
 .ant-form-item-control-input-content {
   display: flex;
   flex-direction: row;
@@ -68,16 +82,19 @@ form .ant-input-number {
 }
 
 
-.ant-btn-success:focus, .ant-btn-success:hover {
+.ant-btn-success:focus,
+.ant-btn-success:hover {
   background-color: #259b24;
   border-color: #259b24;
   color: #fff;
 }
+
 .ant-btn-success {
   background-color: $color_success;
   border-color: $color_success;
   color: #fff;
 }
+
 .ant-btn-boton1 {
   background-color: $color_1;
   color: white;
@@ -93,13 +110,16 @@ form .ant-input-number {
 
 .custom-progress {
   z-index: 1;
+
   .ant-progress-inner {
     vertical-align: top;
     position: fixed;
     top: 70px;
   }
+
   min-height: 1000px;
 }
+
 .ant-layout-footer {
   display: none;
 }
@@ -107,9 +127,11 @@ form .ant-input-number {
 .ant-progress-b {
   border-radius: 0;
 }
+
 .ant-progress-inner {
   border-radius: 0;
 }
+
 /*****************************/
 
 
@@ -117,9 +139,10 @@ form .ant-input-number {
 /** COMPONENTS ***************/
 
 .logo {
-  display:block;
+  display: block;
   color: $color_1;
   font-family: "Arvo", sans-serif;
+
   span {
     color: $color_dos;
   }
@@ -136,7 +159,9 @@ form .ant-input-number {
     text-align: center;
   }
 
-  input[type="text"], input[type="email"], input[type="password"] {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
 
     font-weight: 300;
     background: none;
@@ -152,29 +177,33 @@ form .ant-input-number {
     border-top-style: none;
     padding-right: 20px;
     outline: 0;
+
     &:focus {
       border-bottom: solid 2px $color_1;
       background-position: 0 0;
     }
+
     &::-webkit-input-placeholder {
       color: $color_dos;
     }
 
     &:-webkit-autofill,
     &:-webkit-autofill:hover,
-    &:-webkit-autofill:focus
-    &:-webkit-autofill {
+    &:-webkit-autofill:focus &:-webkit-autofill {
       -webkit-text-fill-color: $color_dos;
       -webkit-box-shadow: 0 0 0px 1000px $color_header inset;
     }
   }
+
   form .anticon {
     position: relative;
     right: 19px;
   }
+
   form button .anticon {
     right: 0;
   }
+
   form button:before {
     background: none;
     opacity: 0;
@@ -187,14 +216,15 @@ form .ant-input-number {
     font-weight: 300;
     margin-bottom: 40px;
   }
+
   .textBelowButton {
     display: block;
     text-align: center;
-    margin-top:20px;
+    margin-top: 20px;
   }
 
   .ant-btn-boton1 {
-    margin-top:10px;
+    margin-top: 10px;
     padding-left: 30px;
     padding-right: 30px;
   }
@@ -209,20 +239,26 @@ form .ant-input-number {
   font-family: 'Quicksand', sans-serif;
   color: $color_header;
   display: flex;
+  background-color: $color_background;
+
   a {
     font-weight: 300;
     color: $color_1;
+
     &:hover {
       color: $color_1_hover;
     }
   }
+
   .separator {
-    width: 80%;
+    width: 90%;
     height: 1px;
     margin: 30px auto;
     border-top: 1px solid #CCC5;
   }
+
   &:not(.darkLayout) {
+
     /*HEADER*/
     .ant-layout-header {
       box-shadow: -1px -1px 20px 2px rgba(0, 0, 0, 0.24);
@@ -234,11 +270,13 @@ form .ant-input-number {
       position: fixed;
       width: 100%;
       z-index: 100;
+
       .logoBar {
         display: flex;
         align-items: center;
         float: left;
         height: 100%;
+
         .logo {
           font-size: 30px;
           margin-bottom: 4px;
@@ -250,26 +288,30 @@ form .ant-input-number {
         flex-direction: row;
         height: 100%;
         align-items: center;
-        float:right;
+        float: right;
+
         .ant-avatar {
           background-color: $color_1;
           cursor: pointer;
         }
+
         .item {
           margin-right: 15px;
           line-height: 52px;
           align-items: center;
-          display:flex;
+          display: flex;
+
           &:last-of-type {
             margin-right: 0px;
           }
+
           .ant-badge-count {
             top: 5px;
-            height:18px;
+            height: 18px;
             border-radius: 10px;
-            min-width:18px;
+            min-width: 18px;
             line-height: 18px;
-            font-size:10px;
+            font-size: 10px;
           }
         }
       }
@@ -289,8 +331,10 @@ form .ant-input-number {
       background: $color_professor_sider;
       height: 100%;
       z-index: 2;
+
       a {
         color: #fff;
+
         span {
           font-size: 16px;
           font-family: 'Quicksand', sans-serif;
@@ -302,9 +346,11 @@ form .ant-input-number {
           height: 80px;
           display: flex;
           align-items: center;
+
           &:hover {
             background-color: #13817e;
           }
+
           .anticon {
             position: absolute;
             right: -10px;
@@ -314,46 +360,57 @@ form .ant-input-number {
         }
       }
     }
-    
+
     /* CONTENT */
     .ant-layout-content {
       max-width: 100%;
       padding: 100px 40px 30px 40px;
       background-color: $color_background;
       transition: all 0.6s ease;
+      min-height: 101vh;
 
       h1 {
         margin-top: 10px;
         font-size: 20px;
       }
+
       .ant-tabs {
         .ant-tabs-ink-bar {
           background-color: $color_1;
         }
-        .ant-tabs-tab-active{
+
+        .ant-tabs-tab-active {
           .ant-tabs-tab-btn {
             color: $color_1;
+
             &:hover {
               color: $color_1_hover;
             }
           }
         }
+
         .ant-tabs-nav .ant-tabs-tab:hover {
           color: $color_1_hover;
         }
+
         .ant-tabs-tabpane {
           margin-top: 10px;
         }
       }
+
       .ant-table-wrapper {
-        .ant-table-thead > tr > th, .ant-table-tbody > tr > td {
+
+        .ant-table-thead>tr>th,
+        .ant-table-tbody>tr>td {
           padding: 10px 8px;
         }
-        .ant-table-thead > tr > th {
+
+        .ant-table-thead>tr>th {
           background-color: inherit;
           padding: 10px 8px 5px 8px;
         }
-        .ant-table-tbody > tr:nth-of-type(2n) {
+
+        .ant-table-tbody>tr:nth-of-type(2n) {
           background: rgba(235, 235, 235, 0.53);
         }
       }
@@ -368,35 +425,49 @@ form .ant-input-number {
 
 
 .projectsListTable {
-  box-shadow: -1px -1px 5px 1px rgba(165,183,190,0.22);
+  box-shadow: -1px -1px 5px 1px rgba(165, 183, 190, 0.22);
   padding: 10px 15px;
   background-color: white;
   border-radius: 10px;
+
   .projectName {
     font-size: 16px;
   }
+
   .projectProcess {
     font-size: 12px;
     color: $color_colorless;
   }
+
   .line {
     border-left: 5px solid;
     padding-left: 7px;
     border-color: $color_header;
     line-height: 17px;
-    &.approved, &.colorless {
+
+    &.approved,
+    &.colorless {
       border-color: $color_colorless;
     }
-    &.dued, &.being_corrected, &.warning {
+
+    &.dued,
+    &.being_corrected,
+    &.warning {
       border-color: $color_warning;
     }
-    &.working, &.assigned, &.success {
+
+    &.working,
+    &.assigned,
+    &.success {
       border-color: $color_success;
     }
-    &.need_correction, &.danger {
+
+    &.need_correction,
+    &.danger {
       border-color: $color_danger;
     }
   }
+
   .dot {
     padding: 5px;
     border-radius: 5px;
@@ -408,16 +479,26 @@ form .ant-input-number {
     position: relative;
     top: 6px;
     margin-right: 10px;
-    &.approved, &.colorless {
+
+    &.approved,
+    &.colorless {
       background-color: $color_colorless;
     }
-    &.dued, &.being_corrected, &.warning {
+
+    &.dued,
+    &.being_corrected,
+    &.warning {
       background-color: $color_warning;
     }
-    &.working, &.assigned, &.success {
+
+    &.working,
+    &.assigned,
+    &.success {
       background-color: $color_success;
     }
-    &.need_correction, &.danger {
+
+    &.need_correction,
+    &.danger {
       background-color: $color_danger;
     }
   }
@@ -427,28 +508,31 @@ form .ant-input-number {
 
 .projectDetails {
   .ant-tag {
-    background-color: $almost_gray;
-    border-color: $color_colorless;
+    cursor: help;
     padding: 3px 10px;
-    border-radius: 10px;
-    color: white;
+    border-radius: 5px;
+
     &:last-of-type {
       margin-right: 0px;
     }
   }
+
   .ant-tabs-extra-content .projectTime {
     font-size: 20px;
   }
+
   .ant-layout-sider {
     background: $color_colorless;
     color: #fff;
     transition: all 0.6s ease;
     height: 100%;
+
     .box {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     h2 {
       font-weight: 300;
       color: inherit;
@@ -457,35 +541,44 @@ form .ant-input-number {
       top: 36px;
       margin-bottom: 20px;
     }
+
     .ant-timeline {
       color: #fff;
       position: relative;
       top: 40px;
+
       .ant-timeline-item-tail {
         border-left: 1px solid #BDD3DB;
       }
+
       .ant-timeline-item:last-of-type {
         font-size: 16px;
         color: white;
         font-weight: 400;
       }
+
       .ant-timeline-item-head-custom {
         border-radius: 10px;
         padding: 2px;
+
         div {
           padding: 4px;
           border-radius: 4px;
 
         }
       }
+
       .ant-timeline-item-head-red {
         background-color: $color_danger;
+
         div {
           background-color: #fff;
         }
       }
+
       .ant-timeline-item-last {
         height: 120px;
+
         .ant-timeline-item-head {
           background-color: $color_1;
           border: solid 1px white;
@@ -494,6 +587,7 @@ form .ant-input-number {
         }
       }
     }
+
     .submitProjectBtn {
       position: fixed;
       bottom: 0px;
@@ -501,17 +595,21 @@ form .ant-input-number {
       background-color: #a5b7beeb;
       text-align: center;
       width: 200px;
+
       .ant-btn-icon-only:first-of-type {
         margin-right: 20px;
       }
     }
   }
+
   .projectDetailsSummary {
     .ant-table-wrapper {
       margin-bottom: 40px;
-      .ant-table-thead > tr > th:nth-of-type(n+2) {
+
+      .ant-table-thead>tr>th:nth-of-type(n+2) {
         width: 85px;
       }
+
       .ant-table-row:last-of-type {
         font-weight: bold;
         font-size: 14px;
@@ -519,20 +617,25 @@ form .ant-input-number {
       }
     }
   }
+
   .projectDetailsPhases {
     position: relative;
+
     .dot-button {
       background: none;
       border: none;
       display: flex;
       align-items: center;
     }
+
     .active {
       margin-bottom: 6px;
     }
+
     .ant-steps {
       padding-top: 2px;
       margin-bottom: 20px;
+
       .dot {
         padding: 6px;
         border-radius: 6px;
@@ -545,6 +648,7 @@ form .ant-input-number {
         height: 6px;
         bottom: 1px;
       }
+
       .icon {
         position: relative;
         z-index: 5;
@@ -555,25 +659,32 @@ form .ant-input-number {
         margin: 0;
         padding-left: 0;
       }
+
       .ant-steps-item-finish .dot {
         background-color: $color_1;
+
         &:hover {
           background-color: $color_1_hover;
         }
       }
+
       .ant-steps-item-finish .dot.cantedit {
-        background-color: #393e3f;
+        background-color: $color_header;
+        opacity: 0.8;
+
         &:hover {
           background-color: $color_header;
         }
       }
+
       .ant-steps-item-tail:after {
         background-color: #d9d9d9;
-        height:2px;
+        height: 2px;
         position: relative;
         width: 100%;
         z-index: 0;
       }
+
       .ant-steps-item-title {
         margin-top: 10px;
         font-size: 14px;
@@ -586,90 +697,118 @@ form .ant-input-number {
         text-transform: uppercase;
       }
     }
+
     .ant-steps-dot .ant-steps-item-tail {
       position: relative;
       top: 6px;
       z-index: 0;
       margin: 0;
     }
+
     .ant-steps-dot .ant-steps-item-icon {
       margin: 0;
       padding-left: 0;
     }
-    .ant-steps-item-finish > .ant-steps-item-container >.ant-steps-item-content > .ant-steps-item-title {
+
+    .ant-steps-item-finish>.ant-steps-item-container>.ant-steps-item-content>.ant-steps-item-title {
       bottom: 1px;
       color: $color_header;
     }
+
     .ant-steps-label-vertical .ant-steps-item-content {
       width: 69px;
     }
+
     .separator {
       margin: 50px auto;
     }
+
     form {
       .ant-row .ant-form-item:last-of-type {
         margin-bottom: 0;
       }
+
       .ant-form-item-label {
         width: 175px;
         text-align: left;
       }
-      .ant-select, .ant-calendar-picker, .ant-input-number {
+
+      .ant-select,
+      .ant-calendar-picker,
+      .ant-input-number {
         width: calc(100% - 30px);
         max-width: 224px;
       }
+
       textarea.ant-input {
         max-width: unset;
         width: calc(100% - 30px);
         vertical-align: middle;
       }
+
       .anticon-info-circle {
         color: $color_dos;
+
         &:hover {
           color: $color_colorless;
         }
       }
+
       .defectList {
         h3 {
-          font-weight:300;
+          font-weight: 300;
           float: left;
           margin-bottom: 20px;
         }
+
         .logNewDefect {
           float: right;
         }
+
         .ant-table-wrapper {
           clear: both;
         }
-        .ant-table-thead > tr > th:nth-of-type(6),
-        .ant-table-tbody > tr > td:nth-of-type(6),
-        .ant-table-thead > tr > th:nth-of-type(7),
-        .ant-table-tbody > tr > td:nth-of-type(7),
-        .ant-table-thead > tr > th:nth-of-type(8),
-        .ant-table-tbody > tr > td:nth-of-type(8) {
+
+        .ant-table-thead>tr>th:nth-of-type(6),
+        .ant-table-tbody>tr>td:nth-of-type(6),
+        .ant-table-thead>tr>th:nth-of-type(7),
+        .ant-table-tbody>tr>td:nth-of-type(7),
+        .ant-table-thead>tr>th:nth-of-type(8),
+        .ant-table-tbody>tr>td:nth-of-type(8) {
           text-align: center;
         }
       }
     }
   }
+
   .projectDetailsFiles {
     .ant-upload {
+      &.ant-upload-drag {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       &.ant-upload-drag p.ant-upload-drag-icon .anticon {
         color: $color_1;
+
         &:hover {
           color: $color_1_hover;
         }
       }
     }
+
     .ant-upload-list {
       display: none;
     }
+
     .dragBox {
       margin-top: 15px;
       margin-bottom: 20px;
       height: 180px;
     }
   }
+
   .projectDetailsMessages {
     .singleMessage {
       margin-bottom: 20px;
@@ -678,62 +817,156 @@ form .ant-input-number {
       padding: 12px 12px 1px 19px;
       width: fit-content;
       min-width: 250px;
+
       &.right {
         margin-left: auto;
         margin-right: 0;
         background: rgb(43, 153, 255);
         color: white;
+
         a {
           color: white;
+
           &:hover {
             color: white;
+
             span {
               text-decoration: underline;
             }
           }
         }
       }
-      &.left {
 
-      }
+      &.left {}
+
       .avatar {
         .ant-avatar.ant-avatar-icon {
           display: inline-grid;
           margin-right: 13px;
         }
       }
+
       .date {
         font-size: 12px;
         color: $color_colorless;
         margin-bottom: 5px;
       }
+
       &.right .date {
         color: #ffffffa8;
       }
+
       .name {
         font-weight: 500;
       }
+
       span.ant-avatar.statusAvatar.ant-avatar-circle.ant-avatar-icon {
         position: absolute;
         margin-left: -32px;
         margin-top: -27px;
         border: 2px solid $color_background;
+
         i {
           line-height: 30px;
         }
       }
     }
+
     .write {
       .ant-btn {
         float: right;
         margin-top: 15px;
       }
     }
+
     .empty {
       margin: 0 auto;
       display: block;
       width: fit-content;
       color: $color_colorless;
+    }
+
+    .generalFeedbackRow {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 35px;
+      margin-top: 30px;
+      align-items: flex-start;
+      gap: 40px;
+    }
+
+    .generalFeedbackColumn {
+      width: 70%;
+      padding: 0 1%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .projectDates {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .projectDate {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 14px;
+    }
+
+    .dateRow {
+      display: flex;
+      flex-direction: row;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .projectDateTitle {
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    .switchRow {
+      font-size: 16px;
+      font-weight: 300;
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 190px;
+    }
+
+    .ant-switch {
+      width: 50px;
+      background: $color_warning;
+      --antd-wave-shadow-color: #ffcc00;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    .ant-switch-checked {
+      background: $medium_green;
+      --antd-wave-shadow-color: #19a516;
+    }
+
+    .general-comment {
+      padding: 15px;
+      width: 65%;
+      max-width: 600px;
+      min-width: 500px;
+      font-weight: 300;
+    }
+
+    .title {
+      margin-left: 1%;
+      font-size: 18px;
+      margin-bottom: 15px;
     }
   }
 }
@@ -741,39 +974,50 @@ form .ant-input-number {
 .userDetails {
   .userProfile {
     h3 {
-      font-weight:300;
+      font-weight: 300;
       margin-bottom: 20px;
       font-size: 18px;
     }
+
     form {
       .ant-row .ant-form-item:last-of-type {
         margin-bottom: 0;
       }
+
       .ant-form-item-label {
         width: 165px;
         text-align: left;
       }
-      .ant-select, .ant-calendar-picker, .ant-input-number, .ant-input {
+
+      .ant-select,
+      .ant-calendar-picker,
+      .ant-input-number,
+      .ant-input {
         width: calc(100% - 30px);
         max-width: 300px;
       }
+
       textarea.ant-input {
         max-width: unset;
         width: calc(100% - 30px);
         vertical-align: middle;
       }
+
       .anticon-info-circle {
         color: $color_dos;
+
         &:hover {
           color: $color_colorless;
         }
       }
     }
+
     .actions {
       width: 90%;
       text-align: right;
       justify-content: flex-end;
       align-items: center;
+
       button.ant-btn.ant-btn-boton1 {
         margin-left: 20px;
         padding-left: 20px;
@@ -789,47 +1033,60 @@ form .ant-input-number {
     flex-direction: row;
     align-items: center;
   }
+
   .anticon {
     margin-right: 5px;
   }
+
   .success .anticon {
     color: $color_success;
   }
+
   .danger .anticon {
     color: $color_danger;
   }
 }
+
 .defectFormPopover {
   .ant-form-item-label {
     width: 140px;
     text-align: left;
     margin-left: 15px;
   }
-  .ant-select, .ant-calendar-picker, .ant-input-number {
+
+  .ant-select,
+  .ant-calendar-picker,
+  .ant-input-number {
     width: calc(100% - 30px);
     max-width: 224px;
   }
+
   textarea.ant-input {
     max-width: unset;
     width: calc(100% - 30px);
     vertical-align: middle;
   }
+
   .anticon-info-circle {
     color: $color_dos;
+
     &:hover {
       color: $color_colorless;
     }
   }
 }
+
 .modalCorrectProject {
   .ant-progress-outer {
     position: relative;
     top: 9px;
   }
+
   .ant-upload-list-item-info .anticon-loading {
     display: none;
   }
 }
+
 .professorDashboard {
   margin-left: 200px;
 
@@ -839,18 +1096,21 @@ form .ant-input-number {
     text-align: right;
   }
 }
+
 .ant-menu-vertical .ant-menu-item.notificationItem {
   line-height: 20px;
   padding-top: 10px;
   padding-bottom: 40px;
 
 }
-.notificationItem{
+
+.notificationItem {
   .notificationDate {
     font-size: 11px;
     display: block;
     margin-top: -3px;
   }
+
   .notificationInfo {
     display: flex;
     flex-direction: column;
@@ -865,10 +1125,12 @@ form .ant-input-number {
     width: 200px;
     text-align: left;
   }
+
   .ant-form-item-control-wrapper {
     float: left;
   }
 }
+
 button {
   cursor: pointer;
 }
@@ -878,7 +1140,7 @@ button {
 }
 
 ol {
-padding: 0;
+  padding: 0;
 }
 
 .dot-button {
@@ -924,9 +1186,11 @@ padding: 0;
 .sider {
   position: fixed;
   top: 70px;
+
   &-open {
     right: 0;
   }
+
   &-close {
     right: -200px;
   }
@@ -954,19 +1218,22 @@ padding: 0;
   height: 40px;
 }
 
-.ant-table-column-sort {
-  background: none !important;
-  &hover {
-    background: #fafafa !important;
-  }
-}
-
 .ant-table-row {
   background: white !important;
 }
 
-.ant-table-cell-row-hover {
-  background: #e7eff0a8 !important;
+.projectsListTable {
+  .ant-table-column-sort {
+    background: none !important;
+
+    &hover {
+      background: #fafafa !important;
+    }
+  }
+
+  .ant-table-cell-row-hover {
+    background: #e7eff0a8 !important;
+  }
 }
 
 .time-conflict-alert {
@@ -994,4 +1261,101 @@ padding: 0;
   position: absolute;
   top: 3px;
   right: 0;
+}
+
+.correction-table-comment {
+  padding: 0;
+  padding-right: 25px;
+  font-weight: 300;
+}
+
+.correction-table {
+  box-shadow: -1px -1px 5px 1px rgba(165, 183, 190, 0.22);
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 10px;
+
+  .ant-table-row-selected {
+    background: white !important;
+
+    td {
+      background: white !important;
+    }
+  }
+
+  .ant-table-row-selected:hover {
+    background-color: $light_green  !important;
+  }
+
+  .ant-table-row-selected-hover {
+    background-color: $light_green  !important;
+  }
+
+  .table-row-disapproved:hover .ant-table-cell-row-hover {
+    background-color: $color_light_warning  !important;
+  }
+
+  .ant-checkbox-checked {
+    .ant-checkbox-inner {
+      border-color: $dark_green  !important;
+      background-color: $medium_green  !important;
+    }
+  }
+
+  .ant-checkbox:hover {
+    .ant-checkbox-inner {
+      border-color: $medium_green  !important;
+      background-color: $light_green;
+    }
+  }
+
+  .ant-checkbox-input:focus+.ant-checkbox-inner {
+    border-color: $dark_green  !important;
+  }
+
+  .obs_icon {
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    padding-left: 10px;
+    font-weight: 500;
+    font-size: 12px;
+  }
+}
+
+.correction-table-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ant-collapse-header:hover {
+  background-color: #eff1f1d8;
+  cursor: pointer;
+}
+
+.phaseLinkButton {
+  color: $color_1_hover;
+  background: none;
+  border: none;
+  margin-right: -4px;
+  padding: 2px 6px;
+  border-radius: 5px;
+
+  &:hover {
+    text-shadow: 1px 1px 2px #bfe6e4;
+  }
+}
+
+.ant-table-expanded-row {
+  background-color: $color_light_warning  !important;
+
+  td {
+    background-color: $color_light_warning  !important
+  }
 }
