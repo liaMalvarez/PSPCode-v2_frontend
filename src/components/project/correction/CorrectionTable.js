@@ -71,7 +71,7 @@ const CorrectionTable = ({ data, sectionName, setSection }) => {
           className="correction-table-comment"
           value={comments[index]}
           bordered={false}
-          autoSize={{ minRows: 2, maxRows: 20 }}
+          autoSize={{ minRows: 0, maxRows: 20 }}
           onChange={(e) => {
             setComments((prevState) => prevState
               .map((prevValue, i) => (index === i ? e.target.value : prevValue)));
@@ -132,6 +132,11 @@ const CorrectionTable = ({ data, sectionName, setSection }) => {
         childrenColumnName: 'Description',
         showExpandColumn: data.some(({ phases }) => phases.length),
       }}
+      onRow={() => ({
+        style: {
+          height: '70px',
+        },
+      })}
       rowSelection={{
         columnTitle: 'Approved',
         onSelect: ({ key }) => {

@@ -134,16 +134,13 @@ class DashboardProjects extends Component {
         const msg = text > 0 ? (<b className="danger">{text}</b>) : 0;
         const content = text == 1 ? (
           <span>
-            {text}
-            student is awaiting your correction
+            {`${text} student is awaiting for your correction`}
           </span>
-        )
-          : (
-            <span>
-              {text}
-              students are awaiting your correction
-            </span>
-          );
+        ) : (
+          <span>
+            {`${text} students are awaiting for your correction`}
+          </span>
+        );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{msg}</Popover>);
       },
     }, {
