@@ -52,9 +52,7 @@ const ProjectList = ({
           <span className="projectName">{record.name}</span>
           <br />
           <span className="projectProcess">
-            Process:
-            {' '}
-            {record.process.name}
+            {`Process: ${record.process.name}`}
           </span>
         </div>
       );

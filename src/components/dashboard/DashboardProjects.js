@@ -61,11 +61,9 @@ class DashboardProjects extends Component {
             <span className="projectName">{record.name}</span>
             <br />
             <span className="projectProcess">
-              Process:
-              {record.process.name}
+              {`Process: ${record.process.name}`}
               <br />
-              Deadline:
-              {moment(record.deadline).format('DD/MM/YYYY')}
+              {`Deadline: ${moment(record.deadline).format('DD/MM/YYYY')}`}
             </span>
           </div>
         );
@@ -77,13 +75,11 @@ class DashboardProjects extends Component {
       render: (text) => {
         const content = text == 1 ? (
           <span>
-            {text}
-            student hasn't this project assigned
+            {`${text} student hasn't this project assigned`}
           </span>
         ) : (
           <span>
-            {text}
-            students haven't this project assigned
+            {`${text} students haven't this project assigned`}
           </span>
         );
         return text == 0 ? 0 : (<Popover content={content}>{text}</Popover>);
@@ -92,19 +88,16 @@ class DashboardProjects extends Component {
       title: 'WORKING',
       dataIndex: 'working',
       key: 'working',
-      render: (text, record, index) => {
+      render: (text) => {
         const content = text == 1 ? (
           <span>
-            {text}
-            student is working on this project
+            {`${text} student is working on this project`}
           </span>
-        )
-          : (
-            <span>
-              {text}
-              students are working on this project
-            </span>
-          );
+        ) : (
+          <span>
+            {`${text} students are working on this project`}
+          </span>
+        );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{text}</Popover>);
       },
     }, {
@@ -114,16 +107,13 @@ class DashboardProjects extends Component {
       render: (text) => {
         const content = text == 1 ? (
           <span>
-            {text}
-            student has finished this project successfully
+            {`${text} student has finished this project successfully`}
           </span>
-        )
-          : (
-            <span>
-              {text}
-              students have finished this project successfully
-            </span>
-          );
+        ) : (
+          <span>
+            {`${text} students have finished this project successfully`}
+          </span>
+        );
         return text == 0 ? (<span>0</span>) : (<Popover content={content}>{text}</Popover>);
       },
     }, {

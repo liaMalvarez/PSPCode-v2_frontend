@@ -36,23 +36,14 @@ import {
   fetchProjectDetailsVersionPhaseDefectsFailure,
 } from '../../actions/projectActions';
 
+import { TEXTS } from '../../constants/constants';
+
 const moment = require('moment/moment');
 
 const { Option } = Select;
 const { TextArea } = Input;
 const { Step } = Steps;
 const FormItem = Form.Item;
-
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 12 },
-  },
-};
 
 const ProjectDetailsPhases = ({
   version,
@@ -223,6 +214,12 @@ const ProjectDetailsPhases = ({
     return () => clearTimeout(saveData);
   }, [activePhase]);
 
+  const pipFields = ['pip_problem', 'pip_proposal', 'pip_notes'];
+
+  const isFieldValid = (fieldName) => (
+    activePhase[fieldName]?.length && activePhase[fieldName]?.length < 15
+  );
+
   const printFormForActivePhase = () => {
     const inputs = [('')];
     if (activePhase.psp_phase && activePhase.psp_phase.first) {
@@ -231,7 +228,6 @@ const ProjectDetailsPhases = ({
           <Col span={12} key="section_plan_time">
             <section>
               <FormItem
-                {...formItemLayout}
                 label="Plan Time"
                 validateStatus={plan_time ? 'warning' : ''}
                 hasFeedback={plan_time}
@@ -281,7 +277,6 @@ const ProjectDetailsPhases = ({
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_actual_base_loc" />
-
               </FormItem>
             </section>
           </Col>));
@@ -302,7 +297,6 @@ const ProjectDetailsPhases = ({
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_m" />
-
               </FormItem>
               <FormItem
                 label="Deleted (D)"
@@ -315,7 +309,6 @@ const ProjectDetailsPhases = ({
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_d" />
-
               </FormItem>
             </Col>
             <Col span={12}>
@@ -330,7 +323,6 @@ const ProjectDetailsPhases = ({
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_r" />
-
               </FormItem>
               <FormItem
                 label="New Reusable (NR)"
@@ -365,38 +357,25 @@ const ProjectDetailsPhases = ({
       }
       if (project.psp_project.process.has_pip) {
         inputs.push((
-          <div key="section_pm_pip">
-            <Row>
-              <Col span={24}>
+          <div className="section_pm_pip">
+            <Col>
+              {pipFields.map((fieldName) => (
                 <FormItem
-                  {...formItemLayout}
-                  label="Problem Description"
+                  label={TEXTS[fieldName]}
                   className="inputTextarea"
+                  validateStatus={isFieldValid(fieldName) ? 'warning' : ''}
+                  help={isFieldValid(fieldName) ? 'This field should contain at least 15 characters' : ''}
                 >
-                  <TextArea autosize={{ minRows: 3 }} onChange={(e) => editPhase('pip_problem', e.target.value)} value={activePhase.pip_problem ? activePhase.pip_problem : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_pip_problem" />
-
+                  <TextArea
+                    autosize={{ minRows: 3 }}
+                    onChange={(e) => editPhase(fieldName, e.target.value)}
+                    value={activePhase[fieldName] || null}
+                    disabled={(!canEdit || !activePhase.start_time)}
+                  />
+                  <InputTooltip input={`project_details_phase_form_pm_${fieldName}`} />
                 </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                  label="Proposal Description"
-                  className="inputTextarea"
-                >
-                  <TextArea autosize={{ minRows: 3 }} onChange={(e) => editPhase('pip_proposal', e.target.value)} value={activePhase.pip_proposal ? activePhase.pip_proposal : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_pip_proposal" />
-
-                </FormItem>
-                <FormItem
-                  {...formItemLayout}
-                  label="Other Notes"
-                  className="inputTextarea"
-                >
-                  <TextArea autosize={{ minRows: 3 }} onChange={(e) => editPhase('pip_notes', e.target.value)} value={activePhase.pip_notes ? activePhase.pip_notes : null} disabled={(!canEdit || !activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_pm_pip_comments" />
-
-                </FormItem>
-              </Col>
-            </Row>
+              ))}
+            </Col>
           </div>));
       }
     }
@@ -502,7 +481,6 @@ const ProjectDetailsPhases = ({
           <Row>
             <Col span={12}>
               <FormItem
-                {...formItemLayout}
                 label="Phase"
                 className="inputSelect"
               >
@@ -522,7 +500,6 @@ const ProjectDetailsPhases = ({
                 <InputTooltip input="project_details_phase_form_phase" />
               </FormItem>
               <FormItem
-                {...formItemLayout}
                 label="Start Time"
                 className="inputDatepicker"
               >
@@ -584,7 +561,6 @@ const ProjectDetailsPhases = ({
             <Col span={12}>
               <section>
                 <FormItem
-                  {...formItemLayout}
                   label="End Time"
                   className="inputDatepicker"
                   validateStatus={elapsed_time ? 'warning' : ''}
@@ -604,7 +580,6 @@ const ProjectDetailsPhases = ({
                   <InputTooltip input="project_details_phase_form_end_time" />
                 </FormItem>
                 <FormItem
-                  {...formItemLayout}
                   label="Int. time"
                   validateStatus={break_time ? 'warning' : ''}
                   hasFeedback={break_time}
@@ -632,7 +607,6 @@ const ProjectDetailsPhases = ({
             </Col>
             <Col span={12}>
               <FormItem
-                {...formItemLayout}
                 label="Comments"
                 className="inputTextarea2"
               >

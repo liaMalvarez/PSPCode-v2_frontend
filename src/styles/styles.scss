@@ -736,13 +736,13 @@ form .ant-input-number {
       .ant-select,
       .ant-calendar-picker,
       .ant-input-number {
-        width: calc(100% - 30px);
+        width: 100%;
         max-width: 224px;
       }
 
       textarea.ant-input {
         max-width: unset;
-        width: calc(100% - 30px);
+        width: 100%;
         vertical-align: middle;
       }
 
@@ -993,13 +993,13 @@ form .ant-input-number {
       .ant-calendar-picker,
       .ant-input-number,
       .ant-input {
-        width: calc(100% - 30px);
+        width: 100%;
         max-width: 300px;
       }
 
       textarea.ant-input {
         max-width: unset;
-        width: calc(100% - 30px);
+        width: 100%;
         vertical-align: middle;
       }
 
@@ -1057,13 +1057,13 @@ form .ant-input-number {
   .ant-select,
   .ant-calendar-picker,
   .ant-input-number {
-    width: calc(100% - 30px);
+    width: 100%;
     max-width: 224px;
   }
 
   textarea.ant-input {
     max-width: unset;
-    width: calc(100% - 30px);
+    width: 100%;
     vertical-align: middle;
   }
 
@@ -1247,7 +1247,7 @@ ol {
 }
 
 .ant-picker {
-  width: calc(100% - 30px);
+  width: 100%;
   max-width: 224px;
 }
 
@@ -1358,4 +1358,9 @@ ol {
   td {
     background-color: $color_light_warning  !important
   }
+}
+
+.section_pm_pip {
+  width: calc(50% + 427px);
+  margin-top: 70px;
 }
