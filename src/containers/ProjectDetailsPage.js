@@ -304,6 +304,24 @@ const ProjectDetailsPage = ({
         valid: (version_data.file),
       },
     ]);
+
+    if (project_data.psp_project.process.has_pip) {
+      setChecklist((prevChecklist) => [...prevChecklist, {
+        key: 'pm_pip_valid',
+        message: 'Post Mortem Phase has PIP fields fulfilled',
+        valid: !version_data.phases.some(({
+          psp_phase,
+          pip_problem,
+          pip_proposal,
+          pip_notes,
+        }) => (
+          psp_phase.order === 6
+          && (!(pip_problem?.length >= 15)
+            || !(pip_proposal?.length >= 15)
+            || !(pip_notes?.length >= 15))
+        )),
+      }]);
+    }
   }, [JSON.stringify(version_data?.phases), version_data?.file]);
 
   const modalUpdateLOCsFunc = (data) => (
