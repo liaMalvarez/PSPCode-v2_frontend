@@ -4,11 +4,13 @@ import {
   message,
   Upload,
   Modal,
+  Button,
 } from 'antd';
 import {
   LoadingOutlined,
   DownloadOutlined,
-  InboxOutlined
+  InboxOutlined,
+  RetweetOutlined,
 } from '@ant-design/icons';
 
 import {
@@ -102,14 +104,13 @@ const ProjectDetailsMessage = ({
       </div>
       {session.user.role !== 'professor' && version.status === 'working'
       && (
-        <div>
-          <span>
-            If you want to delete this zip or upload it again,
-            {' '}
-            <button type="button" className="dangerLink" onClick={onDelete}>click here</button>
-            .
-          </span>
-        </div>
+        <Button
+          onClick={onDelete}
+          icon={<RetweetOutlined />}
+          type="boton1"
+        >
+          Replace File
+        </Button>
       )}
     </div>
   );
@@ -150,7 +151,7 @@ const ProjectDetailsMessage = ({
 const mapStateToProps = (state) => ({
   session: state.session,
   uploaded: state.projects.project_version_file_uploaded,
-  deleting: state.projects.project_version_file_deleting
+  deleting: state.projects.project_version_file_deleting,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -163,7 +164,7 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(deleteFileOnProjectVersion(project, version)).payload.then((result) => {
       dispatch(deleteFileOnProjectVersionSuccess(result));
     });
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectDetailsMessage);
