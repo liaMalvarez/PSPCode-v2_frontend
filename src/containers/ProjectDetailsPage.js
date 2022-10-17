@@ -521,9 +521,13 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover title="Submission Checklist" content={submissionChecklistPopover} placement="leftBottom">
-            <Button onClick={submitProject} icon={submitting ? <LoadingOutlined /> : <UploadOutlined />} type="boton1" disabled={checklist.some(({ valid }) => !valid)}>
-              Submit to
-              {` ${project_data.professor.first_name}`}
+            <Button
+              onClick={submitProject}
+              icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
+              type="boton1"
+              disabled={checklist.some(({ valid }) => !valid)}
+            >
+              {`Submit to ${project_data.professor.first_name}`}
             </Button>
           </Popover>
         </div>
@@ -535,8 +539,7 @@ const ProjectDetailsPage = ({
         <div className="submitProjectBtn">
           <Popover content="Click here to allow phases recording" placement="leftBottom">
             <Button onClick={startProjectFunc} icon={<RightOutlined />} type="boton1">
-              Start
-              {project_data.psp_project.name}
+              {`Start ${project_data.psp_project.name}`}
             </Button>
           </Popover>
         </div>
