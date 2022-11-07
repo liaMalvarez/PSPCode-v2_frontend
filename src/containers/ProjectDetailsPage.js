@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Link, useNavigate, useParams, useLocation,
+} from 'react-router-dom';
+import { format } from 'date-fns';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import cs from 'classnames';
 import {
-  CloudUploadOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   HomeOutlined,
@@ -23,9 +25,7 @@ import {
   InputNumber,
   message,
   Popover,
-  Upload,
   Form,
-  Input,
 } from 'antd';
 
 import TagVersion from '../components/TagVersion';
@@ -46,15 +46,12 @@ import {
   fetchProjectDetails, fetchProjectDetailsSuccess, fetchProjectDetailsVersion,
   fetchProjectDetailsVersionSuccess, fetchProjectDetailsVersionSummary,
   fetchProjectDetailsVersionSummarySuccess, submitProjectVersion,
-  submitProjectVersionSuccess, professorProjectApprove,
-  professorProjectApproveSuccess, professorProjectReject,
-  professorProjectRejectSuccess, startProject, startProjectSuccess,
+  submitProjectVersionSuccess, startProject, startProjectSuccess,
   continueProject, continueProjectSuccess, resetProjectDetails, resetProjectDetailsVersion,
 } from '../actions/projectActions';
 import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
 const { Content, Sider } = Layout;
-const { TextArea } = Input;
 const { TabPane } = Tabs;
 const FormItem = Form.Item;
 
@@ -68,8 +65,6 @@ const ProjectDetailsPage = ({
   startProjectProp,
   fetchProjectDetailsProp,
   fetchProjectDetailsVersionProp,
-  approveProject,
-  rejectProject,
   version_data,
   submitting,
   submitProjectVersionProp,
@@ -85,22 +80,32 @@ const ProjectDetailsPage = ({
 }) => {
   const navigate = useNavigate();
   const { idstudent: studentId, idproject: project_id, tab } = useParams();
+  const { pathname } = useLocation();
 
   const [defaultActiveKey, setDefaultActiveKey] = useState(tab || 'summary');
   const [modalUpdateLOCs, setModalUpdateLOCs] = useState({ total: '', new_reusable: '' });
   const [redeliver, setRedeliver] = useState(false);
-  const [correctProject, setCorrectProject] = useState({});
-  const [messageRejecting, setMessageRejecting] = useState(false);
   const [messageStarting, setMessageStarting] = useState(false);
   const [messageContinueing, setMessageContinueing] = useState(false);
-  const [messageApproving, setMessageApproving] = useState(false);
   const [inputModalUpdateLOCsAdded, setInputModalUpdateLOCsAdded] = useState(null);
   const [inputModalUpdateLOCsAM, setInputModalUpdateLOCsAM] = useState(null);
   const [isOpenSider, setIsOpenSider] = useState(false);
   const [checklist, setChecklist] = useState([]);
 
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+
+  const correctionAllowed = useMemo(() => ((session?.user.role === 'professor'
+  && ['approved', 'need_correction', 'being_corrected'].includes(version_data?.status))
+  || (session?.user.role === 'student'
+  && ['approved', 'need_correction'].includes(version_data?.status))), [session, version_data]);
+
+  const canEditCorrection = useMemo(() => (
+    session?.user.role === 'professor' && version_data?.status === 'being_corrected'
+  ), [session, version_data]);
+
   const changeTab = (key) => {
     const allowed_tabs = ['summary', 'phases', 'files', 'messages', 'correction'];
+
     key = allowed_tabs.some((x) => x === key) ? key : allowed_tabs[0];
 
     if (key === 'summary' && version_data) {
@@ -133,6 +138,16 @@ const ProjectDetailsPage = ({
   }, [tab]);
 
   useEffect(() => {
+    if (pathname.includes('correction')) {
+      if (correctionAllowed) {
+        changeTab('correction');
+      } else {
+        changeTab('summary');
+      }
+    }
+  }, [correctionAllowed]);
+
+  useEffect(() => {
     if (!project_data && !project_loading && !version_loading) {
       if (session && (session.user.role === 'professor' || session.user.id == studentId)) {
         fetchProjectDetailsProp(studentId, project_id);
@@ -148,6 +163,7 @@ const ProjectDetailsPage = ({
       && !version_error
       && !version_data) {
       const lastVersionID = project_data.timeline[project_data.timeline.length - 1].version.id;
+
       fetchProjectDetailsVersionProp(studentId, project_id, lastVersionID);
     }
     if (redeliver && project_data && version_data) {
@@ -158,10 +174,6 @@ const ProjectDetailsPage = ({
       }
     }
 
-    if (messageRejecting && finished_rejecting) {
-      message.loading('Rejecting this Project', 4);
-      setMessageRejecting(false);
-    }
     if (messageStarting && finished_starting) {
       message.loading('Getting all ready, wait a second', 3);
       setMessageStarting(false);
@@ -169,10 +181,6 @@ const ProjectDetailsPage = ({
     if (messageContinueing && finished_continueing) {
       message.loading('Generating a new version, wait a second', 3);
       setMessageContinueing(false);
-    }
-    if (messageApproving && finished_approving) {
-      message.loading('Approving this Project', 3);
-      setMessageApproving(false);
     }
   }, [
     project_id,
@@ -188,90 +196,20 @@ const ProjectDetailsPage = ({
     finished_approving,
   ]);
 
-  const correctProjectFunc = (verdict) => {
-    setCorrectProject({ message: '', file: '' });
-
-    const uploaderProps = {
-      name: 'file',
-      multiple: false,
-      showUploadList: true,
-    };
-
-    const modalContent = () => (
-      <div className="modalCorrectProject">
-        <div>
-          {verdict === 'approved' ? TEXTS.project_details_modal_correctproject_text_approved : TEXTS.project_details_modal_correctproject_text_not_approved}
-          <br />
-          <br />
-          <b>Attach Grading Checklist: </b>
-          <br />
-          <Upload
-            {...uploaderProps}
-            customRequest={(x) => setCorrectProject({ ...correctProject, file: x.file })}
-          >
-            <Button>
-              <CloudUploadOutlined />
-              {' '}
-              Click to Upload
-            </Button>
-          </Upload>
-          <br />
-          <br />
-          <b>Message: </b>
-        </div>
-        <Form onSubmit={() => {}}>
-          <TextArea autosize={{ minRows: 4 }} placeholder={verdict === 'approved' ? TEXTS.project_details_modal_correctproject_veredict_placeholder_approved : TEXTS.project_details_modal_correctproject_veredict_placeholder_not_approved} onChange={(e) => setCorrectProject({ ...correctProject, message: e.target.value })} />
-        </Form>
-      </div>
-    );
-
-    Modal.confirm({
-      title: 'Are you sure?',
-      content: modalContent(),
-      width: 600,
-      okText: (verdict === 'approved') ? 'Yes, Approve this Project' : 'Yes, Reject this Project',
-      okType: 'primary',
-      cancelText: 'No, Cancel',
-      onOk() {
-        if (correctProject.message.length < 1 && correctProject.file == '') {
-          message.warning('You must attach the grading checklist file or write a message', 7);
-          return true;
-        }
-        if (verdict === 'approved') {
-          setMessageApproving(true);
-          approveProject(
-            project_data.course.id,
-            project_data.course_project_instance.id,
-            project_data.id,
-            correctProject,
-          );
-        } else {
-          setMessageRejecting(true);
-          rejectProject(
-            project_data.course.id,
-            project_data.course_project_instance.id,
-            project_data.id,
-            correctProject,
-          );
-        }
-      },
-    });
-  };
-
   const printTimeLine = () => project_data.timeline.map((item, i) => (
     <Timeline.Item dot={<div />} color={PROJECT_STATUS[item.status].color} key={i}>
       {PROJECT_STATUS[item.status].name}
       <br />
-      {new Date(item.date).toLocaleDateString('es-UY', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+      {format(new Date(item.date), 'yyyy-MM-dd')}
     </Timeline.Item>
   ));
 
   useEffect(() => {
-    if (!version_data?.phases?.length) {
+    if (!version_data?.phases?.length || !project_data) {
       return;
     }
 
-    setChecklist([
+    const checklistValue = [
       {
         key: 'phases_named',
         message: 'All phases are named',
@@ -288,8 +226,8 @@ const ProjectDetailsPage = ({
           || (!phases[index + 1] ? !psp_phase.last : psp_phase.last)
           || (psp_phase.first && phases[index + 1]?.psp_phase?.name !== 'DESIGN') // no hay un design inicial
           || (psp_phase.last && phases[index - 1]?.psp_phase?.name !== 'UNIT TEST') // no hay un test final
-          || (psp_phase.name === 'DESIGN' && !['CODE', 'DESIGN'].includes(phases[index + 1]?.psp_phase.name))
-          || (psp_phase.name === 'COMPILE' && phases[index - 1]?.psp_phase.name !== 'CODE')
+          || (psp_phase.name === 'DESIGN' && !['CODE', 'DESIGN'].includes(phases[index + 1]?.psp_phase?.name))
+          || (psp_phase.name === 'COMPILE' && phases[index - 1]?.psp_phase?.name !== 'CODE')
         )),
       },
       {
@@ -303,25 +241,28 @@ const ProjectDetailsPage = ({
         message: 'You have attached the zip file',
         valid: (version_data.file),
       },
-    ]);
+    ];
 
     if (project_data.psp_project.process.has_pip) {
-      setChecklist((prevChecklist) => [...prevChecklist, {
+      checklistValue.push({
         key: 'pm_pip_valid',
         message: 'Post Mortem Phase has PIP fields fulfilled',
-        valid: !version_data.phases.some(({
+        valid: version_data.phases.some(({ psp_phase }) => psp_phase?.order === 6)
+        && !version_data.phases.some(({
           psp_phase,
           pip_problem,
           pip_proposal,
           pip_notes,
         }) => (
-          psp_phase.order === 6
+          psp_phase?.order === 6
           && (!(pip_problem?.length >= 15)
             || !(pip_proposal?.length >= 15)
             || !(pip_notes?.length >= 15))
         )),
-      }]);
+      });
     }
+
+    setChecklist(checklistValue);
   }, [JSON.stringify(version_data?.phases), version_data?.file]);
 
   const modalUpdateLOCsFunc = (data) => (
@@ -401,9 +342,12 @@ const ProjectDetailsPage = ({
           okType: 'success',
           cancelText: 'No',
           onOk() {
-            submitProjectVersionProp(studentId, project_id);
-          },
-          onCancel() {
+            projectApi.project_feedback_create(
+              studentId,
+              project_id,
+              version_data?.id,
+            ).then(() => submitProjectVersionProp(studentId, project_id))
+              .catch(() => message.error('Error on submitting the project', 4));
           },
         });
       } else {
@@ -466,7 +410,7 @@ const ProjectDetailsPage = ({
         okType: 'primary',
         cancelText: 'Cancel',
         onOk() {
-          navigate(`/users/${session.user.id}/returntoproject/${project_id}`);
+          navigate(`/users/${session.user.id}/projects/${project_id}`);
         },
         onCancel() {
         },
@@ -493,7 +437,7 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Button
-            onClick={() => {}} // TO DO: SUBMIT CORRECTION
+            onClick={() => setShowConfirmationModal(true)}
             icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
             type="boton1"
             disabled={checklist.some(({ valid }) => !valid)}
@@ -782,13 +726,18 @@ const ProjectDetailsPage = ({
             <TabPane tab="MESSAGES" key="messages">
               <ProjectDetailsMessages studentId={studentId} project={project_data} />
             </TabPane>
-            <TabPane tab="CORRECTION" key="correction">
-              <ProjectDetailsCorrection
-                studentId={studentId}
-                project={project_data}
-                version={version_data}
-              />
-            </TabPane>
+            {correctionAllowed && (
+              <TabPane tab="CORRECTION" key="correction">
+                <ProjectDetailsCorrection
+                  studentId={studentId}
+                  project={project_data}
+                  version={version_data}
+                  showConfirmationModal={showConfirmationModal}
+                  setShowConfirmationModal={setShowConfirmationModal}
+                  canEditCorrection={canEditCorrection}
+                />
+              </TabPane>
+            )}
           </Tabs>
         </section>
 
@@ -864,18 +813,6 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(submitProjectVersion(userid, projectid)).payload.then((result) => {
       dispatch(submitProjectVersionSuccess(result));
     });
-  },
-  approveProject: (courseId, projectId, assignedProjectId, data) => {
-    dispatch(professorProjectApprove(courseId, projectId, assignedProjectId, data))
-      .payload.then((result) => {
-        dispatch(professorProjectApproveSuccess(result));
-      });
-  },
-  rejectProject: (courseId, projectId, assignedProjectId, data) => {
-    dispatch(professorProjectReject(courseId, projectId, assignedProjectId, data))
-      .payload.then((result) => {
-        dispatch(professorProjectRejectSuccess(result));
-      });
   },
   reset: () => {
     dispatch(resetProjectDetails());

@@ -1364,3 +1364,22 @@ ol {
   width: calc(50% + 427px);
   margin-top: 70px;
 }
+
+.ant-modal {
+  width: 40% !important;
+  min-width: 500px !important;
+}
+
+.error-wrapper {
+  color: #bd3931;
+  text-align: center;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.version-tag-link {
+  border: none;
+  background: none;
+  color: #044578;
+  padding: 0;
+}

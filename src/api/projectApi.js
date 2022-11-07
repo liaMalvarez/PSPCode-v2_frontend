@@ -87,6 +87,18 @@ class Project {
   static first_project(userid) {
     return api.get(`/users/${userid}/assigned_projects/first`);
   }
+
+  static project_feedback_create(userid, projectid, versionid) {
+    return api.post(`/users/${userid}/assigned_projects/${projectid}/project_deliveries/${versionid}/project_feedback`);
+  }
+
+  static get_project_feedback(userid, projectid, versionid) {
+    return api.get(`/users/${userid}/assigned_projects/${projectid}/project_deliveries/${versionid}/project_feedback`);
+  }
+
+  static project_feedback_update(userid, projectid, versionid, newProjectfeedback) {
+    return api.put(`/users/${userid}/assigned_projects/${projectid}/project_deliveries/${versionid}/project_feedback`, newProjectfeedback);
+  }
 }
 
 export default Project;

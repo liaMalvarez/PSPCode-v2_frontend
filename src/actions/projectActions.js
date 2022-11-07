@@ -109,6 +109,8 @@ export const PROJECT_PROFESSOR_REJECT = 'PROJECT_PROFESSOR_REJECT';
 export const PROJECT_PROFESSOR_REJECT_SUCCESS = 'PROJECT_PROFESSOR_REJECT_SUCCESS';
 export const PROJECT_PROFESSOR_REJECT_FAILURE = 'PROJECT_PROFESSOR_REJECT_FAILURE';
 
+export const PROJECT_VERSION_FEEDBACK_GET_SUCCESS = 'PROJECT_VERSION_FEEDBACK_GET_SUCCESS';
+
 export function fetchProjects(userid) {
   return {
     type: PROJECT_LIST_FETCH,
@@ -593,7 +595,7 @@ export function submitProjectVersion(userid, projectid) {
       projectApi.assigned_project_submit(userid, projectid).then((x) => {
         resolve(x.statuses);
       }).catch(() => {
-        reject({ error: true, msg: 'Something went wrong starting project', data });
+        reject({ error: true, msg: 'Something went wrong on delivering project', data });
       });
     }),
   };
@@ -627,7 +629,7 @@ export function startProject(userid, projectid) {
       projectApi.assigned_project_start(userid, projectid).then((x) => {
         resolve(x.statuses);
       }).catch(() => {
-        reject({ error: true, msg: 'Something went wrong starting project', data });
+        reject({ error: true, msg: 'Something went wrong on starting project', data });
       });
     }),
   };
@@ -739,5 +741,12 @@ export function professorProjectApproveFailure(error) {
   return {
     type: PROJECT_PROFESSOR_APPROVE_FAILURE,
     payload: error,
+  };
+}
+
+export function getProjectFeedbackForVersionSuccess(payload) {
+  return {
+    type: PROJECT_VERSION_FEEDBACK_GET_SUCCESS,
+    payload,
   };
 }

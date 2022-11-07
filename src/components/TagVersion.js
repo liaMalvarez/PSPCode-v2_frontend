@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Tag,
   Popover,
-  Button,
 } from 'antd';
 
 const TagVersion = ({
@@ -27,7 +26,13 @@ const TagVersion = ({
       return (
         <span key={item.version.version}>
           {`Version ${item.version.version} `}
-          <a href={() => onChange(idstudent, idproject, item.version.id)} target="blank">(review)</a>
+          <button
+            type="button"
+            className="version-tag-link"
+            onClick={() => onChange(idstudent, idproject, item.version.id)}
+          >
+            (review)
+          </button>
           <br />
         </span>
       );
