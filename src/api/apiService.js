@@ -25,6 +25,10 @@ const handleErrors = (response) => new Promise((resolve, reject) => {
     return;
   }
 
+  if (response?.status === 401 && !response.url.includes('users/password') && !response.url.includes('users/sign_in')) {
+    sessionService.deleteSession().then(() => { window.location.href = '/#/login'; });
+  }
+
   sessionService.loadSession()
     .catch(() => {
       if (response.status === 401 && !response.url.includes('users/password')) {

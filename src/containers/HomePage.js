@@ -36,6 +36,7 @@ const HomePage = ({ session }) => {
     if (pathname === '/session/login') {
       return <Outlet />;
     }
+
     return (
       <Navigate to="session/login" />
     );

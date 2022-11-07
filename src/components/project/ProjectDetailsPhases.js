@@ -124,7 +124,7 @@ const ProjectDetailsPhases = ({
         setMessageDeleting(false);
       }
 
-      if (error.data && error.data.errors && error.data.errors && error.data.errors.elapsed_time) {
+      if (error.data && error.data.errors && error.data.errors.elapsed_time) {
         message.error('Elapsed time should be a positive number (end_time - start_time - interruption_time)', 7);
       } else {
         message.error(error.msg, 5);
@@ -209,7 +209,7 @@ const ProjectDetailsPhases = ({
       setWasEdited(false);
       editPhaseProps(studentId, project.id, version.id, activePhase.id, activePhase);
       setMessageEditing(true);
-    }, 1000);
+    }, 2000);
 
     return () => clearTimeout(saveData);
   }, [activePhase]);

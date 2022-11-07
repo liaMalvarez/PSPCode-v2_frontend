@@ -10,7 +10,6 @@ import * as sessionActions from '../actions/sessionActions';
 import LoginForm from '../components/session/LoginForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-
 const { Content } = Layout;
 
 const UserLoginPage = ({ actions: { login } }) => (
@@ -33,11 +32,11 @@ const UserLoginPage = ({ actions: { login } }) => (
 const { object } = PropTypes;
 
 UserLoginPage.propTypes = {
-  actions: object.isRequired
+  actions: object.isRequired,
 };
 
 const mapDispatch = (dispatch) => ({
-  actions: bindActionCreators(sessionActions, dispatch)
+  actions: bindActionCreators(sessionActions, dispatch),
 });
 
 export default connect(null, mapDispatch)(UserLoginPage);
