@@ -71,11 +71,9 @@ const ProjectDetailsPage = ({
   continueProjectProp,
   version_error,
   version_loading,
-  finished_rejecting,
   finished_starting,
   project_error,
   finished_continueing,
-  finished_approving,
   fetchProjectDetailsVersionSummaryProp,
 }) => {
   const navigate = useNavigate();
@@ -91,7 +89,7 @@ const ProjectDetailsPage = ({
   const [inputModalUpdateLOCsAM, setInputModalUpdateLOCsAM] = useState(null);
   const [isOpenSider, setIsOpenSider] = useState(false);
   const [checklist, setChecklist] = useState([]);
-
+  const [hasSubmited, setHasSubmited] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const correctionAllowed = useMemo(() => ((session?.user.role === 'professor'
@@ -190,10 +188,8 @@ const ProjectDetailsPage = ({
     version_loading,
     session, studentId,
     version_data,
-    finished_rejecting,
     finished_starting,
     finished_continueing,
-    finished_approving,
   ]);
 
   const printTimeLine = () => project_data.timeline.map((item, i) => (
@@ -243,25 +239,6 @@ const ProjectDetailsPage = ({
       },
     ];
 
-    if (project_data.psp_project.process.has_pip) {
-      checklistValue.push({
-        key: 'pm_pip_valid',
-        message: 'Post Mortem Phase has PIP fields fulfilled',
-        valid: version_data.phases.some(({ psp_phase }) => psp_phase?.order === 6)
-        && !version_data.phases.some(({
-          psp_phase,
-          pip_problem,
-          pip_proposal,
-          pip_notes,
-        }) => (
-          psp_phase?.order === 6
-          && (!(pip_problem?.length >= 15)
-            || !(pip_proposal?.length >= 15)
-            || !(pip_notes?.length >= 15))
-        )),
-      });
-    }
-
     setChecklist(checklistValue);
   }, [JSON.stringify(version_data?.phases), version_data?.file]);
 
@@ -270,6 +247,7 @@ const ProjectDetailsPage = ({
 
       <p>
         Enter the actual size data for
+        {' '}
         <b>{data.name}</b>
         .
       </p>
@@ -328,13 +306,34 @@ const ProjectDetailsPage = ({
       return;
     }
 
-    projectApi.first_project(studentId).then((data) => {
-      message.loading('Validating, wait a second', 4);
+    setHasSubmited(true);
 
-      const need_to_update_locs = data.phase_instance
-      && (data.phase_instance.total == null || data.phase_instance.total == 0);
+    projectApi.first_project(studentId).then(() => {
 
-      if (!need_to_update_locs) {
+      const need_to_update_pm = (project_data.psp_project.process.has_pip
+        && version_data.phases.some(({ psp_phase }) => psp_phase?.order === 6)
+        && version_data.phases.some(({
+          psp_phase,
+          pip_problem,
+          pip_proposal,
+          pip_notes,
+        }) => (
+          psp_phase?.order === 6
+          && (!pip_problem || pip_problem?.length < 15
+            || !pip_proposal || pip_proposal?.length < 15
+            || !pip_notes || pip_notes?.length < 15)
+        ))) || (project_data.psp_project.process.has_pan_loc
+        && version_data.phases.some(({
+          total,
+          new_reusable,
+          psp_phase,
+        }) => (
+          psp_phase?.order === 6
+          && (!total || total == 0 || !new_reusable || new_reusable == 0)
+        ))
+      );
+
+      if (!need_to_update_pm) {
         Modal.confirm({
           title: 'Confirmation Required',
           content: 'Are you sure you want to submit your project? This operation can\'t be undone.',
@@ -351,45 +350,13 @@ const ProjectDetailsPage = ({
           },
         });
       } else {
-        Modal.confirm({
-          title: 'Action Required',
-          content: modalUpdateLOCsFunc(data),
-          okText: 'Save',
-          okType: 'primary',
-          cancelText: 'Cancel',
-          onOk() {
-            // Required Inputs
-            if (!modalUpdateLOCs.total > 0 || modalUpdateLOCs.new_reusable === '') {
-              message.warning('You must fill all the required inputs (marked with *)', 7);
-              return true;
-            }
-
-            projectApi.assigned_project_version_phases_update(
-              studentId,
-              data.id,
-              data.project_delivery_id,
-              data.phase_instance.id,
-              {
-                modified: 0,
-                deleted: 0,
-                reused: 0,
-                new_reusable:
-                modalUpdateLOCs.new_reusable,
-                total: modalUpdateLOCs.total,
-              },
-            ).then(() => {
-              message.loading('Updating, wait a second', 4);
-              submitProject();
-            });
-
-            return false;
-          },
-          onCancel() {
-          },
+        Modal.warning({
+          title: 'There are some unfilled fields in Post Mortem phase',
+          content: 'Please fill them in before continue.',
         });
       }
-    }).catch((data) => {
-      console.log('Something went wrong fetching user');
+    }).catch((error) => {
+      console.log('Something went wrong fetching user', error);
     });
   };
 
@@ -711,6 +678,7 @@ const ProjectDetailsPage = ({
               key="phases"
             >
               <ProjectDetailsPhases
+                hasSubmited={hasSubmited}
                 studentId={studentId}
                 project={project_data}
                 version={version_data}
@@ -729,9 +697,9 @@ const ProjectDetailsPage = ({
             {correctionAllowed && (
               <TabPane tab="CORRECTION" key="correction">
                 <ProjectDetailsCorrection
+                  versionId={version_data?.id}
                   studentId={studentId}
                   project={project_data}
-                  version={version_data}
                   showConfirmationModal={showConfirmationModal}
                   setShowConfirmationModal={setShowConfirmationModal}
                   canEditCorrection={canEditCorrection}
@@ -773,8 +741,6 @@ const mapStateToProps = (state) => ({
 
   finished_starting: state.projects.project_version_finished_starting,
   finished_continueing: state.projects.project_version_finished_continueing,
-  finished_rejecting: state.projects.project_version_finished_rejecting,
-  finished_approving: state.projects.project_version_finished_approving,
 });
 
 const mapDispatchToProps = (dispatch) => ({

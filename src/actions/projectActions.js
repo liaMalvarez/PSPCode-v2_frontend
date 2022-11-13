@@ -101,13 +101,7 @@ export const PROJECT_ACTION_CONTINUE_SUCCESS = 'PROJECT_ACTION_CONTINUE_SUCCESS'
 export const PROJECT_ACTION_CONTINUE_FAILURE = 'PROJECT_ACTION_CONTINUE_FAILURE';
 export const PROJECT_ACTION_CONTINUE_RESET = 'PROJECT_ACTION_CONTINUE_RESET';
 
-export const PROJECT_PROFESSOR_APPROVE = 'PROJECT_PROFESSOR_APPROVE';
-export const PROJECT_PROFESSOR_APPROVE_SUCCESS = 'PROJECT_PROFESSOR_APPROVE_SUCCESS';
-export const PROJECT_PROFESSOR_APPROVE_FAILURE = 'PROJECT_PROFESSOR_APPROVE_FAILURE';
-
-export const PROJECT_PROFESSOR_REJECT = 'PROJECT_PROFESSOR_REJECT';
-export const PROJECT_PROFESSOR_REJECT_SUCCESS = 'PROJECT_PROFESSOR_REJECT_SUCCESS';
-export const PROJECT_PROFESSOR_REJECT_FAILURE = 'PROJECT_PROFESSOR_REJECT_FAILURE';
+export const PROJECT_PROFESSOR_SUBMIT_CORRECTION_SUCCESS = 'PROJECT_PROFESSOR_SUBMIT_CORRECTION_SUCCESS';
 
 export const PROJECT_VERSION_FEEDBACK_GET_SUCCESS = 'PROJECT_VERSION_FEEDBACK_GET_SUCCESS';
 
@@ -690,57 +684,9 @@ export function continueProjectReset() {
   };
 }
 
-export function professorProjectReject(courseId, projectId, assignedProjectId, data) {
+export function professorSubmitCorrectionSuccess() {
   return {
-    type: PROJECT_PROFESSOR_REJECT,
-    payload: new Promise((resolve, reject) => {
-      dashboardApi.reject_project(courseId, projectId, assignedProjectId, data).then((x) => {
-        resolve(x.statuses);
-      }).catch(() => {
-        reject({ error: true, msg: 'Something went wrong rejecting project', data });
-      });
-    }),
-  };
-}
-
-export function professorProjectRejectSuccess(version) {
-  return {
-    type: PROJECT_PROFESSOR_REJECT_SUCCESS,
-    payload: version,
-  };
-}
-
-export function professorProjectRejectFailure(error) {
-  return {
-    type: PROJECT_PROFESSOR_REJECT_FAILURE,
-    payload: error,
-  };
-}
-
-export function professorProjectApprove(courseId, projectId, assignedProjectId, data) {
-  return {
-    type: PROJECT_PROFESSOR_APPROVE,
-    payload: new Promise((resolve, reject) => {
-      dashboardApi.approve_project(courseId, projectId, assignedProjectId, data).then((x) => {
-        resolve(x.statuses);
-      }).catch(() => {
-        reject({ error: true, msg: 'Something went wrong approveing project', data });
-      });
-    }),
-  };
-}
-
-export function professorProjectApproveSuccess(version) {
-  return {
-    type: PROJECT_PROFESSOR_APPROVE_SUCCESS,
-    payload: version,
-  };
-}
-
-export function professorProjectApproveFailure(error) {
-  return {
-    type: PROJECT_PROFESSOR_APPROVE_FAILURE,
-    payload: error,
+    type: PROJECT_PROFESSOR_SUBMIT_CORRECTION_SUCCESS,
   };
 }
 

@@ -58,6 +58,7 @@ const ProjectDetailsPhases = ({
   created,
   edited,
   deleted,
+  hasSubmited,
   fetchProjectDetailsVersionPhaseDefectsProps,
 }) => {
   const { state } = useLocation();
@@ -216,8 +217,8 @@ const ProjectDetailsPhases = ({
 
   const pipFields = ['pip_problem', 'pip_proposal', 'pip_notes'];
 
-  const isFieldValid = (fieldName) => (
-    activePhase[fieldName]?.length && activePhase[fieldName]?.length < 15
+  const isFieldInvalid = (fieldName) => (
+    hasSubmited && (!activePhase[fieldName]?.length || activePhase[fieldName]?.length < 15)
   );
 
   const printFormForActivePhase = () => {
@@ -237,7 +238,7 @@ const ProjectDetailsPhases = ({
                 <InputNumber
                   controls={false}
                   min={0}
-                  value={activePhase.plan_time ? activePhase.plan_time : null}
+                  value={activePhase.plan_time || null}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('plan_time', value)}
                 />
@@ -260,7 +261,7 @@ const ProjectDetailsPhases = ({
                 <InputNumber
                   controls={false}
                   min={0}
-                  value={activePhase.plan_loc ? activePhase.plan_loc : null}
+                  value={activePhase.plan_loc || null}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('plan_loc', value)}
                 />
@@ -293,7 +294,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('modified', value)}
-                  value={activePhase.modified ? activePhase.modified : null}
+                  value={activePhase.modified || null}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_m" />
@@ -326,27 +327,30 @@ const ProjectDetailsPhases = ({
               </FormItem>
               <FormItem
                 label="New Reusable (NR)"
+                validateStatus={(hasSubmited && !activePhase.new_reusable) ? 'warning' : ''}
+                hasFeedback={(hasSubmited && !activePhase.new_reusable)}
+                help={(hasSubmited && !activePhase.new_reusable) ? 'This field can\'t be empty' : ''}
               >
                 <InputNumber
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('new_reusable', value)}
-                  value={activePhase.new_reusable ? activePhase.new_reusable : null}
+                  value={activePhase.new_reusable || null}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_nr" />
               </FormItem>
               <FormItem
                 label="Total (T)"
-                validateStatus={empty_total ? 'warning' : ''}
-                hasFeedback={empty_total}
-                help={empty_total}
+                validateStatus={empty_total || (hasSubmited && !activePhase.total) ? 'warning' : ''}
+                hasFeedback={empty_total || (hasSubmited && !activePhase.total)}
+                help={empty_total || (hasSubmited && !activePhase.total ? 'This field can\'t be empty' : '')}
               >
                 <InputNumber
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('total', value)}
-                  value={activePhase.total ? activePhase.total : null}
+                  value={activePhase.total || null}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_t" />
@@ -363,8 +367,9 @@ const ProjectDetailsPhases = ({
                 <FormItem
                   label={TEXTS[fieldName]}
                   className="inputTextarea"
-                  validateStatus={isFieldValid(fieldName) ? 'warning' : ''}
-                  help={isFieldValid(fieldName) ? 'This field should contain at least 15 characters' : ''}
+                  key={fieldName}
+                  validateStatus={isFieldInvalid(fieldName) ? 'warning' : ''}
+                  help={isFieldInvalid(fieldName) ? 'This field should contain at least 15 characters' : ''}
                 >
                   <TextArea
                     autosize={{ minRows: 3 }}

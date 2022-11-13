@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
-
 import { connect } from 'react-redux';
 import {
   Collapse,
@@ -9,7 +8,6 @@ import {
   message,
   Modal,
 } from 'antd';
-
 import {
   ExclamationCircleOutlined,
   CheckCircleOutlined,
@@ -20,9 +18,8 @@ import {
 } from '@ant-design/icons';
 
 import {
-  getProjectFeedbackForVersionSuccess, professorProjectApprove,
-  professorProjectApproveSuccess, professorProjectReject,
-  professorProjectRejectSuccess,
+  getProjectFeedbackForVersionSuccess,
+  professorSubmitCorrectionSuccess,
 } from '../../actions/projectActions';
 import projectApi from '../../api/projectApi';
 import CorrectionTable from './correction/CorrectionTable';
@@ -32,6 +29,7 @@ const { Panel } = Collapse;
 const { TextArea } = Input;
 
 const ProjectDetailsCorrection = ({
+  versionId,
   project,
   studentId,
   showConfirmationModal = true,
@@ -39,8 +37,7 @@ const ProjectDetailsCorrection = ({
   getProjectFeedback,
   projectFeedbackGet,
   canEditCorrection,
-  approveProject,
-  rejectProject,
+  submitCorrection,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -52,12 +49,6 @@ const ProjectDetailsCorrection = ({
 
   const isUnapprovedCriteria = useMemo(() => projectFeedback?.grouped_corrections
     .some(({ corrections }) => corrections.some(({ approved }) => !approved)), [projectFeedback]);
-
-  const versionId = useMemo(
-    () => project.timeline
-      .find(({ id }) => id === project.id)?.version.id || project.id,
-    [project],
-  );
 
   useEffect(() => {
     if (!projectFeedbackGet
@@ -80,15 +71,6 @@ const ProjectDetailsCorrection = ({
       setProjectFeedback(projectFeedbackGet);
     }
   }, [projectFeedbackGet, isLoading, error]);
-
-  const submitCorrection = async () => {
-    await projectApi.project_feedback_update(
-      studentId,
-      project.id,
-      versionId,
-      { ...projectFeedback, reviewed_date: format(new Date(), 'yyyy-MM-dd') },
-    );
-  };
 
   useEffect(() => {
     const warningsList = [];
@@ -132,7 +114,7 @@ const ProjectDetailsCorrection = ({
           </ul>
         ),
         onCancel: () => setShowConfirmationModal(false),
-        onOk: submitCorrection,
+        onOk: () => submitCorrection(studentId, project.id, versionId, projectFeedback),
         okText: `Submit${warningsList.length ? ' anyway' : ''}`,
       });
     }
@@ -333,17 +315,18 @@ const mapDispatchToProps = (dispatch) => ({
       setIsLoading(false);
     });
   },
-  approveProject: (courseId, projectId, assignedProjectId, data) => {
-    dispatch(professorProjectApprove(courseId, projectId, assignedProjectId, data))
-      .payload.then((result) => {
-        dispatch(professorProjectApproveSuccess(result));
-      });
-  },
-  rejectProject: (courseId, projectId, assignedProjectId, data) => {
-    dispatch(professorProjectReject(courseId, projectId, assignedProjectId, data))
-      .payload.then((result) => {
-        dispatch(professorProjectRejectSuccess(result));
-      });
+  submitCorrection: (studentId, projectId, versionId, projectFeedback) => {
+    projectApi.project_feedback_update(
+      studentId,
+      projectId,
+      versionId,
+      { ...projectFeedback, reviewed_date: format(new Date(), 'yyyy-MM-dd') },
+    ).then(() => {
+      dispatch(professorSubmitCorrectionSuccess());
+      message('Correction submitted successfully', 'success');
+    }).catch(() => {
+      message('Something went wrong on submitting the correction', 'error');
+    });
   },
 });
 

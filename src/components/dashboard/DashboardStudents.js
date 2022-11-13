@@ -140,9 +140,7 @@ const DashboardStudents = ({
       title: 'Are you sure?',
       content: (
         <span>
-          This will send the following message to
-          {student.name}
-          :
+          {`This will send the following message to ${student.name}:`}
           <br />
           <br />
           {text}
