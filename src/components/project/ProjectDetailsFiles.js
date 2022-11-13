@@ -45,6 +45,7 @@ const ProjectDetailsMessage = ({
     },
     onChange(info) {
       const { status } = info.file;
+
       if (status === 'done') {
         message.success(`${info.file.name} file uploaded successfully.`);
       } else if (status === 'error') {
@@ -122,7 +123,7 @@ const ProjectDetailsMessage = ({
       <div className="dragBox">
         <Dragger
           {...uploaderProps}
-          customRequest={(x) => customRequest(x)}
+          customRequest={customRequest}
           beforeUpload={beforeUpload}
           onSuccess={onSuccessDrag}
           onError={onError}

@@ -50,12 +50,7 @@ import {
   PROJECT_VERSION_SUBMIT,
   PROJECT_VERSION_SUBMIT_RESET,
   PROJECT_VERSION_SUBMIT_SUCCESS,
-  PROJECT_PROFESSOR_APPROVE,
-  PROJECT_PROFESSOR_APPROVE_FAILURE,
-  PROJECT_PROFESSOR_APPROVE_SUCCESS,
-  PROJECT_PROFESSOR_REJECT,
-  PROJECT_PROFESSOR_REJECT_FAILURE,
-  PROJECT_PROFESSOR_REJECT_SUCCESS,
+  PROJECT_PROFESSOR_SUBMIT_CORRECTION_SUCCESS,
   PROJECT_ACTION_START,
   PROJECT_ACTION_START_SUCCESS,
   PROJECT_ACTION_START_FAILURE,
@@ -551,64 +546,20 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         project_version_submitting: false,
       };
-
-    case PROJECT_PROFESSOR_APPROVE:
-      return { ...state, project_version_finished_approving: false };
-    case PROJECT_PROFESSOR_APPROVE_SUCCESS:
+    case PROJECT_PROFESSOR_SUBMIT_CORRECTION_SUCCESS:
       return {
         ...state,
         active: {
           ...state.active,
           general: {
             ...state.active.general,
-            project: {
-              ...state.active.general.project,
-              timeline: action.payload,
-            },
+            project: null,
           },
           version: {
             ...state.active.version,
-            version: {
-              ...state.active.version.version,
-              status: action.payload[action.payload.length - 1].status,
-            },
+            version: null,
           },
         },
-        project_version_finished_approving: true,
-      };
-    case PROJECT_PROFESSOR_APPROVE_FAILURE:
-      return {
-        ...state,
-        project_version_finished_approving: true,
-      };
-    case PROJECT_PROFESSOR_REJECT:
-      return { ...state, project_version_finished_rejecting: false };
-    case PROJECT_PROFESSOR_REJECT_SUCCESS:
-      return {
-        ...state,
-        active: {
-          ...state.active,
-          general: {
-            ...state.active.general,
-            project: {
-              ...state.active.general.project,
-              timeline: action.payload,
-            },
-          },
-          version: {
-            ...state.active.version,
-            version: {
-              ...state.active.version.version,
-              status: action.payload[action.payload.length - 1].status,
-            },
-          },
-        },
-        project_version_finished_rejecting: true,
-      };
-    case PROJECT_PROFESSOR_REJECT_FAILURE:
-      return {
-        ...state,
-        project_version_finished_rejecting: true,
       };
     case PROJECT_VERSION_FEEDBACK_GET_SUCCESS:
       return {

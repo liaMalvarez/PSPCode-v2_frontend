@@ -72,6 +72,7 @@ b {
 
 form .ant-input-number {
   margin: 0;
+  width: 80%;
 }
 
 .ant-form-item-control-input-content {
@@ -546,6 +547,15 @@ form .ant-input-number {
       color: #fff;
       position: relative;
       top: 40px;
+      overflow: scroll;
+      scrollbar-width: none;
+      max-height: 80vh;
+      padding: 10px;
+      margin-left: -20px;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
 
       .ant-timeline-item-tail {
         border-left: 1px solid #BDD3DB;
