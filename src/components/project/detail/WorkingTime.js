@@ -1,57 +1,61 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
 
-const WorkingTime = ({ working, actualTime, phases }) => {
-  const [workingTime, setWorkingTime] = useState('');
-  const [changeSecond, setChangeSecond] = useState(false);
+class WorkingTime extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      workingTime: '',
+    };
+  }
 
-  const refDiv = useRef(null);
+  componentDidMount() {
+    this.setWorkingTime();
+    setInterval(this.setWorkingTime, 1000);
+  }
 
-  const initWorkingTime = () => {
-    if (!refDiv) {
+  setWorkingTime = () => {
+    if (!this.refDiv) {
       return;
     }
 
     let time = null;
 
-    if (!working) {
-      time = moment.duration({ minutes: actualTime });
+    if (!this.props.working) {
+      time = moment.duration({ minutes: this.props.actualTime });
     } else {
       time = moment.duration();
-      let counting = false;
-
-      phases.forEach((value) => {
+      let contando = false;
+      this.props.phases.map((value) => {
         if (value.start_time && value.end_time) {
           time.add(moment.duration(moment(value.end_time).diff(moment(value.start_time))));
-        } else if (value.start_time && !value.end_time && !counting) {
+        } else if (value.start_time && !value.end_time && !contando) {
           time.add(moment.duration(moment().diff(moment(value.start_time))));
-
-          counting = true;
+          contando = true;
         }
-
         if (value.interruption_time) {
           time.subtract(moment.duration(value.interruption_time, 'minutes'));
         }
       });
     }
-
-    setWorkingTime(`${(`00${time.hours()}`).slice(-2)}:${(`00${time.minutes()}`)
-      .slice(-2)}:${(`00${time.seconds()}`).slice(-2)}`);
+    this.setState({
+      ...this.state,
+      workingTime: `${(`00${time.hours()}`).slice(-2)}:${(`00${time.minutes()}`)
+        .slice(-2)}:${(`00${time.seconds()}`).slice(-2)}`,
+    });
   };
 
-  useEffect(() => {
-    initWorkingTime();
-  }, [changeSecond]);
+  render() {
+    return (
+      <div ref={(workingTime) => { this.refDiv = workingTime; }}>
+        <span>{this.state.workingTime}</span>
+      </div>
+    );
+  }
+}
 
-  useEffect(() => {
-    setInterval(() => setChangeSecond((prev) => !prev), 1000);
-  }, []);
+const mapStateToProps = (state) => ({
+});
 
-  return (
-    <div ref={refDiv}>
-      <span>{workingTime}</span>
-    </div>
-  );
-};
-
-export default WorkingTime;
+export default connect(mapStateToProps, null)(WorkingTime);

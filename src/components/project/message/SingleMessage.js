@@ -1,86 +1,55 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import moment from 'moment';
+import {
+  FileTextOutlined, CheckOutlined, CloseOutlined, ExclamationOutlined
+} from '@ant-design/icons';
 import { Avatar, Popover } from 'antd';
 
-import {
-  FileTextOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  ExclamationOutlined,
-} from '@ant-design/icons';
-
-const SingleMessage = ({ data, user }) => {
-  const itsMySelf = data.person.id === user.id;
-
-  const renderPopover = (message, color, icon) => (
-    <Popover content={message}>
-      <Avatar
-        style={{
-          backgroundColor: color,
-          [itsMySelf ? 'left' : 'right']: '-10px',
-        }}
-        icon={icon}
-        className="statusAvatar"
-      />
-    </Popover>
-  );
-
-  const iconSelector = () => {
-    switch (data.message_type) {
-      case 'approved':
-        return renderPopover('Project approved, well done!', '#56de1d', <CheckOutlined />);
-      case 'rejected':
-        return renderPopover('This project needs correction', '#f04134', <CloseOutlined />);
-      case 'poke':
-        return renderPopover('Harry up!', '#ffbc5a', <ExclamationOutlined />);
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <div className={`singleMessage ${itsMySelf ? 'right' : 'left'}`}>
-      {iconSelector()}
-      {!itsMySelf && (
+class SingleMessage extends Component {
+  render() {
+    return (
+      <div className={`singleMessage ${this.props.data.person.role === 'professor' ? 'right' : 'left'}`}>
+        { this.props.data.message_type === 'approved' && <Popover content="Project approved, well done!"><Avatar style={{ backgroundColor: '#56de1d' }} icon={<CheckOutlined />} className="statusAvatar" /></Popover>}
+        { this.props.data.message_type === 'rejected' && <Popover content="This project needs correction"><Avatar style={{ backgroundColor: '#f04134' }} icon={<CloseOutlined />} className="statusAvatar" /></Popover>}
+        { this.props.data.message_type === 'poke' && <Popover content="Harry up!"><Avatar style={{ backgroundColor: '#ffbc5a' }} icon={<ExclamationOutlined />} className="statusAvatar" /></Popover>}
         <div className="avatar">
-          <span className="name">{data.person.first_name}</span>
+          <span className="name">{this.props.data.person.first_name}</span>
         </div>
-      )}
-
-      <div className="message" style={{ justifyContent: itsMySelf ? 'flex-end' : '' }}>
-        <p>
-          {data.message && data.message.split('\n').map((item, key) => (
-            <span key={key}>
+        <div className="date">
+          <span>
+            {moment.duration(moment().diff(moment(this.props.data.date))).humanize()}
+            {' '}
+            ago
+          </span>
+        </div>
+        <div className="message">
+          <p>
+            {this.props.data.message && this.props.data.message.split('\n').map((item, key) => (<span key={key}>
               {item}
               <br />
-            </span>
-          ))}
-        </p>
-      </div>
+                                                                                                </span>))}
 
-      {data.link && (
-        <div className="attachment">
+          </p>
+        </div>
+        {this.props.data.link
+        && <div className="attachment">
           <Popover content="Click to download the file">
             <span>
-              <a href={data.link} target="_blank" rel="noreferrer">
+              <a href={this.props.data.link} target="_blank" rel="noreferrer">
                 <FileTextOutlined />
                 {' '}
                 <span>1 file attached</span>
               </a>
             </span>
           </Popover>
-        </div>
-      )}
-
-      <div className="date" style={{ textAlign: itsMySelf ? 'left' : 'right' }}>
-        <span>
-          {moment.duration(moment().diff(moment(data.date))).humanize()}
-          {' '}
-          ago
-        </span>
+        </div>}
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
-export default SingleMessage;
+const mapStateToProps = (state) => ({
+});
+
+export default connect(mapStateToProps, null)(SingleMessage);

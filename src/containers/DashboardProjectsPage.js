@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 import { HomeOutlined } from '@ant-design/icons';
 import { Layout, Breadcrumb } from 'antd';
 
+import CustomHeader from '../components/layout/CustomHeader';
+import CustomFooter from '../components/layout/CustomFooter';
 import DashboardProjects from '../components/dashboard/DashboardProjects';
+import ProfessorSider from '../components/layout/ProfessorSider';
 import SelectCourse from '../components/common/SelectCourse';
 
 const { Content } = Layout;
@@ -36,8 +39,11 @@ const DashboardProjectsPage = ({ session }) => (
   </Layout>
 );
 
-const mapStateToProps = ({ session }) => ({
-  session,
+const mapStateToProps = (state) => ({
+  session: state.session,
 });
 
-export default connect(mapStateToProps, null)(DashboardProjectsPage);
+const mapDispatchToProps = () => ({
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardProjectsPage);
