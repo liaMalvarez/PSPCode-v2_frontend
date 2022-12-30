@@ -41,7 +41,7 @@ import SpanData from '../components/common/SpanData';
 import CustomProgress from '../components/common/CustomProgress';
 
 import projectApi from '../api/projectApi';
-import { PROJECT_STATUS, TEXTS } from '../constants/constants';
+import { PROJECT_STATUS } from '../constants/constants';
 import {
   fetchProjectDetails, fetchProjectDetailsSuccess, fetchProjectDetailsVersion,
   fetchProjectDetailsVersionSuccess, fetchProjectDetailsVersionSummary,

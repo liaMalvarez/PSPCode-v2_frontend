@@ -69,7 +69,7 @@ const ProjectDetailsPhases = ({
 
   const [wasEdited, setWasEdited] = useState(false);
   const [canEdit, setCanEdit] = useState(version.status === 'working' && session.user.role !== 'professor');
-  const [activePhase, setActivePhase] = useState(version.phases[version.phases.length - 1]);
+  const [activePhase, setActivePhase] = useState(version.phases[session.user.role === 'professor' ? 0 : version.phases.length - 1]);
 
   const [activeDefect, setActiveDefect] = useState(null);
 
@@ -171,18 +171,22 @@ const ProjectDetailsPhases = ({
       }
       return (<Step key={item.id} status="process" title={item.psp_phase ? item.psp_phase.name : ''} />);
     });
-    return [steps, (<Step key="new_phase" title="Start Phase" />)];
+    return [steps, (<Step key="new_phase" title={session.user.role !== 'professor' ? 'Start Phase' : ''} />)];
   };
 
   const editPhase = (attr, value) => {
-    const actualValue = activePhase[attr];
+    if (!canEdit) return;
+
     if (typeof value === 'number' && parseInt(value, 10) === 0) value = '0';
+
+    const actualValue = activePhase[attr];
     if (typeof actualValue === 'number' && parseInt(actualValue, 10) === parseInt(value, 10) && value !== '0') return;
+
     let newState = { ...activePhase, [attr]: value };
 
     if (attr === 'psp_phase' && version && version.phases && version.phases.length > 0) {
       ['plan_loc', 'plan_time', 'actual_base_loc', 'deleted', 'modified', 'new_reusable', 'reused', 'total', 'pip_problem', 'pip_proposal', 'pip_notes']
-        .map((item) => { newState = { ...newState, [item]: null }; });
+        .forEach((item) => { newState = { ...newState, [item]: null }; });
       if (value.first) {
         const original_phase = [...version.phases].reverse()
           .find((o) => o.psp_phase && o.psp_phase.first);
@@ -437,7 +441,9 @@ const ProjectDetailsPhases = ({
       );
     } if (status === 'wait' && !canEdit) {
       return (
-        <PlusCircleTwoTone twoToneColor="#B1B1B1" />
+        session.user.role === 'professor'
+          ? <span className="dot-end" />
+          : <PlusCircleTwoTone twoToneColor="#B1B1B1" />
       );
     }
   };
@@ -461,7 +467,7 @@ const ProjectDetailsPhases = ({
 
   const noFutureDate = (current) => current > moment().endOf('day');
 
-  const noSmallerThanDate = (current, date) => current < moment(date);
+  const noSmallerThanDate = (current, date) => moment(current) < moment(date);
 
   return (
     <div className="projectDetailsPhases">
@@ -508,7 +514,16 @@ const ProjectDetailsPhases = ({
                 label="Start Time"
                 className="inputDatepicker"
               >
-                <DatePicker disabledDate={(date) => noFutureDate(date)} value={activePhase.start_time ? moment(activePhase.start_time) : null} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss" onChange={(value) => editPhase('start_time', value)} disabled={(!canEdit)} />
+                <DatePicker
+                  disabledDate={(selected) => noFutureDate(selected)
+                    || noSmallerThanDate(activePhase.end_time, selected)}
+                  value={activePhase.start_time ? moment(activePhase.start_time) : null}
+                  placeholder="Select date and time"
+                  showTime
+                  format="DD/MM/YYYY HH:mm:ss"
+                  onChange={(value) => editPhase('start_time', value)}
+                  disabled={(!canEdit)}
+                />
                 <InputTooltip input="project_details_phase_form_start_time" />
               </FormItem>
             </Col>
@@ -629,14 +644,23 @@ const ProjectDetailsPhases = ({
         <div className="separator" />
         <div>
           {canEdit && version.phases.length > 1 && (
-            <span style={{ color: '#bd3931', display: 'flex', alignItems: 'center' }}>
+            <button
+              onClick={deletePhase}
+              style={{
+                color: '#bd3931',
+                display: 'flex',
+                alignItems: 'center',
+                padding: 0,
+                border: 'none',
+                background: 'none',
+              }}
+            >
               Delete Phase
               <DeleteTwoTone
                 style={{ fontSize: '20px', marginLeft: '6px' }}
                 twoToneColor="#bd3931"
-                onClick={deletePhase}
               />
-            </span>
+            </button>
           )}
         </div>
       </section>
