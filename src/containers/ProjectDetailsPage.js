@@ -321,7 +321,7 @@ const ProjectDetailsPage = ({
           psp_phase?.order === 6
           && (!pip_problem || pip_problem?.length < 15
             || !pip_proposal || pip_proposal?.length < 15
-            || !pip_notes || pip_notes?.length < 15)
+            || !pip_notes)
         ))) || (project_data.psp_project.process.has_pan_loc
         && version_data.phases.some(({
           total,
