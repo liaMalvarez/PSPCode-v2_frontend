@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import {
   message,
@@ -24,6 +24,13 @@ const ProjectDetailsMessages = ({
   const [messageState, setMessageState] = useState('');
   const [messageCreating, setMessageCreating] = useState(false);
 
+  const messagesRef = useRef(null);
+
+  useEffect(() => {
+    const node = messagesRef.current;
+    node.scrollTop = node.scrollHeight;
+  }, [project.messages.length]);
+
   useEffect(() => {
     if (messageCreating && created) {
       message.success('Message sent', 2);
@@ -44,16 +51,20 @@ const ProjectDetailsMessages = ({
 
   return (
     <div className="projectDetailsMessages">
-      <div className="messages-container">
+      <div
+        className="messages-container"
+        ref={messagesRef}
+      >
         {project.messages.length === 0
           ? <span className="empty">No messages to be shown</span>
           : [...project.messages]
             .sort((a, b) => b.id - a.id)
-            .map((item) => (
+            .map((item, index) => (
               <SingleMessage
                 key={item.id}
                 data={item}
                 user={session.user}
+                isLastOne={!index}
               />
             ))}
       </div>

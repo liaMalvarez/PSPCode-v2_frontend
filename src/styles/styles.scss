@@ -835,10 +835,12 @@ form .ant-input-number {
 
     .messages-container {
       max-height: 45vh;
-      overflow-y: auto;
+      overflow-y: scroll;
       padding-top: 20px;
       display: flex;
       flex-direction: column-reverse;
+      scroll-behavior: smooth;
+      animation: scroll 0.3s ease-out;
 
       -ms-overflow-style: none;
       scrollbar-width: none;
@@ -882,6 +884,10 @@ form .ant-input-number {
             }
           }
         }
+      }
+
+      &.last {
+        margin-bottom: 7px;
       }
 
       .avatar {
@@ -1342,33 +1348,33 @@ ol {
   }
 
   .ant-table-row-selected:hover {
-    background-color: $light_green  !important;
+    background-color: $light_green !important;
   }
 
   .ant-table-row-selected-hover {
-    background-color: $light_green  !important;
+    background-color: $light_green !important;
   }
 
   .table-row-disapproved:hover .ant-table-cell-row-hover {
-    background-color: $color_light_warning  !important;
+    background-color: $color_light_warning !important;
   }
 
   .ant-checkbox-checked {
     .ant-checkbox-inner {
-      border-color: $dark_green  !important;
-      background-color: $medium_green  !important;
+      border-color: $dark_green !important;
+      background-color: $medium_green !important;
     }
   }
 
   .ant-checkbox:hover {
     .ant-checkbox-inner {
-      border-color: $medium_green  !important;
+      border-color: $medium_green !important;
       background-color: $light_green;
     }
   }
 
   .ant-checkbox-input:focus+.ant-checkbox-inner {
-    border-color: $dark_green  !important;
+    border-color: $dark_green !important;
   }
 
   .obs_icon {
@@ -1411,10 +1417,10 @@ ol {
 }
 
 .ant-table-expanded-row {
-  background-color: $color_light_warning  !important;
+  background-color: $color_light_warning !important;
 
   td {
-    background-color: $color_light_warning  !important
+    background-color: $color_light_warning !important
   }
 }
 
@@ -1440,4 +1446,12 @@ ol {
   background: none;
   color: #044578;
   padding: 0;
+}
+
+.menu-arrow {
+  border: none;
+  font-size: 200%;
+  display: flex;
+  align-items: center;
+  color: #f9f9f9;
 }
