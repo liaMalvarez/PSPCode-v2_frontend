@@ -21,13 +21,7 @@ const ProfessorSider = ({ session }) => {
         <span>
           Projects Dashboard
           {!pathname.includes('students') && (
-          <CaretLeftOutlined style={{
-            border: 'none',
-            fontSize: '200%',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          />
+            <CaretLeftOutlined className="menu-arrow" />
           )}
         </span>
       </Link>
@@ -35,13 +29,7 @@ const ProfessorSider = ({ session }) => {
         <span>
           Students Dashboard
           {pathname.includes('students') && !projectId && (
-          <CaretLeftOutlined style={{
-            border: 'none',
-            fontSize: '200%',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-          />
+            <CaretLeftOutlined className="menu-arrow" />
           )}
         </span>
       </Link>

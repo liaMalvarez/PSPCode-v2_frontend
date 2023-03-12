@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import {
   message,
@@ -16,43 +16,62 @@ const { TextArea } = Input;
 
 const ProjectDetailsMessages = ({
   created,
+  session,
   createMessage,
   studentId,
-  project
+  project,
 }) => {
   const [messageState, setMessageState] = useState('');
   const [messageCreating, setMessageCreating] = useState(false);
 
+  const messagesRef = useRef(null);
+
+  useEffect(() => {
+    const node = messagesRef.current;
+    node.scrollTop = node.scrollHeight;
+  }, [project.messages.length]);
+
   useEffect(() => {
     if (messageCreating && created) {
-      message.loading('Sending new message', 4);
+      message.success('Message sent', 2);
       setMessageCreating(false);
       setMessageState('');
     }
   }, [created, messageCreating]);
 
-  const sendNewMessage = () => {
-    createMessage(studentId, project.id, {
+  const sendNewMessage = async () => {
+    await createMessage(studentId, project.id, {
       message: {
-        text: messageState
-      }
+        text: messageState,
+      },
     });
+
     setMessageCreating(true);
   };
 
   return (
     <div className="projectDetailsMessages">
-      <div>
-        {project.messages.length > 0 && [...project.messages]
-          .sort((a, b) => a.id - b.id)
-          .map((item) => (<SingleMessage key={item.id} data={item} />))}
-        {project.messages.length === 0 && <span className="empty">No messages to be shown</span>}
+      <div
+        className="messages-container"
+        ref={messagesRef}
+      >
+        {project.messages.length === 0
+          ? <span className="empty">No messages to be shown</span>
+          : [...project.messages]
+            .sort((a, b) => b.id - a.id)
+            .map((item, index) => (
+              <SingleMessage
+                key={item.id}
+                data={item}
+                user={session.user}
+                isLastOne={!index}
+              />
+            ))}
       </div>
-      <div className="separator" />
       <div className="write">
         <TextArea
-          style={{ width: '100%' }}
-          autosize={{ minRows: 3 }}
+          className="text-area"
+          autoSize={{ minRows: 2, maxRows: 6 }}
           value={messageState}
           disabled={messageCreating}
           onChange={({ target: { value } }) => setMessageState(value)}
@@ -71,15 +90,17 @@ const ProjectDetailsMessages = ({
 
 const mapStateToProps = (state) => ({
   session: state.session,
-  created: state.projects.project_messages_created
+  created: state.projects.project_messages_created,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  createMessage: (userid, projectid, message) => {
-    dispatch(createMessageOnProject(userid, projectid, message)).payload.then((result) => {
+  createMessage: (userid, projectid, messageContent) => {
+    dispatch(createMessageOnProject(userid, projectid, messageContent)).payload.then((result) => {
       dispatch(createMessageOnProjectSuccess(result));
+    }).catch(() => {
+      message.error('Error sending new message', 2);
     });
-  }
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectDetailsMessages);

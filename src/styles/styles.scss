@@ -551,7 +551,6 @@ form .ant-input-number {
       scrollbar-width: none;
       max-height: 80vh;
       padding: 10px;
-      margin-left: -20px;
 
       &::-webkit-scrollbar {
         display: none;
@@ -657,6 +656,17 @@ form .ant-input-number {
         z-index: 5;
         height: 6px;
         bottom: 1px;
+      }
+
+      .dot-end {
+        border-radius: 50%;
+        background-color: $color_dos;
+        float: left;
+        display: block;
+        width: 14px;
+        position: relative;
+        z-index: 5;
+        height: 14px;
       }
 
       .icon {
@@ -820,13 +830,42 @@ form .ant-input-number {
   }
 
   .projectDetailsMessages {
+    margin-top: -10px;
+    padding-bottom: -20px;
+
+    .messages-container {
+      max-height: 45vh;
+      overflow-y: scroll;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column-reverse;
+      scroll-behavior: smooth;
+      animation: scroll 0.3s ease-out;
+
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .messages-container::-webkit-scrollbar {
+      display: none;
+    }
+
     .singleMessage {
       margin-bottom: 20px;
       background: #CCC6;
       border-radius: 11px;
-      padding: 12px 12px 1px 19px;
+      padding: 20px;
+      padding-bottom: 5px;
       width: fit-content;
-      min-width: 250px;
+      min-width: 350px;
+      max-width: 60%;
+      position: relative;
+
+      .message {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+      }
 
       &.right {
         margin-left: auto;
@@ -847,9 +886,14 @@ form .ant-input-number {
         }
       }
 
-      &.left {}
+      &.last {
+        margin-bottom: 7px;
+      }
 
       .avatar {
+        margin-bottom: 5px;
+        font-size: 16px;
+
         .ant-avatar.ant-avatar-icon {
           display: inline-grid;
           margin-right: 13px;
@@ -870,10 +914,9 @@ form .ant-input-number {
         font-weight: 500;
       }
 
-      span.ant-avatar.statusAvatar.ant-avatar-circle.ant-avatar-icon {
+      .statusAvatar {
         position: absolute;
-        margin-left: -32px;
-        margin-top: -27px;
+        top: -10px;
         border: 2px solid $color_background;
 
         i {
@@ -883,9 +926,20 @@ form .ant-input-number {
     }
 
     .write {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding-top: 15px;
+
+      .text-area::-webkit-scrollbar {
+        display: none;
+      }
+
       .ant-btn {
         float: right;
-        margin-top: 15px;
+        height: 50px;
+        padding: 0 20px;
+        margin-left: 15px;
       }
     }
 
@@ -1294,33 +1348,33 @@ ol {
   }
 
   .ant-table-row-selected:hover {
-    background-color: $light_green  !important;
+    background-color: $light_green !important;
   }
 
   .ant-table-row-selected-hover {
-    background-color: $light_green  !important;
+    background-color: $light_green !important;
   }
 
   .table-row-disapproved:hover .ant-table-cell-row-hover {
-    background-color: $color_light_warning  !important;
+    background-color: $color_light_warning !important;
   }
 
   .ant-checkbox-checked {
     .ant-checkbox-inner {
-      border-color: $dark_green  !important;
-      background-color: $medium_green  !important;
+      border-color: $dark_green !important;
+      background-color: $medium_green !important;
     }
   }
 
   .ant-checkbox:hover {
     .ant-checkbox-inner {
-      border-color: $medium_green  !important;
+      border-color: $medium_green !important;
       background-color: $light_green;
     }
   }
 
   .ant-checkbox-input:focus+.ant-checkbox-inner {
-    border-color: $dark_green  !important;
+    border-color: $dark_green !important;
   }
 
   .obs_icon {
@@ -1363,10 +1417,10 @@ ol {
 }
 
 .ant-table-expanded-row {
-  background-color: $color_light_warning  !important;
+  background-color: $color_light_warning !important;
 
   td {
-    background-color: $color_light_warning  !important
+    background-color: $color_light_warning !important
   }
 }
 
@@ -1392,4 +1446,12 @@ ol {
   background: none;
   color: #044578;
   padding: 0;
+}
+
+.menu-arrow {
+  border: none;
+  font-size: 200%;
+  display: flex;
+  align-items: center;
+  color: #f9f9f9;
 }

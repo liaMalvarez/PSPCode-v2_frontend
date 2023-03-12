@@ -38,6 +38,7 @@ const ProjectListPage = ({ session }) => {
         {session.user.role === 'professor' && (
         <h1>
           Projects of
+          {' '}
           <SpanData entityName="student" entityId={studentId} loading output="first_name" />
         </h1>
         )}

@@ -1,5 +1,7 @@
 import React from 'react';
 import moment from 'moment';
+import classNames from 'classnames';
+
 import { Avatar, Popover } from 'antd';
 
 import {
@@ -9,7 +11,7 @@ import {
   ExclamationOutlined,
 } from '@ant-design/icons';
 
-const SingleMessage = ({ data, user }) => {
+const SingleMessage = ({ data, user, isLastOne }) => {
   const itsMySelf = data.person.id === user.id;
 
   const renderPopover = (message, color, icon) => (
@@ -39,7 +41,7 @@ const SingleMessage = ({ data, user }) => {
   };
 
   return (
-    <div className={`singleMessage ${itsMySelf ? 'right' : 'left'}`}>
+    <div className={classNames('singleMessage', { right: itsMySelf, last: isLastOne })}>
       {iconSelector()}
       {!itsMySelf && (
         <div className="avatar">
