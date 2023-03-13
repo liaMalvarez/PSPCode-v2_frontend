@@ -1,4 +1,4 @@
-FROM node:12.22.7 as build-deps
+FROM node:14.21.2 as build-deps
 
 WORKDIR /usr/src/app
 COPY package*.json ./

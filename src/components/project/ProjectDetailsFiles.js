@@ -33,11 +33,11 @@ const ProjectDetailsMessage = ({
   session,
 }) => {
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
 
   const uploaderProps = {
     name: 'file',
     multiple: false,
-    accept: 'application/zip',
     showUploadList: true,
     action: 'https://jsonplaceholder.typicode.com/posts/',
     headers: {
@@ -54,12 +54,22 @@ const ProjectDetailsMessage = ({
     },
   };
 
-  const beforeUpload = () => {
+  const beforeUpload = (file) => {
     setUploading(true);
+
+    if (file.type !== 'application/zip') {
+      setError('You can only upload .zip files!');
+      setUploading(false);
+
+      return false;
+    }
+    setError('');
+
+    return true;
   };
 
   const onError = () => {
-    setUploading(true);
+    setUploading(false);
   };
 
   const onDelete = () => {
@@ -83,8 +93,9 @@ const ProjectDetailsMessage = ({
     }
   }, [uploading, uploaded]);
 
-  const customRequest = (x) => {
-    uploadFile(studentId, project.id, version.id, x.file);
+  const customRequest = async (x) => {
+    await uploadFile(studentId, project.id, version.id, x.file, setError);
+    setUploading(false);
   };
 
   const renderDownload = () => (
@@ -138,6 +149,7 @@ const ProjectDetailsMessage = ({
           <p className="ant-upload-hint">Upload only a single zip file with all your project files inside</p>
         </Dragger>
       </div>
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 
@@ -156,10 +168,11 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  uploadFile: (userid, projectid, versionid, file) => {
-    dispatch(attachFileOnProjectVersion(userid, projectid, versionid, file)).payload.then((result) => {
-      dispatch(attachFileOnProjectVersionSuccess(result));
-    });
+  uploadFile: (userid, projectid, versionid, file, setErrorMessage) => {
+    dispatch(attachFileOnProjectVersion(userid, projectid, versionid, file, setErrorMessage))
+      .payload.then((result) => {
+        dispatch(attachFileOnProjectVersionSuccess(result));
+      });
   },
   deleteFile: (project, version) => {
     dispatch(deleteFileOnProjectVersion(project, version)).payload.then((result) => {

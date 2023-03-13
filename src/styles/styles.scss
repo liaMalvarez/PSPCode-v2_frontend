@@ -834,7 +834,7 @@ form .ant-input-number {
     padding-bottom: -20px;
 
     .messages-container {
-      max-height: 45vh;
+      height: 45vh;
       overflow-y: scroll;
       padding-top: 20px;
       display: flex;
@@ -1454,4 +1454,8 @@ ol {
   display: flex;
   align-items: center;
   color: #f9f9f9;
+}
+
+.error-message {
+  color: $color_danger_hover;
 }
