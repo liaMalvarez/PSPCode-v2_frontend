@@ -222,7 +222,15 @@ const ProjectDetailsPhases = ({
   const pipFields = ['pip_problem', 'pip_proposal', 'pip_notes'];
 
   const isFieldInvalid = (fieldName) => (
-    hasSubmited && (!activePhase[fieldName]?.length || activePhase[fieldName]?.length < 15)
+    hasSubmited && (
+      !activePhase[fieldName]?.length
+      || (fieldName !== 'pip_notes' && activePhase[fieldName]?.length < 15)
+    )
+  );
+
+  const pipErrorMessage = (hasMinimum) => (hasMinimum
+    ? 'This field should contain at least 15 characters'
+    : 'This field cannot be empty'
   );
 
   const printFormForActivePhase = () => {
@@ -373,7 +381,7 @@ const ProjectDetailsPhases = ({
                   className="inputTextarea"
                   key={fieldName}
                   validateStatus={isFieldInvalid(fieldName) ? 'warning' : ''}
-                  help={isFieldInvalid(fieldName) ? 'This field should contain at least 15 characters' : ''}
+                  help={isFieldInvalid(fieldName) ? pipErrorMessage(fieldName !== 'pip_notes') : ''}
                 >
                   <TextArea
                     autosize={{ minRows: 3 }}

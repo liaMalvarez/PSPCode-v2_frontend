@@ -512,14 +512,14 @@ export function createMessageOnProjectReset() {
   };
 }
 
-export function attachFileOnProjectVersion(userid, projectid, versionid, file) {
+export function attachFileOnProjectVersion(userid, projectid, versionid, file, setErrorMessage) {
   return {
     type: PROJECT_VERSION_ATTACH_FILE,
     payload: new Promise((resolve, reject) => {
       projectApi.assigned_project_attach_file(userid, projectid, versionid, file).then((x) => {
         resolve(x);
       }).catch(() => {
-        reject({ error: true, msg: 'Something went wrong attaching the zip', data });
+        setErrorMessage('Something went wrong attaching the zip, please try again or contact your professor');
       });
     }),
   };
