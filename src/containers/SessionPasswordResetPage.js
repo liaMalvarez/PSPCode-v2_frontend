@@ -10,7 +10,6 @@ import * as sessionActions from '../actions/sessionActions';
 import PasswordResetForm from '../components/session/PasswordResetForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-
 const { Content } = Layout;
 
 const SessionPasswordResetPage = ({ actions: { reset } }) => (
@@ -33,11 +32,11 @@ const SessionPasswordResetPage = ({ actions: { reset } }) => (
 const { object } = PropTypes;
 
 SessionPasswordResetPage.propTypes = {
-  actions: object.isRequired
+  actions: object.isRequired,
 };
 
 const mapDispatch = (dispatch) => ({
-  actions: bindActionCreators(sessionActions, dispatch)
+  actions: bindActionCreators(sessionActions, dispatch),
 });
 
 export default connect(null, mapDispatch)(SessionPasswordResetPage);

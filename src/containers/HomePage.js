@@ -33,7 +33,7 @@ const HomePage = ({ session }) => {
   }, [session]);
 
   if (!session.authenticated && hasUpdated) {
-    if (pathname === '/session/login') {
+    if (['/session/login', '/session/password/forgot'].includes(pathname)) {
       return <Outlet />;
     }
 
@@ -47,7 +47,7 @@ const HomePage = ({ session }) => {
     return (<LoadingOutlined size="large" />);
   }
 
-  if (pathname === '/' || pathname === '/session/login' || !allowedRoute) {
+  if (['/', '/session/login', '/session/password/forgot'].includes(pathname) || !allowedRoute) {
     return (
       <Navigate to={session.user.role === 'professor'
         ? 'professor/dashboard/projects'

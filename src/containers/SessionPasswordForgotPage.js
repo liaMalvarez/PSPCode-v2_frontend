@@ -10,7 +10,6 @@ import * as sessionActions from '../actions/sessionActions';
 import PasswordForgotForm from '../components/session/PasswordForgotForm'; // eslint-disable-line import/no-named-as-default
 import Logo from '../components/common/Logo';
 
-
 const { Content } = Layout;
 
 const SessionPasswordForgotPage = ({ actions: { forgot } }) => (
@@ -33,11 +32,11 @@ const SessionPasswordForgotPage = ({ actions: { forgot } }) => (
 const { object } = PropTypes;
 
 SessionPasswordForgotPage.propTypes = {
-  actions: object.isRequired
+  actions: object.isRequired,
 };
 
 const mapDispatch = (dispatch) => ({
-  actions: bindActionCreators(sessionActions, dispatch)
+  actions: bindActionCreators(sessionActions, dispatch),
 });
 
 export default connect(null, mapDispatch)(SessionPasswordForgotPage);

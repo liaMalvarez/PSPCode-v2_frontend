@@ -204,7 +204,7 @@ const UserProfile = ({
             </div>
           )}
         <Row className="actions">
-          <a href={`?token=${sessionState.token}&uid=${sessionState.uid}&client_id=${sessionState.client}#/session/password/reset`}>Change Password</a>
+          <a href="/#/session/password/reset">Change Password</a>
           <Button type="boton1" onClick={save}>
             Save
             {returnToProjectId ? ' and Continue' : ''}
