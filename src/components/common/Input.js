@@ -16,7 +16,7 @@ const Input = ({
       <input {...input} {...{ placeholder, type }} />
       {touched && error && (
         <Popover content={error}>
-          <CloseCircleOutlined />
+          <CloseCircleOutlined style={{ color: 'red' }} />
         </Popover>
       )}
       {false && touched && !error && (
