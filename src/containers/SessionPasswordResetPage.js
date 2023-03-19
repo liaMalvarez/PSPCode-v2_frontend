@@ -17,7 +17,7 @@ const SessionPasswordResetPage = ({ actions: { reset }, session }) => (
         <Logo />
         <PasswordResetForm
           onSubmit={reset}
-          isAuth={session.authenticated}
+          isAuth={Object.keys(session.user).length}
         />
       </div>
     </Content>

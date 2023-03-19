@@ -20,6 +20,14 @@ export const PasswordResetForm = ({
     handleSubmit();
   };
 
+  const deleteParamsOnRedirect = () => {
+    const currentUrl = window.location.href;
+    const urlWithoutQueryParams = currentUrl.split('?')[0];
+
+    window.history.pushState({}, '', urlWithoutQueryParams);
+    window.location.href = urlWithoutQueryParams;
+  };
+
   return (
     <div>
       <div className="textAboveForm">
@@ -68,15 +76,25 @@ export const PasswordResetForm = ({
             </Button>
           )}
           {(error === 'yes') && (
-            <Link to={{ pathname: '/', search: '' }}>
-              <Button type="boton1">Go Back to Home</Button>
+            <Link
+              to={isAuth ? '/' : '/session/login'}
+              onClick={deleteParamsOnRedirect}
+            >
+              <Button type="boton1">
+                Go Back to
+                {' '}
+                {isAuth ? 'Home' : 'Login'}
+              </Button>
             </Link>
           )}
         </div>
       </form>
       {(!error || error === 'no') && (
         <div className="textBelowButton">
-          <Link to={{ pathname: isAuth ? '/' : '/session/login', search: '' }}>
+          <Link
+            to={isAuth ? '/' : '/session/login'}
+            onClick={deleteParamsOnRedirect}
+          >
             <MehOutlined style={{ marginRight: '10px' }} />
             I do not want to reset my password
           </Link>
