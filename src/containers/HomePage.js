@@ -32,7 +32,7 @@ const HomePage = ({ session }) => {
     setHasUpdated(true);
   }, [session]);
 
-  if (!session.authenticated && hasUpdated) {
+  if (!Object.keys(session.user).length && hasUpdated) {
     if (['/session/login', '/session/password/forgot', '/session/password/reset'].includes(pathname)) {
       return <Outlet />;
     }
@@ -42,8 +42,7 @@ const HomePage = ({ session }) => {
     );
   }
 
-  if ((!session.authenticated && !hasUpdated)
-  || (session.authenticated && !Object.keys(session.user).length)) {
+  if ((!hasUpdated && !Object.keys(session.user).length)) {
     return (<LoadingOutlined size="large" />);
   }
 
