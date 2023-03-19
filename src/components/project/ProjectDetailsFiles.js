@@ -35,6 +35,16 @@ const ProjectDetailsMessage = ({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
+  const zipTypes = [
+    '.zip',
+    'application/octet-stream',
+    'application/x-zip-compressed',
+    'application/zip',
+    'application/x-zip',
+    'multipart/x-zip',
+    'application/x-myzip',
+  ];
+
   const uploaderProps = {
     name: 'file',
     multiple: false,
@@ -57,7 +67,7 @@ const ProjectDetailsMessage = ({
   const beforeUpload = (file) => {
     setUploading(true);
 
-    if (file.type !== 'application/zip') {
+    if (!zipTypes.includes(file.type)) {
       setError('You can only upload .zip files!');
       setUploading(false);
 
