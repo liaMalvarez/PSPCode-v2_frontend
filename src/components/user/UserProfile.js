@@ -25,26 +25,15 @@ const UserProfile = ({
   session,
   error,
   updated,
-  returnToProjectId,
+  idproject,
   updateUserProp,
   user,
   loading,
 }) => {
   const navigate = useNavigate();
 
-  const [canEditStudent, setCanEditStudent] = useState(true);
-  const [canEditProfessor, setCanEditProfessor] = useState(true);
   const [userState, setUserState] = useState(user);
-  const [sessionState, setSessionState] = useState({ token: '', uid: '', client: '' });
   const [isSavingInfo, setIsSavingInfo] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
-
-  useEffect(() => {
-    sessionService.loadSession()
-      .then((loadedSession) => {
-        setSessionState(loadedSession);
-      });
-  }, []);
 
   useEffect(() => {
     if (error) {
@@ -66,8 +55,8 @@ const UserProfile = ({
         sessionService.loadUser().then((currentUser) => {
           sessionService.saveUser({ ...currentUser, ...user });
         }).then(() => {
-          if (returnToProjectId) {
-            navigate(`students/${user.id}/projects/${returnToProjectId}`);
+          if (idproject) {
+            navigate(`students/${user.id}/projects/${idproject}`);
           } else {
             message.success('Correctly Saved', 2);
           }
@@ -102,19 +91,28 @@ const UserProfile = ({
             <FormItem
               label="First Name"
             >
-              <Input onChange={(e) => update('first_name', e.target.value)} value={userState.first_name} disabled={(!(canEditProfessor || canEditStudent))} />
+              <Input
+                onChange={(e) => update('first_name', e.target.value)}
+                value={userState.first_name}
+              />
               <InputTooltip input="user_profile_form_first_name" />
             </FormItem>
             <FormItem
               label="Last Name"
             >
-              <Input onChange={(e) => update('last_name', e.target.value)} value={userState.last_name} disabled={(!(canEditProfessor || canEditStudent))} />
+              <Input
+                onChange={(e) => update('last_name', e.target.value)}
+                value={userState.last_name}
+              />
               <InputTooltip input="user_profile_form_last_name" />
             </FormItem>
             <FormItem
               label="Email"
             >
-              <Input onChange={(e) => update('email', e.target.value)} value={userState.email} disabled={(!(canEditProfessor || canEditStudent))} />
+              <Input
+                onChange={(e) => update('email', e.target.value)}
+                value={userState.email}
+              />
               <InputTooltip input="user_profile_form_email" />
             </FormItem>
           </Col>
@@ -128,8 +126,19 @@ const UserProfile = ({
             <FormItem
               label="Role"
             >
-              <Select onChange={(value) => update('role', value)} value={userState.role} disabled>
-                {ROLES.map((item) => (<Option key={item.id} value={item.value}>{item.name}</Option>))}
+              <Select
+                onChange={(value) => update('role', value)}
+                value={userState.role}
+                disabled
+              >
+                {ROLES.map((item) => (
+                  <Option
+                    key={item.id}
+                    value={item.value}
+                  >
+                    {item.name}
+                  </Option>
+                ))}
               </Select>
               <InputTooltip input="user_profile_form_role" />
             </FormItem>
@@ -154,13 +163,13 @@ const UserProfile = ({
                   <FormItem
                     label="Programming Language"
                   >
-                    <Input onChange={(e) => update('programming_language', e.target.value)} value={userState.programming_language} disabled={(!(canEditStudent))} />
+                    <Input onChange={(e) => update('programming_language', e.target.value)} value={userState.programming_language} />
                     <InputTooltip input="user_profile_form_programming_language" />
                   </FormItem>
                   <FormItem
                     label="Programming Level"
                   >
-                    <Select onChange={(e) => update('programming_experience', e)} value={userState.programming_experience} disabled={(!(canEditStudent))}>
+                    <Select onChange={(e) => update('programming_experience', e)} value={userState.programming_experience}>
                       <Select.Option key="1" value="Less than 1 year">Less than 1 year</Select.Option>
                       <Select.Option key="2" value="1 to 2 years">1 to 2 years</Select.Option>
                       <Select.Option key="3" value="3 to 4 years">3 to 4 years</Select.Option>
@@ -171,8 +180,7 @@ const UserProfile = ({
                   <FormItem
                     label="Have a Job?"
                   >
-
-                    <Select onChange={(e) => update('have_a_job', e === 'true')} value={String(userState.have_a_job)} disabled={(!(canEditStudent))}>
+                    <Select onChange={(e) => update('have_a_job', e === 'true')} value={userState.have_a_job ? String(userState.have_a_job) : null}>
                       <Select.Option key="1" value="true">Yes</Select.Option>
                       <Select.Option key="0" value="false">No</Select.Option>
                     </Select>
@@ -183,19 +191,19 @@ const UserProfile = ({
                   <FormItem
                     label="Job Position"
                   >
-                    <Input onChange={(e) => update('job_role', e.target.value)} value={userState.job_role} disabled={(!(canEditStudent))} />
+                    <Input onChange={(e) => update('job_role', e.target.value)} value={userState.job_role} />
                     <InputTooltip input="user_profile_form_job_role" />
                   </FormItem>
                   <FormItem
                     label="Academic Experience"
                   >
-                    <Input onChange={(e) => update('academic_experience', e.target.value)} value={userState.academic_experience} disabled={(!(canEditStudent))} />
+                    <Input onChange={(e) => update('academic_experience', e.target.value)} value={userState.academic_experience} />
                     <InputTooltip input="user_profile_form_academic_experience" />
                   </FormItem>
                   <FormItem
                     label="Collage Progress"
                   >
-                    <Input onChange={(e) => update('collegue_career_progress', e.target.value)} value={userState.collegue_career_progress} disabled={(!(canEditStudent))} />
+                    <Input onChange={(e) => update('collegue_career_progress', e.target.value)} value={userState.collegue_career_progress} />
                     <InputTooltip input="user_profile_form_collegue_career_progress" />
                   </FormItem>
                 </Col>
@@ -207,7 +215,7 @@ const UserProfile = ({
           <a href="/#/session/password/reset">Change Password</a>
           <Button type="boton1" onClick={save}>
             Save
-            {returnToProjectId ? ' and Continue' : ''}
+            {idproject ? ' and Continue' : ''}
           </Button>
         </Row>
       </Form>

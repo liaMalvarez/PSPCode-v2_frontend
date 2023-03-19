@@ -235,7 +235,7 @@ const ProjectDetailsPhases = ({
 
   const printFormForActivePhase = () => {
     const inputs = [('')];
-    if (activePhase.psp_phase && activePhase.psp_phase.first) {
+    if (activePhase?.psp_phase?.first) {
       if (project.psp_project.process.has_plan_time) {
         inputs.push((
           <Col span={12} key="section_plan_time">
