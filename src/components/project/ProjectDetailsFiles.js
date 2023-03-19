@@ -69,13 +69,13 @@ const ProjectDetailsMessage = ({
   };
 
   const onError = () => {
-    setUploading(false);
+    setUploading(true);
   };
 
   const onDelete = () => {
     Modal.confirm({
-      title: 'Are you sure you want to delete this?',
-      content: 'This operation can\'t be undone.',
+      title: 'Are you sure you want to replace it?',
+      content: 'Once you upload another file the old one will be deleted',
       okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
@@ -95,7 +95,6 @@ const ProjectDetailsMessage = ({
 
   const customRequest = async (x) => {
     await uploadFile(studentId, project.id, version.id, x.file, setError);
-    setUploading(false);
   };
 
   const renderDownload = () => (
@@ -158,6 +157,7 @@ const ProjectDetailsMessage = ({
   } if (!version.file && session.user.role === 'student' && version.status === 'working') {
     return renderUpload(true);
   }
+
   return renderUpload(false);
 };
 

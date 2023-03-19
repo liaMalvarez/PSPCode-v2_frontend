@@ -21,7 +21,7 @@ const UserDetailsPage = ({
   session,
   fetchUserDetailsProp,
 }) => {
-  const { hash: location_hash, iduser: user_id, returntoprojectid } = useParams();
+  const { hash: location_hash, iduser: user_id, idproject } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,7 +68,7 @@ const UserDetailsPage = ({
         <section>
           <Tabs defaultActiveKey={location_hash === '#activity' ? '2' : '1'}>
             <TabPane tab="PROFILE" key="1">
-              <UserProfile user={user_data} returnToProjectId={returntoprojectid} />
+              <UserProfile user={user_data} idproject={idproject} />
             </TabPane>
           </Tabs>
         </section>

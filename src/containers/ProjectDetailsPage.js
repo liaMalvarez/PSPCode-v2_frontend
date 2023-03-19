@@ -376,7 +376,7 @@ const ProjectDetailsPage = ({
         okType: 'primary',
         cancelText: 'Cancel',
         onOk() {
-          navigate(`/users/${session.user.id}/projects/${project_id}`);
+          navigate(`/users/${session.user.id}`);
         },
         onCancel() {
         },
@@ -507,6 +507,12 @@ const ProjectDetailsPage = ({
   const goToTab = (key) => {
     navigate(`/students/${studentId}/projects/${project_id}/${key}`);
   };
+
+  if ((!project_loading && !project_data)
+  || (!version_loading && version_error && !version_data)
+  ) {
+    navigate('/');
+  }
 
   if ((project_loading || !project_data)
     || (!version_loading && !version_error && !version_data)
