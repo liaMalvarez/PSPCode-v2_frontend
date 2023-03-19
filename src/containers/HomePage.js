@@ -33,7 +33,7 @@ const HomePage = ({ session }) => {
   }, [session]);
 
   if (!session.authenticated && hasUpdated) {
-    if (['/session/login', '/session/password/forgot'].includes(pathname)) {
+    if (['/session/login', '/session/password/forgot', '/session/password/reset'].includes(pathname)) {
       return <Outlet />;
     }
 

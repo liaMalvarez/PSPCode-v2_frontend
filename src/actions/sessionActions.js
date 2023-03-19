@@ -37,7 +37,15 @@ export const forgot = (user) => () => sessionApi.forgot(user, String(window.loca
 });
 
 export const reset = (user) => async () => {
-  const headers = await sessionService.loadSession();
+  let headers = await sessionService.loadSession();
+
+  if (!headers.token) {
+    headers = { 
+      token: url.searchParams.get('token'), 
+      uid: url.searchParams.get('uid'), 
+      client: url.searchParams.get('client_id') 
+    };
+  }
 
   return sessionApi.reset(user, headers).then(() => {
     throw new SubmissionError({ ok: true });
