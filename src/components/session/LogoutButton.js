@@ -1,10 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
 import {
   Button,
 } from 'antd';
+
 import * as sessionActions from '../../actions/sessionActions';
 
 const LogoutButton = ({ actions: { logout } }) => {
@@ -22,7 +24,7 @@ const LogoutButton = ({ actions: { logout } }) => {
 };
 
 LogoutButton.propTypes = {
-  actions: Object.isRequired,
+  actions: PropTypes.object.isRequired,
 };
 
 const mapDispatch = (dispatch) => ({

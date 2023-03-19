@@ -57,7 +57,13 @@ const CustomHeader = ({
         </Menu.Item>
       )}
       <Menu.Item key="1">
-        <a href="https://psp-heroku-staging.s3.amazonaws.com/message/file/44/14398c71-31e9-434c-8390-c11a71d976f8.pdf" target="_blank" rel="noreferrer">Help</a>
+        <a
+          href="https://psp-heroku-staging.s3.amazonaws.com/message/file/44/14398c71-31e9-434c-8390-c11a71d976f8.pdf"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Help
+        </a>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="3"><LogoutButton /></Menu.Item>

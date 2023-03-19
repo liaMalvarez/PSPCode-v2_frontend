@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { Field, reduxForm } from 'redux-form';
 import { Button } from 'antd';
+import { MehOutlined } from '@ant-design/icons';
 
 import Input from '../common/Input';
 import * as constraints from '../../utils/constraints';
@@ -10,6 +12,7 @@ export const PasswordResetForm = ({
   handleSubmit,
   error,
   submitting,
+  isAuth,
 }) => {
   const onSubmit = (e) => {
     e.preventDefault();
@@ -55,22 +58,30 @@ export const PasswordResetForm = ({
           )}
         <div className="hCenter">
           {(!error || error === 'no') && (
-          <Button
-            htmlType="submit"
-            loading={submitting}
-            onClick={handleSubmit}
-            type="boton1"
-          >
-            {submitting ? ' Loading...' : 'Submit'}
-          </Button>
+            <Button
+              htmlType="submit"
+              loading={submitting}
+              onClick={handleSubmit}
+              type="boton1"
+            >
+              {submitting ? ' Loading...' : 'Submit'}
+            </Button>
           )}
           {(error === 'yes') && (
-            <Link to="/">
+            <Link to={{ pathname: '/', search: '' }}>
               <Button type="boton1">Go Back to Home</Button>
             </Link>
           )}
         </div>
       </form>
+      {(!error || error === 'no') && (
+        <div className="textBelowButton">
+          <Link to={{ pathname: isAuth ? '/' : '/session/login', search: '' }}>
+            <MehOutlined style={{ marginRight: '10px' }} />
+            I do not want to reset my password
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

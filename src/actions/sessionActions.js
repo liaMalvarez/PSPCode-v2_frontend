@@ -37,7 +37,7 @@ export const forgot = (user) => () => sessionApi.forgot(user, String(window.loca
 });
 
 export const reset = (user) => async () => {
-  let headers = {}
+  let headers = {};
 
   try {
     headers = await sessionService.loadSession();
@@ -45,15 +45,13 @@ export const reset = (user) => async () => {
     const url = new URL(window.location.href);
 
     if (!headers?.token) {
-      headers = { 
-        token: url.searchParams.get('token'), 
-        uid: url.searchParams.get('uid'), 
-        client: url.searchParams.get('client_id') 
+      headers = {
+        token: url.searchParams.get('token'),
+        uid: url.searchParams.get('uid'),
+        client: url.searchParams.get('client_id'),
       };
     }
   }
-
-  console.log('en fuera', headers)
 
   return sessionApi.reset(user, headers).then(() => {
     throw new SubmissionError({ ok: true });
