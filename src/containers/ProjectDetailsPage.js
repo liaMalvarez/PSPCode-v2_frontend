@@ -92,10 +92,22 @@ const ProjectDetailsPage = ({
   const [hasSubmited, setHasSubmited] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
-  const correctionAllowed = useMemo(() => ((session?.user.role === 'professor'
+  const correctionAllowed = useMemo(
+    () => ((session?.user.role === 'professor'
   && ['approved', 'need_correction', 'being_corrected'].includes(version_data?.status))
   || (session?.user.role === 'student'
-  && ['approved', 'need_correction'].includes(version_data?.status))), [session, version_data]);
+  && (['approved', 'need_correction'].includes(version_data?.status)
+  || (version_data?.version > 1 && version_data?.status === 'working')))),
+    [session, version_data],
+  );
+
+  const versionIdForCorrection = useMemo(() => (
+    version_data?.status === 'working' && version_data?.version > 1
+      ? project_data?.timeline[
+        (project_data?.timeline.length || 2) - 2
+      ]?.version?.id // previous version feedback
+      : version_data?.id
+  ), [version_data]);
 
   const canEditCorrection = useMemo(() => (
     session?.user.role === 'professor' && version_data?.status === 'being_corrected'
@@ -702,7 +714,7 @@ const ProjectDetailsPage = ({
             {correctionAllowed && (
               <TabPane tab="CORRECTION" key="correction">
                 <ProjectDetailsCorrection
-                  versionId={version_data?.id}
+                  versionId={versionIdForCorrection || version_data?.id}
                   studentId={studentId}
                   project={project_data}
                   showConfirmationModal={showConfirmationModal}

@@ -529,7 +529,7 @@ const ProjectDetailsPhases = ({
                   placeholder="Select date and time"
                   showTime
                   format="DD/MM/YYYY HH:mm:ss"
-                  onChange={(value) => editPhase('start_time', value)}
+                  onChange={(value) => editPhase('start_time', value?.startOf('second'))}
                   disabled={(!canEdit)}
                 />
                 <InputTooltip input="project_details_phase_form_start_time" />
@@ -602,7 +602,9 @@ const ProjectDetailsPhases = ({
                     placeholder="Select date and time"
                     showTime
                     format="DD/MM/YYYY HH:mm:ss"
-                    onChange={(value) => editPhase('end_time', value)}
+                    onChange={(value) => {
+                      editPhase('end_time', value?.startOf('second'));
+                    }}
                     disabled={(!canEdit || !activePhase.start_time)}
                   />
                   <InputTooltip input="project_details_phase_form_end_time" />
