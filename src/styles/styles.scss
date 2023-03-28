@@ -1460,3 +1460,20 @@ ol {
 .error-message {
   color: $color_danger_hover;
 }
+
+.hoc_loader {
+  font-size: 90px;
+  color: $color_1;
+  margin: auto;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  margin-left: -45px;
+}
+
+.warnings-list {
+  max-width: 400px;
+  display: block;
+  margin-left: 25px;
+  padding: 0;
+}
