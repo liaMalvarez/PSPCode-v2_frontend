@@ -20,19 +20,17 @@ require('antd/dist/result.css');
 const HomePage = ({ session }) => {
   const { pathname } = useLocation();
 
-  const [hasUpdated, setHasUpdated] = useState(false);
-
   const allowedRoutesArray = Object.values(routes);
   allowedRoutesArray.shift();
 
   const allowedRoute = allowedRoutesArray
     .some((route) => matchPath(route, pathname));
 
-  useEffect(() => {
-    setHasUpdated(true);
-  }, [session]);
+  if (!session.checked) {
+    return (<LoadingOutlined className="hoc_loader" />);
+  }
 
-  if (!Object.keys(session.user).length && hasUpdated) {
+  if (!session.authenticated && session.checked) {
     if (['/session/login', '/session/password/forgot', '/session/password/reset'].includes(pathname)) {
       return <Outlet />;
     }
@@ -42,7 +40,7 @@ const HomePage = ({ session }) => {
     );
   }
 
-  if ((!hasUpdated && !Object.keys(session.user).length)) {
+  if ((!Object.keys(session.user).length)) {
     return (<LoadingOutlined size="large" />);
   }
 
