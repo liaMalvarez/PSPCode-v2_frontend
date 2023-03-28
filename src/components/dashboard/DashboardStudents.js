@@ -119,13 +119,24 @@ const DashboardStudents = ({
         status: 'Pending',
         color: 'warning',
         msg: (
-          <span>
+          <div>
             {record.first_name}
+            {' '}
             hasn&apos;t this project assigned and is still working on
+            {' '}
             {record.current_project.name}
             .
-            <button type="button" onClick={() => assign({ id: record.id, name: record.first_name }, projectOfRecord(record))}>Assign anyway</button>
-          </span>
+            <button
+              className="ant-btn-boton1"
+              style={{ marginTop: '10px', padding: '3px 8px' }}
+              onClick={() => assign(
+                { id: record.id, name: record.first_name },
+                projectOfRecord(record),
+              )}
+            >
+              Assign anyway
+            </button>
+          </div>
         ),
       };
     }

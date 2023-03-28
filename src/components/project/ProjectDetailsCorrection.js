@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { connect } from 'react-redux';
 import {
   Collapse,
   Input,
@@ -17,10 +16,6 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons';
 
-import {
-  getProjectFeedbackForVersionSuccess,
-  professorSubmitCorrectionSuccess,
-} from '../../actions/projectActions';
 import projectApi from '../../api/projectApi';
 import CorrectionTable from './correction/CorrectionTable';
 import CustomTag from '../CustomTag';
@@ -32,93 +27,15 @@ const ProjectDetailsCorrection = ({
   versionId,
   project,
   studentId,
-  showConfirmationModal = true,
-  setShowConfirmationModal = () => {},
-  getProjectFeedback,
-  projectFeedbackGet,
   canEditCorrection,
-  submitCorrection,
+  error,
+  isLoading,
+  projectFeedback,
+  setProjectFeedback,
+  isUnapprovedCriteria,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
   const [areChangesToBeSaved, setAreChangesToBeSaved] = useState(false);
   const [hasSavedChanges, setHasSavedChanges] = useState(false);
-
-  const [projectFeedback, setProjectFeedback] = useState(null);
-
-  const isUnapprovedCriteria = useMemo(() => projectFeedback?.grouped_corrections
-    .some(({ corrections }) => corrections.some(({ approved }) => !approved)), [projectFeedback]);
-
-  useEffect(() => {
-    if (!projectFeedbackGet
-      || project.id !== projectFeedbackGet.projectid
-      || versionId !== projectFeedbackGet.versionId
-      || studentId !== projectFeedbackGet.studentid
-    ) {
-      getProjectFeedback(
-        studentId,
-        project.id,
-        versionId,
-        setError,
-        setIsLoading,
-      );
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading && !error && projectFeedbackGet) {
-      setProjectFeedback(projectFeedbackGet);
-    }
-  }, [projectFeedbackGet, isLoading, error]);
-
-  useEffect(() => {
-    const warningsList = [];
-
-    if (showConfirmationModal) {
-      if (!projectFeedback.comment) {
-        warningsList.push('The general comment is empty.');
-      }
-
-      if (isUnapprovedCriteria && projectFeedback.approved) {
-        warningsList.push('The project is being approved having unapproved criteria.');
-      } else if (!isUnapprovedCriteria && !projectFeedback.approved) {
-        warningsList.push('All the criteria is approved but the project is not.');
-      }
-
-      if (projectFeedback.grouped_corrections
-        .some(({ corrections }) => corrections
-          .some(({ comment, approved }) => !comment && !approved))) {
-        warningsList.push('There are unapproved criteria with empty comments.');
-      }
-
-      if (projectFeedback.grouped_corrections
-        .some(({ corrections }) => corrections
-          .some(({ obs_phases, approved }) => obs_phases.length && approved))) {
-        warningsList.push('Some of the approved criteria has atomatically detected errors.');
-      }
-
-      Modal.confirm({
-        title: 'Do you want to submit the correction? This action can\'t be undone.',
-        icon: <ExclamationCircleOutlined />,
-        content: (
-          <ul
-            style={{
-              maxWidth: '400px',
-              display: 'block',
-              marginLeft: '25px',
-              padding: '0',
-            }}
-          >
-            {warningsList.map((warning) => <li key={warning}>{warning}</li>)}
-          </ul>
-        ),
-        onCancel: () => setShowConfirmationModal(false),
-        onOk: () => submitCorrection(studentId, project.id, versionId, projectFeedback),
-        okText: `Submit${warningsList.length ? ' anyway' : ''}`,
-      });
-    }
-  }, [showConfirmationModal]);
 
   const panelHeader = (corrections, name) => (
     <div className="correction-table-header">
@@ -296,38 +213,4 @@ const ProjectDetailsCorrection = ({
   );
 };
 
-const mapStateToProps = (state) => ({
-  projectFeedbackGet: state.projects.active?.project_feedback,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  getProjectFeedback: (userid, projectid, versionId, setError, setIsLoading) => {
-    projectApi.get_project_feedback(userid, projectid, versionId).then((result) => {
-      dispatch(getProjectFeedbackForVersionSuccess({
-        ...result,
-        userid,
-        projectid,
-        versionId,
-      }));
-      setIsLoading(false);
-    }).catch(() => {
-      setError('Something went wrong on loading Project Feedback');
-      setIsLoading(false);
-    });
-  },
-  submitCorrection: (studentId, projectId, versionId, projectFeedback) => {
-    projectApi.project_feedback_update(
-      studentId,
-      projectId,
-      versionId,
-      { ...projectFeedback, reviewed_date: format(new Date(), 'yyyy-MM-dd') },
-    ).then(() => {
-      dispatch(professorSubmitCorrectionSuccess());
-      message('Correction submitted successfully', 'success');
-    }).catch(() => {
-      message('Something went wrong on submitting the correction', 'error');
-    });
-  },
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(ProjectDetailsCorrection);
+export default ProjectDetailsCorrection;

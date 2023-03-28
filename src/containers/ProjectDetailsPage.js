@@ -1,12 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
-  Link, useNavigate, useParams, useLocation,
+  Link,
+  useNavigate,
+  useParams,
+  useLocation,
 } from 'react-router-dom';
 import { format } from 'date-fns';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import cs from 'classnames';
 import {
+  ExclamationCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
   HomeOutlined,
@@ -48,6 +56,7 @@ import {
   fetchProjectDetailsVersionSummarySuccess, submitProjectVersion,
   submitProjectVersionSuccess, startProject, startProjectSuccess,
   continueProject, continueProjectSuccess, resetProjectDetails, resetProjectDetailsVersion,
+  getProjectFeedbackForVersionSuccess, professorSubmitCorrectionSuccess,
 } from '../actions/projectActions';
 import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
@@ -75,6 +84,9 @@ const ProjectDetailsPage = ({
   project_error,
   finished_continueing,
   fetchProjectDetailsVersionSummaryProp,
+  savedProjectFeedback,
+  getProjectFeedback,
+  submitCorrection,
 }) => {
   const navigate = useNavigate();
   const { idstudent: studentId, idproject: project_id, tab } = useParams();
@@ -90,7 +102,15 @@ const ProjectDetailsPage = ({
   const [isOpenSider, setIsOpenSider] = useState(false);
   const [checklist, setChecklist] = useState([]);
   const [hasSubmited, setHasSubmited] = useState(false);
+
+  // Project feedback states
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [projectFeedbackError, setProjectFeedbackError] = useState('');
+  const [projectFeedbackLoading, setProjectFeedbackLoading] = useState(false);
+  const [projectFeedback, setProjectFeedback] = useState(null);
+
+  // Button Loader
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const correctionAllowed = useMemo(
     () => ((session?.user.role === 'professor'
@@ -313,12 +333,90 @@ const ProjectDetailsPage = ({
     </Form>
   );
 
+  const isUnapprovedCriteria = useMemo(() => projectFeedback?.grouped_corrections
+    .some(({ corrections }) => corrections.some(({ approved }) => !approved)), [projectFeedback]);
+
+  useEffect(() => {
+    if (!savedProjectFeedback
+      && correctionAllowed && project_data?.id && versionIdForCorrection && studentId
+      && ((project_data?.id !== savedProjectFeedback?.projectid)
+        || (versionIdForCorrection !== savedProjectFeedback?.versionId)
+        || (studentId !== savedProjectFeedback?.studentid)
+      )) {
+      getProjectFeedback(
+        studentId,
+        project_data?.id,
+        versionIdForCorrection,
+        setProjectFeedbackError,
+        setProjectFeedbackLoading,
+      );
+    }
+  }, [correctionAllowed, project_data, studentId, versionIdForCorrection]);
+
+  useEffect(() => {
+    if (!projectFeedbackLoading && !projectFeedbackError && savedProjectFeedback) {
+      setProjectFeedback(savedProjectFeedback);
+    }
+  }, [savedProjectFeedback, projectFeedbackLoading, projectFeedbackError]);
+
+  useEffect(() => {
+    const warningsList = [];
+
+    if (showConfirmationModal) {
+      if (!projectFeedback.comment) {
+        warningsList.push('The general comment is empty.');
+      }
+
+      if (isUnapprovedCriteria && projectFeedback.approved) {
+        warningsList.push('The project is being approved having unapproved criteria.');
+      } else if (!isUnapprovedCriteria && !projectFeedback.approved) {
+        warningsList.push('All the criteria is approved but the project is not.');
+      }
+
+      if (projectFeedback.grouped_corrections
+        .some(({ corrections }) => corrections
+          .some(({ comment, approved }) => !comment && !approved))) {
+        warningsList.push('There are unapproved criteria with empty comments.');
+      }
+
+      if (projectFeedback.grouped_corrections
+        .some(({ corrections }) => corrections
+          .some(({ obs_phases, approved }) => obs_phases.length && approved))) {
+        warningsList.push('Some of the approved criteria has atomatically detected errors.');
+      }
+
+      Modal.confirm({
+        title: 'Do you want to submit the correction? This action can\'t be undone.',
+        icon: <ExclamationCircleOutlined />,
+        content: (
+          <ul className="warnings-list">
+            {warningsList.map((warning) => <li key={warning}>{warning}</li>)}
+          </ul>
+        ),
+        onCancel: () => setShowConfirmationModal(false),
+        onOk: () => {
+          setIsButtonLoading(true);
+
+          submitCorrection(
+            studentId,
+            project_data.id,
+            versionIdForCorrection,
+            projectFeedback,
+            setIsButtonLoading,
+          );
+        },
+        okText: `Submit${warningsList.length ? ' anyway' : ''}`,
+      });
+    }
+  }, [showConfirmationModal]);
+
   const submitProject = () => {
     if (submitting) {
       return;
     }
 
     setHasSubmited(true);
+    setIsButtonLoading(true);
 
     projectApi.first_project(studentId).then(() => {
       const need_to_update_pm = (project_data.psp_project.process.has_pip
@@ -369,10 +467,20 @@ const ProjectDetailsPage = ({
     }).catch((error) => {
       console.log('Something went wrong fetching user', error);
     });
+
+    setIsButtonLoading(false);
   };
 
   const startProjectFunc = () => {
-    const required_attrs = ['academic_experience', 'collegue_career_progress', 'programming_experience', 'programming_language'];
+    const required_attrs = [
+      'academic_experience',
+      'collegue_career_progress',
+      'programming_experience',
+      'programming_language',
+    ];
+
+    setIsButtonLoading(true);
+
     const background_ok = required_attrs
       .reduce((x, y) => x && session.user[y] && session.user[y].length > 0, true);
 
@@ -394,11 +502,14 @@ const ProjectDetailsPage = ({
         },
       });
     }
+
+    setIsButtonLoading(false);
   };
 
   const onContinueProject = () => {
     setMessageContinueing(true);
-    continueProjectProp(studentId, project_id);
+    setIsButtonLoading(true);
+    continueProjectProp(studentId, project_id, setIsButtonLoading);
     setRedeliver(true);
   };
 
@@ -415,6 +526,7 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Button
+            loading={isButtonLoading}
             onClick={() => setShowConfirmationModal(true)}
             icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
             type="boton1"
@@ -447,6 +559,7 @@ const ProjectDetailsPage = ({
               onClick={submitProject}
               icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
               type="boton1"
+              loading={isButtonLoading}
               disabled={checklist.some(({ valid }) => !valid)}
             >
               {`Submit to ${project_data.professor.first_name}`}
@@ -460,7 +573,12 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here to allow phases recording" placement="leftBottom">
-            <Button onClick={startProjectFunc} icon={<RightOutlined />} type="boton1">
+            <Button
+              onClick={startProjectFunc}
+              loading={isButtonLoading}
+              icon={<RightOutlined />}
+              type="boton1"
+            >
               {`Start ${project_data.psp_project.name}`}
             </Button>
           </Popover>
@@ -472,8 +590,14 @@ const ProjectDetailsPage = ({
       return (
         <div className="submitProjectBtn">
           <Popover content="Click here, make your corrections and submit it again" placement="leftBottom">
-            <Button onClick={onContinueProject} icon={<RightOutlined />} type="boton1">
+            <Button
+              loading={isButtonLoading}
+              onClick={onContinueProject}
+              icon={<RightOutlined />}
+              type="boton1"
+            >
               Continue
+              {' '}
               {project_data.psp_project.name}
             </Button>
           </Popover>
@@ -717,9 +841,12 @@ const ProjectDetailsPage = ({
                   versionId={versionIdForCorrection || version_data?.id}
                   studentId={studentId}
                   project={project_data}
-                  showConfirmationModal={showConfirmationModal}
-                  setShowConfirmationModal={setShowConfirmationModal}
+                  projectFeedback={projectFeedback}
+                  setProjectFeedback={setProjectFeedback}
+                  error={projectFeedbackError}
+                  isLoading={projectFeedbackLoading}
                   canEditCorrection={canEditCorrection}
+                  isUnapprovedCriteria={isUnapprovedCriteria}
                 />
               </TabPane>
             )}
@@ -758,6 +885,8 @@ const mapStateToProps = (state) => ({
 
   finished_starting: state.projects.project_version_finished_starting,
   finished_continueing: state.projects.project_version_finished_continueing,
+
+  savedProjectFeedback: state.projects.active?.project_feedback,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -787,14 +916,49 @@ const mapDispatchToProps = (dispatch) => ({
       dispatch(startProjectSuccess(result));
     });
   },
-  continueProjectProp: (userid, projectid) => {
+  continueProjectProp: (userid, projectid, setIsButtonLoading) => {
     dispatch(continueProject(userid, projectid)).payload.then((result) => {
       dispatch(continueProjectSuccess(result));
+      setIsButtonLoading(false);
     });
   },
   submitProjectVersionProp: (userid, projectid) => {
     dispatch(submitProjectVersion(userid, projectid)).payload.then((result) => {
       dispatch(submitProjectVersionSuccess(result));
+    });
+  },
+  getProjectFeedback: (userid, projectid, versionId, setError, setIsLoading) => {
+    projectApi.get_project_feedback(userid, projectid, versionId).then((result) => {
+      dispatch(getProjectFeedbackForVersionSuccess({
+        ...result,
+        userid,
+        projectid,
+        versionId,
+      }));
+      setIsLoading(false);
+    }).catch(() => {
+      setError('Something went wrong on loading Project Feedback');
+      setIsLoading(false);
+    });
+  },
+  submitCorrection: (
+    studentId,
+    projectId,
+    versionId,
+    projectFeedback,
+    setIsSubmittingCorrection,
+  ) => {
+    projectApi.project_feedback_update(
+      studentId,
+      projectId,
+      versionId,
+      { ...projectFeedback, reviewed_date: format(new Date(), 'yyyy-MM-dd') },
+    ).then(() => {
+      dispatch(professorSubmitCorrectionSuccess());
+      setIsSubmittingCorrection(false);
+      message('Correction submitted successfully', 'success');
+    }).catch(() => {
+      message('Something went wrong on submitting the correction', 'error');
     });
   },
   reset: () => {
