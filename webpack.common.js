@@ -13,8 +13,9 @@ module.exports = {
   target: 'web', // necessary per https://webpack.github.io/docs/testing.html#compile-and-test
   output: {
     path: path.resolve(__dirname, 'dist'), // Note: Physical files are only output by the production build task `npm run build`.
-    filename: 'bundle.js',
+    filename: 'bundle.[contenthash].js',
     publicPath: '/',
+    chunkFilename: '[id].[chunkhash].js',
   },
   plugins: [
     new HtmlWebpackPlugin({ // Create HTML file that includes references to bundled CSS and JS.
@@ -25,6 +26,8 @@ module.exports = {
       },
       inject: true,
       favicon: 'src/favicon.ico',
+      filename: 'index.[contenthash].html',
+      hash: true,
     }),
     new Dotenv(),
   ],
@@ -43,35 +46,24 @@ module.exports = {
       },
       { test: /\.eot(\?v=\d+.\d+.\d+)?$/, loader: 'file-loader' },
       {
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          mimetype: 'application/font-woff',
-        },
-      },
-      {
-        test: /\.[ot]tf(\?v=\d+.\d+.\d+)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          mimetype: 'application/octet-stream',
-        },
-      },
-      {
-        test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          esModule: false,
-          mimetype: 'image/svg+xml',
-        },
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 10000,
+              mimetype: 'application/font-woff',
+              name: '[name].[contenthash].[ext]', // Nombre de archivo de salida
+              outputPath: 'fonts/', // Ruta de salida del archivo
+            },
+          },
+        ],
       },
       {
         test: /\.(jpe?g|png|gif|ico)$/i,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]',
+          name: '[name].[contenthash].[ext]',
           esModule: false,
         },
       },

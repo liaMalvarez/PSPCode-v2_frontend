@@ -54,7 +54,9 @@ export const reset = (user) => async () => {
     }
   }
 
-  return sessionApi.reset(user, headers).then(() => {
+  return sessionApi.reset(user, headers).then((userData) => {
+    sessionService.saveUser(userData?.data);
+
     throw new SubmissionError({ ok: true });
   }).catch((err) => {
     if (err.errors && err.errors.ok) {
