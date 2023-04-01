@@ -15,10 +15,9 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'), // Note: Physical files are only output by the production build task `npm run build`.
     filename: 'bundle.[contenthash].js',
     publicPath: '/',
-    chunkFilename: '[id].[chunkhash].js',
   },
   plugins: [
-    new HtmlWebpackPlugin({ // Create HTML file that includes references to bundled CSS and JS.
+    new HtmlWebpackPlugin({
       template: 'src/index.html',
       minify: {
         removeComments: true,
@@ -26,7 +25,7 @@ module.exports = {
       },
       inject: true,
       favicon: 'src/favicon.ico',
-      filename: 'index.[contenthash].html',
+      filename: 'index.html',
       hash: true,
     }),
     new Dotenv(),
@@ -47,23 +46,26 @@ module.exports = {
       { test: /\.eot(\?v=\d+.\d+.\d+)?$/, loader: 'file-loader' },
       {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 10000,
-              mimetype: 'application/font-woff',
-              name: '[name].[contenthash].[ext]', // Nombre de archivo de salida
-              outputPath: 'fonts/', // Ruta de salida del archivo
-            },
+        loader: 'url-loader',
+        options: {
+          limit: 10000,
+          mimetype: {
+            'application/font-woff': ['woff', 'woff2'],
+            'application/octet-stream': ['ttf', 'eot'],
+            'image/svg+xml': ['svg'],
+            'image/png': ['png'],
+            'image/jpeg': ['jpg', 'jpeg'],
+            'image/gif': ['gif'],
+            'image/x-icon': ['ico'],
+            esModule: false,
           },
-        ],
+        },
       },
       {
         test: /\.(jpe?g|png|gif|ico)$/i,
         loader: 'file-loader',
         options: {
-          name: '[name].[contenthash].[ext]',
+          name: '[name].[ext]',
           esModule: false,
         },
       },
