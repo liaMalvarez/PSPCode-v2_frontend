@@ -202,7 +202,6 @@ const ProjectDetailsPhases = ({
         }
       }
     }
-    if (typeof actualValue === 'string' && String(actualValue).trim() === String(value).trim()) return;
 
     setWasEdited(true);
     setActivePhase(newState);

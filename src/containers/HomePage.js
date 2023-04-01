@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Navigate,
   Outlet,
@@ -39,12 +39,16 @@ const HomePage = ({ session }) => {
       <Navigate to="session/login" />
     );
   }
-
-  if ((!Object.keys(session.user).length)) {
-    return (<LoadingOutlined size="large" />);
+  console.log('hoc', session.user);
+  if (!Object.keys(session.user).length) {
+    return (<LoadingOutlined className="hoc_loader" />);
   }
 
-  if (['/', '/session/login', '/session/password/forgot'].includes(pathname) || !allowedRoute) {
+  if (
+    ['/', '/session/login', '/session/password/forgot'].includes(pathname)
+    || !allowedRoute
+    || (pathname === '/session/password/reset' && session.user.role === 'professor')
+  ) {
     return (
       <Navigate to={session.user.role === 'professor'
         ? 'professor/dashboard/projects'
