@@ -31,19 +31,14 @@ const DashboardStudents = ({
   finished_poke,
   finished_assign,
 }) => {
-  const [sortedInfo, setSortedInfo] = useState(null);
-  const [filteredInfo, setFilteredInfo] = useState(null);
+  const [sortedInfo, setSortedInfo] = useState({ columnKey: 'status', order: true });
+  const [filteredInfo, setFilteredInfo] = useState({ professor: [session.user.id] });
   const [messagePoking, setMessagePoking] = useState('');
   const [messageAssigning, setMessageAssigning] = useState('');
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setSortedInfo(sortedInfo || { columnKey: 'status', order: true });
-    setFilteredInfo(filteredInfo || { professor: [String(session.user.id)] });
-
-    return reset();
-  }, []);
+  useEffect(() => reset(), []);
 
   useEffect(() => {
     if (course) {
@@ -201,12 +196,13 @@ const DashboardStudents = ({
         ? x : [...x, y]), []) : [],
     onFilter: (value, record) => String(record.professor.id) === String(value),
     render: (text) => text.first_name,
+    filteredValue: filteredInfo?.professor,
   }, {
     title: 'CURRENT PROJECT',
     key: 'project',
     width: '20%',
     className: projectId ? 'displayNone' : '',
-    sorter: (a, b) => a.id - b.id,
+    sorter: (a, b) => a.current_project.id - b.current_project.id,
     render: (_, record) => projectOfRecord(record).name,
     sortOrder: sortedInfo?.columnKey === 'project' && sortedInfo.order,
   }, {
@@ -214,7 +210,7 @@ const DashboardStudents = ({
     dataIndex: 'status',
     key: 'status',
     width: projectId ? '32%' : '20%',
-    sorter: (a, b) => statusOfProject(a).status > statusOfProject(b).status,
+    sorter: (a, b) => statusOfProject(a).status.localeCompare(statusOfProject(b).status || ''),
     sortOrder: sortedInfo?.columnKey === 'status' && sortedInfo.order,
     render: (_, record) => {
       const status = statusOfProject(record);
@@ -302,6 +298,11 @@ const DashboardStudents = ({
     },
   }];
 
+  const handleChange = (pagination, filters, sorter) => {
+    setSortedInfo(sorter);
+    setFilteredInfo(filters);
+  };
+
   return (
     <Table
       rowKey="id"
@@ -309,6 +310,7 @@ const DashboardStudents = ({
       columns={columns}
       dataSource={students}
       loading={loading}
+      onChange={handleChange}
       pagination={false}
       onRow={(record) => ({
         onClick: () => { navigate(`/students/${record.id}/projects/${(projectId && projectOfRecord(record).assigned_project_id) ? projectOfRecord(record).assigned_project_id : ''}`); }, // click row
