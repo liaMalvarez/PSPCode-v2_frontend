@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 
 const SingleMessage = ({ data, user, isLastOne }) => {
-  const itsMySelf = data.person.id === user.id;
+  const itsMySelf = data.person.id === user.id && data.person.role === user.role;
 
   const renderPopover = (message, color, icon) => (
     <Popover content={message}>

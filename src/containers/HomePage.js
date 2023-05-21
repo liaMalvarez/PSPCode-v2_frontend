@@ -39,7 +39,7 @@ const HomePage = ({ session }) => {
       <Navigate to="session/login" />
     );
   }
-  console.log('hoc', session.user);
+
   if (!Object.keys(session.user).length) {
     return (<LoadingOutlined className="hoc_loader" />);
   }
