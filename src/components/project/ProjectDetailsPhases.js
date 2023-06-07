@@ -94,6 +94,56 @@ const ProjectDetailsPhases = ({
   };
   window.history.replaceState({}, document.title);
 
+  const editPhase = (attr, value) => {
+    if (!canEdit) return;
+
+    if (typeof value === 'number' && parseInt(value, 10) === 0) value = '0';
+
+    const actualValue = activePhase[attr];
+    if (typeof actualValue === 'number' && parseInt(actualValue, 10) === parseInt(value, 10) && value !== '0') return;
+
+    let newState = { ...activePhase, [attr]: value };
+
+    if (attr === 'psp_phase' && version?.phases?.length) {
+      [
+        'plan_loc', 
+        'plan_time', 
+        'actual_base_loc', 
+        'deleted', 
+        'modified', 
+        'new_reusable', 
+        'reused', 
+        'total', 
+        'pip_problem', 
+        'pip_proposal', 
+        'pip_notes'
+      ].forEach((item) => { 
+        newState = { ...newState, [item]: null }; 
+      });
+
+      if (value.first) {
+        const original_phase = [...version.phases].reverse()
+          .find((o) => o.psp_phase && o.psp_phase.first);
+
+        if (original_phase) {
+          ['plan_loc', 'plan_time', 'actual_base_loc'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
+        }
+      }
+
+      if (value.last) {
+        const original_phase = [...version.phases].reverse()
+          .find((o) => o.psp_phase && o.psp_phase.last);
+
+        if (original_phase) {
+          ['deleted', 'modified', 'new_reusable', 'reused', 'total'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
+        }
+      }
+    }
+
+    setWasEdited(true);
+    setActivePhase(newState);
+  };
+
   useEffect(() => {
     fetchProjectDetailsVersionPhaseDefectsProps(
       studentId,
@@ -126,7 +176,10 @@ const ProjectDetailsPhases = ({
       }
 
       if (error.data && error.data.errors && error.data.errors.elapsed_time) {
+        message.destroy();
         message.error('Elapsed time should be a positive number (end_time - start_time - interruption_time)', 7);
+       
+        editPhase('interruption_time', 0);
       } else {
         message.error(error.msg, 5);
       }
@@ -172,39 +225,6 @@ const ProjectDetailsPhases = ({
       return (<Step key={item.id} status="process" title={item.psp_phase ? item.psp_phase.name : ''} />);
     });
     return [steps, (<Step key="new_phase" title={session.user.role !== 'professor' ? 'Start Phase' : ''} />)];
-  };
-
-  const editPhase = (attr, value) => {
-    if (!canEdit) return;
-
-    if (typeof value === 'number' && parseInt(value, 10) === 0) value = '0';
-
-    const actualValue = activePhase[attr];
-    if (typeof actualValue === 'number' && parseInt(actualValue, 10) === parseInt(value, 10) && value !== '0') return;
-
-    let newState = { ...activePhase, [attr]: value };
-
-    if (attr === 'psp_phase' && version && version.phases && version.phases.length > 0) {
-      ['plan_loc', 'plan_time', 'actual_base_loc', 'deleted', 'modified', 'new_reusable', 'reused', 'total', 'pip_problem', 'pip_proposal', 'pip_notes']
-        .forEach((item) => { newState = { ...newState, [item]: null }; });
-      if (value.first) {
-        const original_phase = [...version.phases].reverse()
-          .find((o) => o.psp_phase && o.psp_phase.first);
-        if (original_phase) {
-          ['plan_loc', 'plan_time', 'actual_base_loc'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
-        }
-      }
-      if (value.last) {
-        const original_phase = [...version.phases].reverse()
-          .find((o) => o.psp_phase && o.psp_phase.last);
-        if (original_phase) {
-          ['deleted', 'modified', 'new_reusable', 'reused', 'total'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
-        }
-      }
-    }
-
-    setWasEdited(true);
-    setActivePhase(newState);
   };
 
   useEffect(() => {
@@ -619,7 +639,10 @@ const ProjectDetailsPhases = ({
                     min={0}
                     value={activePhase.interruption_time ? activePhase.interruption_time : null}
                     disabled={(!canEdit || !activePhase.start_time)}
-                    onChange={(value) => editPhase('interruption_time', value)}
+                    onChange={(value) => {
+                      console.log(value);
+                      editPhase('interruption_time', value);
+                    }}
                   />
                   <InputTooltip input="project_details_phase_form_int" />
                 </FormItem>
