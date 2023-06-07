@@ -37,15 +37,21 @@ const ProjectList = ({
     setSortedInfo(sorter);
   };
 
+  const statusMapping = {
+    working: 'colorless',
+    assigned: 'success',
+    being_corrected: 'dued',
+    need_correction: 'danger',
+    approved: 'colorless',
+  };
+
   const columns = [{
     title: 'PROJECT NAME',
     dataIndex: 'name',
     key: 'name',
     width: '22%',
     render: (_, record) => {
-      const status = (moment.duration(moment(record.deadline).diff(moment()))
-        .asMilliseconds() < 0
-        && record.status !== 'approved') ? 'dued' : record.status;
+      const status = statusMapping[record.status];
 
       return (
         <div className={`line ${status}`}>
@@ -83,13 +89,12 @@ const ProjectList = ({
       { text: 'Working', value: 'working' },
       { text: 'Assigned', value: 'assigned' },
       { text: 'Being Corrected', value: 'being_corrected' },
+      { text: 'Need Correction', value: 'need_correction' },
     ],
     filteredValue: filteredInfo.status,
     onFilter: (value, record) => record.status.includes(value),
-    render: (text, record, index) => {
-      const status = (moment.duration(moment(record.deadline).diff(moment()))
-        .asMilliseconds() < 0
-        && record.status != 'approved') ? 'dued' : record.status;
+    render: (text, record) => {
+      const status = statusMapping[record.status];
 
       const span = (
         <span>

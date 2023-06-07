@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Popover } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 
@@ -19,10 +18,4 @@ const InputTooltip = ({ input }) => {
   );
 };
 
-const mapStateToProps = (state) => ({
-});
-
-const mapDispatchToProps = (dispatch) => ({
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(InputTooltip);
+export default InputTooltip;

@@ -45,27 +45,48 @@ const DefectForm = ({
   const [fixDefectsLoading, setFixDefectsLoading] = useState(false);
   const [fixDefectsList, setFixDefectsList] = useState([]);
 
+  const getFixDefects = (phaseInj = defect?.phase_injected?.id, onChange = false) => {
+    projectApi.assigned_project_version_phases_defect_find(
+      studentId,
+      projectId,
+      version.id,
+      phaseInj,
+    ).then((defectList) => {
+      const filteredList = defectList.filter(({ id }) => id !== defect?.id); // filter out current defect
+      setFixDefectsList(filteredList);
+
+      const selectedDefect = filteredList.find(({ id }) => id === defect?.fix_defect);
+
+      if((selectedDefect ?? !!defect?.fix_defect) && !onChange) {
+        setDefectState({
+          ...defect,
+          fix_defect: selectedDefect ? `#${selectedDefect.id} ${selectedDefect.defect_type}` : undefined,
+        });
+      }
+
+      setFixDefectsLoading(false);
+      setFixDefectsReady(true);
+    });
+  };
+
   useEffect(() => {
     if (defect) {
       setShowModal(true);
       setDefectState(defect);
+
+      if (defect.phase_injected.id) {
+        getFixDefects();
+      }
     }
   }, [defect]);
 
   const handleChange = (attr, value) => {
     if (attr === 'phase_injected') {
       setDefectState({ ...defectState, fix_defect: null, [attr]: value });
+
       setFixDefectsLoading(true);
-      projectApi.assigned_project_version_phases_defect_find(
-        studentId,
-        projectId,
-        version.id,
-        value.id,
-      ).then((defectList) => {
-        setFixDefectsList(defectList);
-        setFixDefectsLoading(false);
-        setFixDefectsReady(true);
-      });
+
+      getFixDefects(value.id, true);
     } else {
       setDefectState({ ...defectState, [attr]: value });
     }
@@ -87,19 +108,17 @@ const DefectForm = ({
     onEdit(null);
   };
 
-  const isFixDefectReq = ['COMPILE', 'UNIT TEST'].includes(defectState?.phase_injected
-  && fixDefectsList.length
-  && version.phases.map(({ psp_phase: { id, name } }) => ({ id, name }))
-    .find(({ id }) => String(id) === defectState?.phase_injected.id)?.name);
+  const isFixDefectReq = ['5', '4'].includes(defectState?.phase_injected?.id)
+  && fixDefectsList.length;
 
   const isSaveDisabled = (!defectState
-      || !defectState?.discovered_time
-      || !defectState?.phase_injected
-      || !defectState?.defect_type
-      || !defectState?.fixed_time
-      || !defectState?.description
+    || !defectState?.discovered_time
+    || !defectState?.phase_injected
+    || !defectState?.defect_type
+    || !defectState?.fixed_time
+    || !defectState?.description
     || (isFixDefectReq && !defectState?.fix_defect)
-      || String(defectState?.description).trim() === ''
+    || String(defectState?.description).trim() === ''
   );
 
   const modalOk = () => {
