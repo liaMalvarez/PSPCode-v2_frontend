@@ -1330,6 +1330,10 @@ ol {
   font-weight: 300;
 }
 
+.ant-input:disabled {
+  cursor: default;
+}
+
 .correction-table {
   box-shadow: -1px -1px 5px 1px rgba(165, 183, 190, 0.22);
   padding: 10px 15px;
@@ -1367,6 +1371,21 @@ ol {
     .ant-checkbox-inner {
       border-color: $medium_green !important;
       background-color: $light_green;
+    }
+  }
+
+  .ant-checkbox-disabled {
+    cursor: default;
+
+    .ant-checkbox-inner {
+      background-color: rgba(250, 211, 211, 0.497) !important;
+      border-color: #e99f9f90 !important;
+    }
+  }
+
+  .ant-checkbox-disabled:hover {
+    .ant-checkbox-inner {
+      border-color: #e99f9f90 !important;
     }
   }
 

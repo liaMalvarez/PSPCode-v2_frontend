@@ -162,7 +162,7 @@ const ProjectDetailsCorrection = ({
               </div>
               <TextArea
                 disabled={!canEditCorrection}
-                placeholder="Leave a general comment of the project..."
+                placeholder={!canEditCorrection ? "No comment" : "Leave a general comment of the project..."}
                 className="general-comment"
                 value={projectFeedback.comment}
                 autoSize={{ minRows: 3 }}
