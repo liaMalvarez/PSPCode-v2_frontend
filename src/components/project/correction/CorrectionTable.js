@@ -79,7 +79,7 @@ const CorrectionTable = ({
         <TextArea
           key={index}
           disabled={disabled}
-          placeholder="Leave a comment for the student..."
+          placeholder={disabled ? "No comment" : "Leave a comment for the student..."}
           className="correction-table-comment"
           value={comments[index]}
           bordered={false}
