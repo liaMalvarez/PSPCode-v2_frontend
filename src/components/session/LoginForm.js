@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 import { Field, reduxForm } from 'redux-form';
 import { Button } from 'antd';
 
@@ -13,8 +12,6 @@ export const LoginForm = (props) => {
     error,
     submitting,
   } = props;
-
-  const navigate = useNavigate();
 
   const onLogin = async (event) => {
     event.preventDefault();
