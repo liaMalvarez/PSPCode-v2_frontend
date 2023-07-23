@@ -60,6 +60,8 @@ const ProjectDetailsPhases = ({
   deleted,
   hasSubmited,
   fetchProjectDetailsVersionPhaseDefectsProps,
+  forcedPM,
+  setForcedPM,
 }) => {
   const { state } = useLocation();
 
@@ -159,6 +161,13 @@ const ProjectDetailsPhases = ({
       setActivePhase(version.phases[state.phaseIndex]);
     }
   }, [state, state?.phaseIndex]);
+
+  useEffect(() => {
+    if (forcedPM) {
+      setActivePhase(version.phases[forcedPM]);
+      setForcedPM(null);
+    }
+  }, [forcedPM]);
 
   useEffect(() => {
     if (error) {
@@ -505,7 +514,7 @@ const ProjectDetailsPhases = ({
       >
         { printPhasesSteps()}
       </Steps>
-      {session.user.role !== 'professor' && (
+      {canEdit && (
         <Alert
           message="Phase data is automatically saved."
           type="info"

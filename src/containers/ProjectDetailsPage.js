@@ -30,10 +30,8 @@ import {
   Modal,
   Timeline,
   Button,
-  InputNumber,
   message,
   Popover,
-  Form,
 } from 'antd';
 
 import TagVersion from '../components/TagVersion';
@@ -62,7 +60,6 @@ import { pspDataFetch, pspDataFetchSuccess } from '../actions/utilsActions';
 
 const { Content, Sider } = Layout;
 const { TabPane } = Tabs;
-const FormItem = Form.Item;
 
 const ProjectDetailsPage = ({
   reset,
@@ -93,15 +90,15 @@ const ProjectDetailsPage = ({
   const { pathname } = useLocation();
 
   const [defaultActiveKey, setDefaultActiveKey] = useState(tab || 'summary');
-  const [modalUpdateLOCs, setModalUpdateLOCs] = useState({ total: '', new_reusable: '' });
+
   const [redeliver, setRedeliver] = useState(false);
   const [messageStarting, setMessageStarting] = useState(false);
   const [messageContinueing, setMessageContinueing] = useState(false);
-  const [inputModalUpdateLOCsAdded, setInputModalUpdateLOCsAdded] = useState(null);
-  const [inputModalUpdateLOCsAM, setInputModalUpdateLOCsAM] = useState(null);
+
   const [isOpenSider, setIsOpenSider] = useState(false);
   const [checklist, setChecklist] = useState([]);
   const [hasSubmited, setHasSubmited] = useState(false);
+  const [selectedPhase, setSelectedPhase] = useState(null);
 
   // Project feedback states
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -274,65 +271,6 @@ const ProjectDetailsPage = ({
     setChecklist(checklistValue);
   }, [JSON.stringify(version_data?.phases), version_data?.file]);
 
-  const modalUpdateLOCsFunc = (data) => (
-    <Form className="modalUpdateLOCs" onSubmit={() => {}}>
-
-      <p>
-        Enter the actual size data for
-        {' '}
-        <b>{data.name}</b>
-        .
-      </p>
-      <br />
-
-      <FormItem label="Base (B)" style={{ display: 'none' }}>
-        <InputNumber min={0} value={0} disabled />
-      </FormItem>
-
-      <FormItem label="Deleted (D)" style={{ display: 'none' }}>
-        <InputNumber min={0} value={0} disabled />
-      </FormItem>
-
-      <FormItem label="Modified (M)" style={{ display: 'none' }}>
-        <InputNumber min={0} value={0} disabled />
-      </FormItem>
-
-      <FormItem label="Added (A)">
-        <InputNumber
-          min={0}
-          ref={(input) => setInputModalUpdateLOCsAdded(input.inputNumberRef)}
-          disabled
-        />
-      </FormItem>
-
-      <FormItem label="Added + Modified (A&M)">
-        <InputNumber
-          min={0}
-          ref={(input) => setInputModalUpdateLOCsAM(input.inputNumberRef)}
-          disabled
-        />
-      </FormItem>
-
-      <FormItem label="* Total (T)">
-        <InputNumber
-          min={0}
-          onChange={(v) => {
-            inputModalUpdateLOCsAdded.setValue(v);
-            inputModalUpdateLOCsAM.setValue(v);
-            setModalUpdateLOCs({ ...modalUpdateLOCs, total: v });
-          }}
-        />
-      </FormItem>
-
-      <FormItem label="* New Reusable (NR)">
-        <InputNumber
-          min={0}
-          onChange={(value) => setModalUpdateLOCs({ ...modalUpdateLOCs, new_reusable: value })}
-        />
-      </FormItem>
-    </Form>
-  );
-
   const isUnapprovedCriteria = useMemo(() => projectFeedback?.grouped_corrections
     .some(({ corrections }) => corrections.some(({ approved }) => !approved)), [projectFeedback]);
 
@@ -382,7 +320,7 @@ const ProjectDetailsPage = ({
       if (projectFeedback.grouped_corrections
         .some(({ corrections }) => corrections
           .some(({ obs_phases, approved }) => obs_phases.length && approved))) {
-        warningsList.push('Some of the approved criteria has atomatically detected errors.');
+        warningsList.push('Some of the approved criteria has automatically detected errors.');
       }
 
       Modal.confirm({
@@ -462,6 +400,10 @@ const ProjectDetailsPage = ({
         Modal.warning({
           title: 'There are some unfilled fields in Post Mortem phase',
           content: 'Please fill them in before continue.',
+          onOk() {
+            setDefaultActiveKey('phases')
+            setSelectedPhase(version_data.phases.length - 1);
+          }
         });
       }
     }).catch((error) => {
@@ -530,7 +472,6 @@ const ProjectDetailsPage = ({
             onClick={() => setShowConfirmationModal(true)}
             icon={submitting ? <LoadingOutlined /> : <UploadOutlined />}
             type="boton1"
-            disabled={checklist.some(({ valid }) => !valid)}
           >
             Submit Correction
           </Button>
@@ -823,6 +764,8 @@ const ProjectDetailsPage = ({
                 studentId={studentId}
                 project={project_data}
                 version={version_data}
+                forcedPM={selectedPhase}
+                setForcedPM={setSelectedPhase}
               />
             </TabPane>
             <TabPane tab="FILES" key="files">
