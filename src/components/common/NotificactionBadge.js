@@ -153,8 +153,8 @@ const NotificationBadge = ({
       })}
 
       <Menu.Divider />
-      { ((notifications.length - 1 === (limit * page))
-        || (notifications.length - 1 === limit * (page - 1) && loading))
+      { ((notifications.length === (limit * page))
+        || (notifications.length === limit * (page - 1) && loading))
       && (
         <Menu.Item key="older">
           See older
@@ -163,9 +163,16 @@ const NotificationBadge = ({
     </Menu>
   );
 
-  if (notifications && notifications.length > 0) {
+  if (!!notifications?.length) {
     return (
-      <Popover placement="bottomRight" title={renderTitle()} content={renderContent()} trigger="click" visible={popOverVisible} onVisibleChange={handleVisibleChange}>
+      <Popover 
+        placement="bottomRight"
+        title={renderTitle()} 
+        content={renderContent()} 
+        trigger="click" 
+        visible={popOverVisible} 
+        onVisibleChange={handleVisibleChange}
+      >
         <Badge count={count}>
           <Avatar shape="circle" icon={icon} onClick={() => markAsSeen()} />
         </Badge>
