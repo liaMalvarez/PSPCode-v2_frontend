@@ -1,10 +1,10 @@
 {
-  "name": "react_redux_base",
-  "version": "0.1.0",
-  "description": "",
+  "name": "psp-code",
+  "version": "2.0",
+  "description": "Frontend app used as a tool for the 'Principios y Fundamentos del Proceso Personal de Software' UdelaR's course",
   "engines": {
-    "npm": ">4",
-    "node": ">5"
+    "npm": ">=14.19.3",
+    "node": ">=12.22.6"
   },
   "scripts": {
     "postinstall": "npx patch-package",
@@ -14,9 +14,9 @@
     "prebuild": "yarn run clean-dist",
     "build": "webpack --config webpack.prod.js"
   },
-  "author": "Guillermo y Guillermo",
+  "author": "Gustavo Audi y Lía Malvárez",
   "license": "MIT",
-  "homepage": "https://tavidian.github.io/psp-react",
+  "homepage": "https://www.psp-course.com",
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "antd": "4.20.0",

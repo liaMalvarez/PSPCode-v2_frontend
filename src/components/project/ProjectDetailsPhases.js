@@ -278,7 +278,7 @@ const ProjectDetailsPhases = ({
                 <InputNumber
                   controls={false}
                   min={0}
-                  value={activePhase.plan_time || null}
+                  value={activePhase.plan_time}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('plan_time', value)}
                 />
@@ -301,7 +301,7 @@ const ProjectDetailsPhases = ({
                 <InputNumber
                   controls={false}
                   min={0}
-                  value={activePhase.plan_loc || null}
+                  value={activePhase.plan_loc}
                   disabled={(!canEdit || !activePhase.start_time)}
                   onChange={(value) => editPhase('plan_loc', value)}
                 />
@@ -314,7 +314,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('actual_base_loc', value)}
-                  value={activePhase.actual_base_loc ? activePhase.actual_base_loc : null}
+                  value={activePhase.actual_base_loc}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_actual_base_loc" />
@@ -334,7 +334,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('modified', value)}
-                  value={activePhase.modified || null}
+                  value={activePhase.modified}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_m" />
@@ -346,7 +346,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('deleted', value)}
-                  value={activePhase.deleted ? activePhase.deleted : null}
+                  value={activePhase.deleted}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_d" />
@@ -360,7 +360,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('reused', value)}
-                  value={activePhase.reused ? activePhase.reused : null}
+                  value={activePhase.reused}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_r" />
@@ -375,7 +375,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('new_reusable', value)}
-                  value={activePhase.new_reusable || null}
+                  value={activePhase.new_reusable}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_nr" />
@@ -390,7 +390,7 @@ const ProjectDetailsPhases = ({
                   controls={false}
                   min={0}
                   onChange={(value) => editPhase('total', value)}
-                  value={activePhase.total || null}
+                  value={activePhase.total}
                   disabled={(!canEdit || !activePhase.start_time)}
                 />
                 <InputTooltip input="project_details_phase_form_pm_loc_t" />
@@ -414,7 +414,7 @@ const ProjectDetailsPhases = ({
                   <TextArea
                     autosize={{ minRows: 3 }}
                     onChange={(e) => editPhase(fieldName, e.target.value)}
-                    value={activePhase[fieldName] || null}
+                    value={activePhase[fieldName]}
                     disabled={(!canEdit || !activePhase.start_time)}
                   />
                   <InputTooltip input={`project_details_phase_form_pm_${fieldName}`} />
@@ -646,7 +646,7 @@ const ProjectDetailsPhases = ({
                   <InputNumber
                     controls={false}
                     min={0}
-                    value={activePhase.interruption_time ? activePhase.interruption_time : null}
+                    value={activePhase.interruption_time}
                     disabled={(!canEdit || !activePhase.start_time)}
                     onChange={(value) => {
                       console.log(value);
