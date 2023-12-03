@@ -24,7 +24,7 @@
   - `docker push public.ecr.aws/m9q5t8l6/psp-code-frontend:{version}`
 - Connect to de Droplet 2 on web.
 - Pull image in the Droplet:
-  - Modify name of backend version image in docker-compose file and save changes.
+  - Modify name of frontend version image in docker-compose file and save changes.
   - Run command `docker compose up -d` to deploy the last version.
 
 ## Main Technologies
