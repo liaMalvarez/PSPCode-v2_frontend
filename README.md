@@ -12,7 +12,20 @@
 5. Start the dev server using `yarn start`.
 
 ## Deploy the app
-// TO DO!!
+- Install Docker and AWS CLI in your PC.
+- Retrieve an authentication token and authenticate your Docker client to your registry.
+  Use the AWS CLI:
+  - `aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m9q5t8l6`.
+- Build your Docker image using the following command:
+  - `docker build -t psp-code-frontend .`.
+- After the build completes, tag your image so you can push the image to this repository:
+  - `docker tag psp-code-frontend:{version} public.ecr.aws/m9q5t8l6/psp-code-frontend:{version}`
+- Run the following command to push this image to your newly created AWS repository:
+  - `docker push public.ecr.aws/m9q5t8l6/psp-code-frontend:{version}`
+- Connect to de Droplet 2 on web.
+- Pull image in the Droplet:
+  - Modify name of backend version image in docker-compose file and save changes.
+  - Run command `docker compose up -d` to deploy the last version.
 
 ## Main Technologies
 
