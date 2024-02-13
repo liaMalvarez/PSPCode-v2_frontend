@@ -1,54 +1,21 @@
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
-import { connect } from 'react-redux';
-import { TEXTS }from '../../constants/constants'
+import React from 'react';
+import { Popover } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
-const Icon = require('antd/lib/icon');
-const Popover = require('antd/lib/popover');
+import { TEXTS } from '../../constants/constants';
 
-class InputTooltip extends Component {
-
-  constructor(props) {
-    super(props);
-
+const InputTooltip = ({ input }) => {
+  if (!TEXTS[input]) {
+    return (<span />);
   }
 
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-
-  render() {
-    if (!TEXTS[this.props.input]) {
-      return (<span />);
-    }
-
-    return (
-      <Popover content={TEXTS[this.props.input]}>
-        <Link>
-          <Icon type="info-circle" />
-        </Link>
-      </Popover>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-  };
+  return (
+    <Popover className="input-tooltip" content={TEXTS[input]}>
+      <div>
+        <InfoCircleOutlined />
+      </div>
+    </Popover>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(InputTooltip);
+export default InputTooltip;

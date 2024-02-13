@@ -1,51 +1,48 @@
-import React, { Component, PropTypes } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import { Link, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router';
+import { Layout } from 'antd';
+import { CaretLeftOutlined } from '@ant-design/icons';
 
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Sider = require('antd/lib/layout/Sider');
+const { Sider } = Layout;
 
-const { Content } = Layout;
+const ProfessorSider = ({ session }) => {
+  const { pathname } = useLocation();
+  const { idproject: projectId } = useParams();
 
-class ProfessorSider extends Component {
-
-  constructor(props) {
-    super(props);
+  if (session.user.role !== 'professor') {
+    return (<div />);
   }
 
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-  }
-  componentWillReceiveProps(nextProps) {
-  }
-
-  render() {
-    if(this.props.session.user.role !== 'professor') {
-      return (<div />);
-    }
-    return (
-      <Sider className="professorSider">
-        <Link to={'/professor/dashboard/projects'}><span>Projects Dashboard {this.props.selected === 'dashboard.projects' && <Icon type="caret-left" />}</span></Link>
-        <Link to={'/professor/dashboard/students'}><span>Students Dashboard {this.props.selected === 'dashboard.students' && <Icon type="caret-left" />}</span></Link>
-      </Sider>
-    );
-  }
-}
-
-const mapStateToProps = (state, ownState) => {
-  return {
-    session: state.session,
-    selected: ownState.selected,
-  };
+  return (
+    <Sider className="professorSider sider">
+      <Link to="/professor/dashboard/projects">
+        <span>
+          Projects Dashboard
+          {!pathname.includes('students') && (
+            <CaretLeftOutlined className="menu-arrow" />
+          )}
+        </span>
+      </Link>
+      <Link to="/professor/dashboard/students">
+        <span>
+          Students Dashboard
+          {pathname.includes('students') && !projectId && (
+            <CaretLeftOutlined className="menu-arrow" />
+          )}
+        </span>
+      </Link>
+    </Sider>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-  };
-};
+const mapStateToProps = (state, ownState) => ({
+  session: state.session,
+  selected: ownState.selected,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfessorSider);
-

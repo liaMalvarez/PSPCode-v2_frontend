@@ -1,78 +1,84 @@
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import React from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { connect } from 'react-redux';
-import CustomHeader from '../components/layout/CustomHeader';
-import CustomFooter from '../components/layout/CustomFooter';
+import { HomeOutlined } from '@ant-design/icons';
+import { Layout, Breadcrumb } from 'antd';
+
 import DashboardStudents from '../components/dashboard/DashboardStudents';
-import ProfessorSider from "../components/layout/ProfessorSider";
-import SpanData from "../components/common/SpanData";
-import SelectCourse from "../components/common/SelectCourse";
-
-
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
-const Sider = require('antd/lib/layout/Sider');
+import ProfessorSider from '../components/layout/ProfessorSider';
+import SpanData from '../components/common/SpanData';
+import SelectCourse from '../components/common/SelectCourse';
 
 const { Content } = Layout;
 
-require('antd/dist/antd.css');
+const DashboardStudentsPage = ({ session }) => {
+  const { idproject: projectId } = useParams();
 
-class DashboardStudentsPage extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <Layout>
-        <CustomHeader/>
-        <Layout className="ant-layout-has-sider">
-          <ProfessorSider selected="dashboard.students" />
-          <Content className="professorDashboard">
-            <Breadcrumb>
-              <Breadcrumb.Item><Link to="/"><Icon type="home"/></Link></Breadcrumb.Item>
-              { this.props.projectId && <Breadcrumb.Item><Link to="/professor/dashboard/projects">Projects</Link></Breadcrumb.Item> }
-              { this.props.projectId && <Breadcrumb.Item><SpanData entityName="project" entityId={this.props.projectId} loading output="name" /></Breadcrumb.Item> }
-              { !this.props.projectId && <Breadcrumb.Item>Students</Breadcrumb.Item> }
-            </Breadcrumb>
-            {this.props.projectId &&
-            <div>
-              <h1><SpanData entityName="project" entityId={this.props.projectId} loading output="name" /> Dashboard</h1>
-              <div className="filters">
-                <span>Deadline: <SpanData entityName="project" entityId={this.props.projectId} loading output="deadline" format="date" /></span>
-                <div style={{visibility:'hidden'}}><SelectCourse /></div>
-              </div>
-            </div>}
-            {!this.props.projectId &&
-            <div>
-              <h1>Students Dashboard</h1>
-              <div className="filters">
-                <SelectCourse />
-              </div>
+  return (
+    <Layout className="ant-layout-has-sider">
+      <ProfessorSider selected="dashboard.students" />
+      <Content className="professorDashboard">
+        <Breadcrumb>
+          <Breadcrumb.Item>
+            <Link to={session.user.role === 'professor'
+              ? '/professor/dashboard/projects'
+              : `/students/${session.user.id}/projects`}
+            >
+              <HomeOutlined />
+            </Link>
+          </Breadcrumb.Item>
+          { projectId && <Breadcrumb.Item><Link to="/professor/dashboard/projects">Projects</Link></Breadcrumb.Item> }
+          { projectId && (
+            <Breadcrumb.Item>
+              <SpanData
+                entityName="project"
+                entityId={projectId}
+                loading
+                output="name"
+              />
+            </Breadcrumb.Item>
+          )}
+          { !projectId && <Breadcrumb.Item>Students</Breadcrumb.Item> }
+        </Breadcrumb>
+        {projectId && (
+          <div>
+            <h1>
+              <SpanData entityName="project" entityId={projectId} loading output="name" />
+              {' '}
+              Dashboard
+            </h1>
+            <div className="filters">
+              <span>
+                Deadline:
+                {' '}
+                <SpanData entityName="project" entityId={projectId} loading output="deadline" format="date" />
+              </span>
+              <div style={{ visibility: 'hidden' }}><SelectCourse /></div>
             </div>
-            }
-            <section>
-              <DashboardStudents projectId={this.props.projectId} />
-            </section>
+          </div>
+        )}
+        {!projectId && (
+          <div>
+            <h1>Students Dashboard</h1>
+            <div className="filters">
+              <SelectCourse />
+            </div>
+          </div>
+        )}
+        <section>
+          <DashboardStudents projectId={projectId} />
+        </section>
 
-          </Content>
-        </Layout>
-        <CustomFooter/>
-      </Layout>
-    );
-  }
+      </Content>
+    </Layout>
+  );
 };
 
-const mapStateToProps = (state, ownState) => {
-  return {
-    projectId: ownState.params.idproject,
-  };
-};
+const mapStateToProps = (state) => ({
+  session: state.session,
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-  }
-};
+const mapDispatchToProps = () => ({
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardStudentsPage);

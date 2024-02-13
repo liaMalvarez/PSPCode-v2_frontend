@@ -9,6 +9,7 @@ export const login = {
     presence: true
   }
 };
+
 export const passwordForgot = {
   email: {
     presence: true,
@@ -28,6 +29,7 @@ export const passwordReset = {
     equality: 'password'
   }
 };
+
 export const signUp = {
   email: {
     presence: true,
@@ -45,5 +47,4 @@ export const signUp = {
   }
 };
 
-export const validations = constraints =>
-  data => validate(data, constraints) || {};
+export const validations = (constraints) => (data) => validate(data, constraints) || {};

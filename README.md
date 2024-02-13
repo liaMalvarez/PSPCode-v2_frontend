@@ -1,40 +1,33 @@
 # React Redux Base
 
-## Npm commands
-1. **Run the app**. `yarn start` or `npm start`
-2. **Build the app**. `yarn build` or `npm run build`
-3. **Lint the app**. `yarn lint` or `npm run lint`
-4. **Test the app**. `yarn test` or `npm run test`
+## Node scripts
+1. **Install the libraries**. `yarn` 
+1. **Run the app**. `yarn start`
+2. **Build the app**. `yarn build` 
 
 ## Getting Started
-1. Clone the repository
-2. Install dependencies: `yarn` or `npm install`
-3. Create two constants files in `./src` folder(devConstant.js and prodConstants.js):
-  * devConstants is used while you are developing(on `npm start` script)
-  * prodConstats is used once you build the app(on `npm run build` script)
+2. Execute the `nvm use` command to ensure that you have the correct version of node installed and active.
+3. Install dependencies: `yarn`.
+4. Create a `.env` file taking as a example the `.env.example` and add the `API_URL`.
+5. Start the dev server using `yarn start`.
 
-  Those files should include the `API_URL` constant.
+## Deploy the app
+- Install Docker and AWS CLI in your PC.
+- Retrieve an authentication token and authenticate your Docker client to your registry.
+  Use the AWS CLI:
+  - `aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/m9q5t8l6`.
+- Build your Docker image using the following command:
+  - `docker build -t psp-code-frontend .`.
+- After the build completes, tag your image so you can push the image to this repository:
+  - `docker tag psp-code-frontend:{version} public.ecr.aws/m9q5t8l6/psp-code-frontend:{version}`
+- Run the following command to push this image to your newly created AWS repository:
+  - `docker push public.ecr.aws/m9q5t8l6/psp-code-frontend:{version}`
+- Connect to de Droplet 2 on web.
+- Pull image in the Droplet:
+  - Modify name of frontend version image in docker-compose file and save changes.
+  - Run command `docker compose up -d` to deploy the last version.
 
-  devConstants.js or prodConstants.js example:
-  ```javascript
-  export const config = {
-    API_URL: 'http://your-api-url.com'
-  };
-  ```
-4. Start the dev server: `yarn start` or `npm start -s`
-
-## Initial Machine Setup
-**Install [Node 4.0.0 or greater](https://nodejs.org)** - (6.0 or greater is recommended for optimal build performance). Need to run multiple versions of Node? Use [nvm](https://github.com/creationix/nvm).
-
-**Install [Yarn](https://yarnpkg.com/en/docs/install)** - Fast, reliable, and secure package manager
-
-## Deploying to AWS S3
-1. **Install [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/installing.html)**
-2. **Configure AWS** with the command `aws configure`
-3. **Set the buckets for your app** in the script `/tools/deployS3.js`
-4. **Run the command to deploy** `npm run deploy:staging` or `npm run deploy:production`
-
-## Technologies
+## Main Technologies
 
 | **Tech** | **Description**
 |----------|-------
@@ -43,8 +36,6 @@
 |  [React Router](https://github.com/reactjs/react-router) | A complete routing library for React |
 |  [Babel](http://babeljs.io) |  Compiles ES6 to ES5. Enjoy the new version of JavaScript today.|
 | [Webpack](http://webpack.github.io) | Bundles npm packages and our JS into a single file. Includes hot reloading via [React Hot Loader](https://github.com/gaearon/react-hot-loader). |
-| [Express](https://github.com/expressjs/express) | Fast, unopinionated, minimalist web framework for node. |
-| [Jest](https://facebook.github.io/jest/) | Automated tests with built-in expect assertions and  [Enzyme](https://github.com/airbnb/enzyme) for DOM testing without a browser using Node. |
 | [ESLint](http://eslint.org/)| Lint JS. Reports syntax and style issues. Using [eslint-plugin-react](https://github.com/yannickcr/eslint-plugin-react) for additional React specific linting rules. |
 | [SASS](http://sass-lang.com/) | Compiled CSS styles with variables, functions, and more.
 | [PostCSS](https://github.com/postcss/postcss) | Transform styles with JS plugins. Used to autoprefix CSS |

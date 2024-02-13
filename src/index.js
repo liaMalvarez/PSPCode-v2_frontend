@@ -2,44 +2,59 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import { browserHistory, applyRouterMiddleware, hashHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
-import { useScroll } from 'react-router-scroll';
+import { Provider } from 'react-redux';
+import { Route, Routes, HashRouter } from 'react-router-dom';
 import { AppContainer } from 'react-hot-loader';
+import { ConfigProvider } from 'antd';
+import { createHashHistory } from 'history';
 import enUS from 'antd/lib/locale-provider/en_US';
+
 import configureStore from './store/configureStore';
-import Root from './containers/Root';
-import routes from './routes'; // eslint-disable-line import/no-named-as-default
+import routes from './constants/routesPaths';
 
-
+import ProjectListPage from './containers/ProjectsListPage';
+import ProjectDetailsPage from './containers/ProjectDetailsPage';
+import SessionLoginPage from './containers/SessionLoginPage'; // eslint-disable-line import/no-named-as-default
+import SessionPasswordForgotPage from './containers/SessionPasswordForgotPage'; // eslint-disable-line import/no-named-as-default
+import SessionPasswordResetPage from './containers/SessionPasswordResetPage'; // eslint-disable-line import/no-named-as-default
+import UserDetailsPage from './containers/UserDetailsPage';
+import DashboardProjectsPage from './containers/DashboardProjectsPage';
+import DashboardStudentsPage from './containers/DashboardStudentsPage';
+import HomePage from './containers/HomePage';
 
 import './styles/styles.scss';
 
-const LocaleProvider = require('antd/lib/locale-provider');
-//require('./favicon.ico'); // Tell webpack to load favicon.ico
-
 const store = configureStore();
 
-// Create an enhanced history that syncs navigation events with the store
-const history = syncHistoryWithStore(hashHistory, store);
-
-const appRoutes = routes;
-
-const renderApp = (appRoutes) => {
-  render(
-    <LocaleProvider locale={enUS}>
+const history = createHashHistory();
+render(
+  <HashRouter history={history} location={history.location} navigator={history}>
+    <ConfigProvider locale={enUS}>
       <AppContainer>
-        <Root store={store} history={history} routes={appRoutes} render={applyRouterMiddleware(useScroll())} />
+        <Provider store={store}>
+          <Routes>
+            <Route path={routes.index} element={<HomePage />}>
+              {/* Students */}
+              <Route path={routes.userDetails} element={<UserDetailsPage />} />
+              <Route path={routes.studentReturnProject} element={<UserDetailsPage />} />
+              <Route path={routes.studentProjectDetailsTab} element={<ProjectDetailsPage />} />
+              <Route path={routes.studentProjectDetails} element={<ProjectDetailsPage />} />
+              <Route path={routes.studentProjectsList} element={<ProjectListPage />} />
+
+              {/* Professors */}
+              <Route path={routes.professorProjectDetails} element={<DashboardStudentsPage />} />
+              <Route path={routes.professorProjectsList} element={<DashboardProjectsPage />} />
+              <Route path={routes.professorStudentsList} element={<DashboardStudentsPage />} />
+
+              {/* Session */}
+              <Route path={routes.login} element={<SessionLoginPage />} />
+              <Route path={routes.passwordForgot} element={<SessionPasswordForgotPage />} />
+              <Route path={routes.passwordReset} element={<SessionPasswordResetPage />} />
+            </Route>
+          </Routes>
+        </Provider>
       </AppContainer>
-    </LocaleProvider>,
-    document.getElementById('app')
-  );
-};
-
-renderApp(appRoutes);
-
-if (module.hot) {
-  module.hot.accept('./routes', () => {
-    renderApp(appRoutes);
-  });
-}
+    </ConfigProvider>
+  </HashRouter>,
+  document.getElementById('app'),
+);

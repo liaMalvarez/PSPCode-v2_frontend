@@ -1,37 +1,27 @@
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { Progress } from 'antd';
 
-const Progress = require('antd/lib/progress');
+const CustomProgress = () => (
+  <div className="custom-progress">
+    <Progress
+      strokeWidth={10}
+      strokeColor={{
+        '0%': '#92b0af',
+        '100%': '#0dc0bb',
+      }}
+      status="active"
+      percent={100}
+      showInfo={false}
+      strokeLinecap="square"
+    />
+  </div>
+);
 
-class CustomProgress extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillReceiveProps(nextProps) {
-  }
-
-  render() {
-    return (
-      <div className="customProgress">
-        <Progress strokeWidth={5} status="active" percent={100} showInfo={false} />
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state) => ({
+const mapStateToProps = () => ({
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = () => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomProgress);

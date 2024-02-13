@@ -1,67 +1,77 @@
-import React, { Component, PropTypes } from 'react';
-import {Link, hashHistory} from 'react-router';
+import React from 'react';
+import {
+  Navigate,
+  Outlet,
+  useLocation,
+  matchPath,
+} from 'react-router-dom';
 import { connect } from 'react-redux';
-import CustomHeader from '../components/layout/CustomHeader';
+import { Layout } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+
 import CustomFooter from '../components/layout/CustomFooter';
-import {logout} from "../actions/sessionActions";
+import CustomHeader from '../components/layout/CustomHeader';
+import ProfessorSider from '../components/layout/ProfessorSider';
 
+import routes from '../constants/routesPaths';
 
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-const Breadcrumb = require('antd/lib/breadcrumb');
-const Sider = require('antd/lib/layout/Sider');
+require('antd/dist/result.css');
 
-const { Content } = Layout;
+const HomePage = ({ session }) => {
+  const { pathname } = useLocation();
 
-require('antd/dist/antd.css');
+  const allowedRoutesArray = Object.values(routes);
+  allowedRoutesArray.shift();
 
+  const allowedRoute = allowedRoutesArray
+    .some((route) => matchPath(route, pathname));
 
-
-class HomePage extends Component {
-
-  constructor(props) {
-    super(props);
+  if (!session.checked) {
+    return (<LoadingOutlined className="hoc_loader" />);
   }
-  componentDidMount() {
-    this.redirectToPage();
-  }
-  redirectToPage() {
-    if(!this.props.session.authenticated || !this.props.session.user.id) {
-      hashHistory.push('/session/login');
-    } else if(this.props.session.user.role === 'professor') {
-      hashHistory.push('/professor/dashboard/projects');
-    } else {
-      hashHistory.push('/students/' + this.props.session.user.id + '/projects');
+
+  if (!session.authenticated && session.checked) {
+    if (['/session/login', '/session/password/forgot', '/session/password/reset'].includes(pathname)) {
+      return <Outlet />;
     }
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if(!nextProps.session.authenticated || !nextProps.session.user.id ) {
-      hashHistory.push('/session/login');
-    } else {
-      this.redirectToPage();
-    }
-  }
-
-  render() {
     return (
-      <div>Welcome.
-        <a onClick={logout}>Logout</a>
-      </div>
+      <Navigate to="session/login" />
     );
   }
-};
 
-const mapStateToProps = (state, ownState) => {
-  console.log(ownState.params);
-  return {
-    session: state.session
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
+  if (!Object.keys(session.user).length) {
+    return (<LoadingOutlined className="hoc_loader" />);
   }
+
+  if (
+    ['/', '/session/login', '/session/password/forgot'].includes(pathname)
+    || !allowedRoute
+    || (pathname === '/session/password/reset' && session.user.role === 'professor')
+  ) {
+    return (
+      <Navigate to={session.user.role === 'professor'
+        ? 'professor/dashboard/projects'
+        : `students/${session.user.id}/projects`}
+      />
+    );
+  }
+
+  return (
+    <Layout>
+      <CustomHeader />
+      {session.user.role === 'professor' && <ProfessorSider />}
+      <Outlet />
+      <CustomFooter />
+    </Layout>
+  );
 };
+
+const mapStateToProps = (state) => ({
+  session: state.session,
+});
+
+const mapDispatchToProps = () => ({
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

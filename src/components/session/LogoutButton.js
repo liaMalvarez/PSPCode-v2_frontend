@@ -1,23 +1,34 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { bindActionCreators } from 'redux';
+import {
+  Button,
+} from 'antd';
+
 import * as sessionActions from '../../actions/sessionActions';
 
-const LogoutButton = ({ actions: { logout } }) => (
-  <a onClick={logout}>
-    Logout
-  </a>
-);
+const LogoutButton = ({ actions: { logout } }) => {
+  const navigate = useNavigate();
+  const logoutHandler = async () => {
+    await logout();
+    navigate('/session/login');
+  };
 
-const { object } = PropTypes;
-
-LogoutButton.propTypes = {
-  actions: object.isRequired
+  return (
+    <Button type="button" onClick={logoutHandler}>
+      Logout
+    </Button>
+  );
 };
 
-const mapDispatch = dispatch => ({
-  actions: bindActionCreators(sessionActions, dispatch)
+LogoutButton.propTypes = {
+  actions: PropTypes.object.isRequired,
+};
+
+const mapDispatch = (dispatch) => ({
+  actions: bindActionCreators(sessionActions, dispatch),
 });
 
 export default connect(null, mapDispatch)(LogoutButton);

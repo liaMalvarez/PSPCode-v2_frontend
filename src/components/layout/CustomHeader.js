@@ -1,153 +1,166 @@
-import React, { Component, PropTypes } from 'react';
+/* eslint-disable react/no-multi-comp */
+/* eslint-disable react/no-unstable-nested-components */
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import moment from 'moment';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
+import {
+  Popover,
+  Layout,
+  Avatar,
+  Badge,
+  Menu,
+} from 'antd';
+import { BellOutlined, UserOutlined, MessageOutlined } from '@ant-design/icons';
+
 import LogoutButton from '../session/LogoutButton';
 import NotificationBadge from '../common/NotificactionBadge';
 import Logo from '../common/Logo';
-import { fetchNotifications, fetchNotificationsSuccess, fetchNotificationsFailure, updateNotifications, updateNotificationsFailure, updateNotificationsSuccess, fetchNotificationsReset, fetchOlderNotifications, fetchOlderNotificationsFailure, fetchOlderNotificationsReset, fetchOlderNotificationsSuccess,
-  fetchNotiMessages, fetchNotiMessagesSuccess, fetchNotiMessagesFailure, updateNotiMessages, updateNotiMessagesFailure, updateNotiMessagesSuccess, fetchNotiMessagesReset, fetchOlderNotiMessages, fetchOlderNotiMessagesFailure, fetchOlderNotiMessagesReset, fetchOlderNotiMessagesSuccess} from '../../actions/notificationActions'
-
-const Layout = require('antd/lib/layout');
-const Row = require('antd/lib/row');
-const Col = require('antd/lib/col');
-const Badge = require('antd/lib/badge');
-const Popover = require('antd/lib/popover');
-const Icon = require('antd/lib/icon');
-const Avatar = require('antd/lib/avatar');
-const Menu = require('antd/lib/menu');
+import {
+  fetchNotifications,
+  fetchNotificationsSuccess,
+  updateNotifications,
+  updateNotificationsSuccess,
+  fetchOlderNotifications,
+  fetchOlderNotificationsSuccess,
+  fetchNotiMessages,
+  fetchNotiMessagesSuccess,
+  updateNotiMessages,
+  updateNotiMessagesSuccess,
+  fetchOlderNotiMessages,
+  fetchOlderNotiMessagesSuccess,
+} from '../../actions/notificationActions';
 
 const { Header } = Layout;
 
 const NOTIFICATION_LIST_LIMIT = 8;
 
+const CustomHeader = ({
+  fetchNotificationsProp,
+  fetchNotiMessagesProp,
+  session,
+  notifications,
+  updateNotificationsProp,
+  fetchOlderNotificationsProp,
+  fetchOlderNotiMessagesProp,
+  updateNotiMessagesProp,
+}) => {
+  useEffect(() => {
+    fetchNotificationsProp();
+    fetchNotiMessagesProp();
+  }, []);
 
-
-
-class CustomHeader extends Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-    this.props.fetchNotifications();
-    this.props.fetchNotiMessages();
-  }
-  componentWillReceiveProps(nextProps) {
-  }
-
-  ProfileMenu() {
-    return (
-      <Menu selectable={false} style={{'margin': '-8px -16px'}}>
-        {this.props.session.user.role === 'student' &&
+  const ProfileMenu = () => (
+    <Menu selectable={false} style={{ margin: '-8px -16px' }}>
+      {session.user.role === 'student' && (
         <Menu.Item key="0">
-          <Link to={'/users/' + this.props.session.user.id}>My Profile</Link>
+          <Link to={`/users/${session.user.id}`}>My Profile</Link>
         </Menu.Item>
-        }
-        <Menu.Item key="1">
-          <a href="https://psp-heroku-staging.s3.amazonaws.com/message/file/44/14398c71-31e9-434c-8390-c11a71d976f8.pdf" target="_blank">Help</a>
-        </Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="3"><LogoutButton /></Menu.Item>
-      </Menu>
-    );
-  }
+      )}
+      <Menu.Item key="1">
+        <a
+          href="https://psp-heroku-staging.s3.amazonaws.com/message/file/44/14398c71-31e9-434c-8390-c11a71d976f8.pdf"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Help
+        </a>
+      </Menu.Item>
+      <Menu.Divider />
+      <Menu.Item key="3"><LogoutButton /></Menu.Item>
+    </Menu>
+  );
 
-  render() {
-    return (
-      <Header>
-        <div className="logoBar">
-          <Link to="/"><Logo /></Link>
+  return (
+    <Header>
+      <div className="logoBar">
+        <Link to={session.user.role === 'professor'
+          ? '/professor/dashboard/projects'
+          : `students/${session.user.id}/projects`}
+        >
+          <Logo />
+        </Link>
+      </div>
+      <div className="notificationBar">
+        <div className="item">
+          <NotificationBadge
+            type="general"
+            title="Notifications"
+            icon={<BellOutlined />}
+            notifications={notifications.general.list}
+            count={notifications.general.count}
+            loading={notifications.general.loading}
+            markseen={updateNotificationsProp}
+            older={fetchOlderNotificationsProp}
+            limit={NOTIFICATION_LIST_LIMIT}
+          />
         </div>
-        <div className="notificationBar">
-          <div className="item">
-            <NotificationBadge type="general" title="Notifications" icon="bell" notifications={this.props.notifications.general.list} count={this.props.notifications.general.count} loading={this.props.notifications.general.loading} markseen={this.props.updateNotifications} older={this.props.fetchOlderNotifications} limit={NOTIFICATION_LIST_LIMIT} />
-          </div>
-          <div className="item">
-            <NotificationBadge type="message" title="Messages" icon="message"  notifications={this.props.notifications.messages.list} count={this.props.notifications.messages.count} loading={this.props.notifications.messages.loading} markseen={this.props.updateNotiMessages} older={this.props.fetchOlderNotiMessages} limit={NOTIFICATION_LIST_LIMIT} />
-          </div>
-          <div className="item">
-            <Popover placement="bottomRight" title={this.props.session.user.first_name + ' ' + (this.props.session.user.last_name && this.props.session.user.last_name.substr(0,1)) + '.'} content={this.ProfileMenu()} trigger="click">
-              <Badge>
-                <Avatar icon="user"/>
-              </Badge>
-            </Popover>
-          </div>
+        <div className="item">
+          <NotificationBadge
+            type="message"
+            title="Messages"
+            icon={<MessageOutlined />}
+            notifications={notifications.messages.list}
+            count={notifications.messages.count}
+            loading={notifications.messages.loading}
+            markseen={updateNotiMessagesProp}
+            older={fetchOlderNotiMessagesProp}
+            limit={NOTIFICATION_LIST_LIMIT}
+          />
         </div>
-      </Header>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    session: state.session,
-
-    notifications: state.notifications,
-  };
+        <div className="item">
+          <Popover
+            placement="bottomRight"
+            title={`${session.user.first_name} ${session.user.last_name && session.user.last_name.substr(0, 1)}.`}
+            content={ProfileMenu()}
+            trigger="click"
+          >
+            <Badge>
+              <Avatar shape="circle" icon={<UserOutlined />} />
+            </Badge>
+          </Popover>
+        </div>
+      </div>
+    </Header>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    fetchNotifications: () => {
-      dispatch(fetchNotifications(NOTIFICATION_LIST_LIMIT)).payload.then((result) => {
-        if (true) {
-          dispatch(fetchNotificationsSuccess(result));
-        } else {
-          dispatch(fetchNotificationsFailure(result.error));
-        }
-      });
-    },
-    fetchOlderNotifications: (page) => {
-      dispatch(fetchOlderNotifications(NOTIFICATION_LIST_LIMIT,page)).payload.then((result) => {
-        if (true) {
-          dispatch(fetchOlderNotificationsSuccess(result));
-        } else {
-          dispatch(fetchOlderNotificationsFailure(result.error));
-        }
-      });
-    },
-    updateNotifications: (role) => {
-      dispatch(updateNotifications(role)).payload.then((result) => {
-        if (true) {
-          dispatch(updateNotificationsSuccess(result));
-        } else {
-          dispatch(updateNotificationsFailure(result.error));
-        }
-      });
-    },
-    fetchNotiMessages: () => {
-      dispatch(fetchNotiMessages(NOTIFICATION_LIST_LIMIT)).payload.then((result) => {
-        if (true) {
-          dispatch(fetchNotiMessagesSuccess(result));
-        } else {
-          dispatch(fetchNotiMessagesFailure(result.error));
-        }
-      });
-    },
-    fetchOlderNotiMessages: (page) => {
-      dispatch(fetchOlderNotiMessages(NOTIFICATION_LIST_LIMIT,page)).payload.then((result) => {
-        if (true) {
-          dispatch(fetchOlderNotiMessagesSuccess(result));
-        } else {
-          dispatch(fetchOlderNotiMessagesFailure(result.error));
-        }
-      });
-    },
-    updateNotiMessages: (role) => {
-      dispatch(updateNotiMessages(role)).payload.then((result) => {
-        if (true) {
-          dispatch(updateNotiMessagesSuccess(result));
-        } else {
-          dispatch(updateNotiMessagesFailure(result.error));
-        }
-      });
-    }
-  };
-};
+const mapStateToProps = (state) => ({
+  session: state.session,
+
+  notifications: state.notifications,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  fetchNotificationsProp: () => {
+    dispatch(fetchNotifications(NOTIFICATION_LIST_LIMIT)).payload.then((result) => {
+      dispatch(fetchNotificationsSuccess(result));
+    });
+  },
+  fetchOlderNotificationsProp: (page) => {
+    dispatch(fetchOlderNotifications(NOTIFICATION_LIST_LIMIT, page)).payload.then((result) => {
+      dispatch(fetchOlderNotificationsSuccess(result));
+    });
+  },
+  updateNotificationsProp: (role) => {
+    dispatch(updateNotifications(role)).payload.then((result) => {
+      dispatch(updateNotificationsSuccess(result));
+    });
+  },
+  fetchNotiMessagesProp: () => {
+    dispatch(fetchNotiMessages(NOTIFICATION_LIST_LIMIT)).payload.then((result) => {
+      dispatch(fetchNotiMessagesSuccess(result));
+    });
+  },
+  fetchOlderNotiMessagesProp: (page) => {
+    dispatch(fetchOlderNotiMessages(NOTIFICATION_LIST_LIMIT, page)).payload.then((result) => {
+      dispatch(fetchOlderNotiMessagesSuccess(result));
+    });
+  },
+  updateNotiMessagesProp: (role) => {
+    dispatch(updateNotiMessages(role)).payload.then((result) => {
+      dispatch(updateNotiMessagesSuccess(result));
+    });
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(CustomHeader);

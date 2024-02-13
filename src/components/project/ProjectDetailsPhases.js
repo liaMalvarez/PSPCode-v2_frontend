@@ -1,382 +1,490 @@
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import {
+  message,
+  Steps,
+  Input,
+  Form,
+  Popover,
+  Select,
+  DatePicker,
+  InputNumber,
+  Modal,
+  Row,
+  Col,
+  Alert,
+} from 'antd';
+import { useLocation } from 'react-router';
+
+import { PlusCircleTwoTone, DeleteTwoTone } from '@ant-design/icons';
+
 import DefectsList from './defect/DefectsList';
 import DefectForm from './defect/DefectForm';
 import InputTooltip from '../common/InputTooltip';
 import {
-  createPhaseOnProjectVersion, createPhaseOnProjectVersionSuccess, createPhaseOnProjectVersionFailure,
-  createPhaseOnProjectVersionReset,
-  editPhaseOnProjectVersion, editPhaseOnProjectVersionSuccess, editPhaseOnProjectVersionFailure,
-  editPhaseOnProjectVersionReset,
-  deletePhaseOnProjectVersion, deletePhaseOnProjectVersionSuccess, deletePhaseOnProjectVersionFailure,
-  deletePhaseOnProjectVersionReset, fetchProjectDetailsVersionPhaseDefects,
-  fetchProjectDetailsVersionPhaseDefectsSuccess, fetchProjectDetailsVersionPhaseDefectsFailure,
+  createPhaseOnProjectVersion,
+  createPhaseOnProjectVersionSuccess,
+  createPhaseOnProjectVersionFailure,
+  editPhaseOnProjectVersion,
+  editPhaseOnProjectVersionSuccess,
+  editPhaseOnProjectVersionFailure,
+  deletePhaseOnProjectVersion,
+  deletePhaseOnProjectVersionSuccess,
+  deletePhaseOnProjectVersionFailure,
+  fetchProjectDetailsVersionPhaseDefects,
+  fetchProjectDetailsVersionPhaseDefectsSuccess,
+  fetchProjectDetailsVersionPhaseDefectsFailure,
 } from '../../actions/projectActions';
 
-const Icon = require('antd/lib/icon');
-const Steps = require('antd/lib/steps');
-const Popover = require('antd/lib/popover');
-const Form = require('antd/lib/form');
-const TextArea = require('antd/lib/input/TextArea');
-const Select = require('antd/lib/select');
-const DatePicker = require('antd/lib/date-picker');
-const InputNumber = require('antd/lib/input-number');
-const Modal = require('antd/lib/modal');
-const message = require('antd/lib/message');
-const moment = require('moment/moment');
-const Row = require('antd/lib/row');
-const Col = require('antd/lib/col');
-const Option = Select.Option;
+import { TEXTS } from '../../constants/constants';
 
+const moment = require('moment/moment');
+
+const { Option } = Select;
+const { TextArea } = Input;
+const { Step } = Steps;
 const FormItem = Form.Item;
 
-const Step = Steps.Step;
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 12 },
-  },
-};
+const ProjectDetailsPhases = ({
+  version,
+  session,
+  studentId,
+  project,
+  createPhaseProps,
+  deletePhaseProps,
+  editPhaseProps,
+  psp_data,
+  error,
+  created,
+  edited,
+  deleted,
+  hasSubmited,
+  fetchProjectDetailsVersionPhaseDefectsProps,
+  forcedPM,
+  setForcedPM,
+}) => {
+  const { state } = useLocation();
 
+  const [messageEditing, setMessageEditing] = useState(false);
+  const [messageDeleting, setMessageDeleting] = useState(false);
+  const [messageCreating, setMessageCreating] = useState(false);
 
-class ProjectDetailsPhases extends Component {
+  const [wasEdited, setWasEdited] = useState(false);
+  const [canEdit, setCanEdit] = useState(version.status === 'working' && session.user.role !== 'professor');
+  const [activePhase, setActivePhase] = useState(version.phases[session.user.role === 'professor' ? 0 : version.phases.length - 1]);
 
-  constructor(props) {
-    super(props);
+  const [activeDefect, setActiveDefect] = useState(null);
 
-    this.formTimeout = null;
-    this.state = {
-      canEdit: (this.props.version.status === 'working' && this.props.session.user.role !== 'professor'),
-      activePhase: this.props.version.phases[this.props.version.phases.length - 1],
-      activeDefect: null
-    };
-  }
+  const {
+    break_time,
+    elapsed_time,
+    fix_time,
+    empty_loc,
+    plan_time,
+    empty_total,
+    time_conflict_start,
+    time_conflict_end,
+  } = activePhase.observations || {
+    break_time: null,
+    elapsed_time: null,
+    fix_time: null,
+    empty_loc: null,
+    plan_time: null,
+    empty_total: null,
+    time_conflict_start: null,
+    time_conflict_end: null,
+  };
+  window.history.replaceState({}, document.title);
 
-  componentWillUnmount() {
-  }
+  const editPhase = (attr, value) => {
+    if (!canEdit) return;
 
-  componentDidMount() {
-    this.props.fetchProjectDetailsVersionPhaseDefects(this.props.studentId,this.props.project.id,this.props.version.id,this.state.activePhase.id);
-  }
+    if (typeof value === 'number' && parseInt(value, 10) === 0) value = '0';
 
-  componentWillUpdate(nextProps, nextState) {
-    if (this.state.activePhase.id != nextState.activePhase.id) {
-      this.props.fetchProjectDetailsVersionPhaseDefects(this.props.studentId,this.props.project.id,this.props.version.id,nextState.activePhase.id);
+    const actualValue = activePhase[attr];
+    if (typeof actualValue === 'number' && parseInt(actualValue, 10) === parseInt(value, 10) && value !== '0') return;
+
+    let newState = { ...activePhase, [attr]: value };
+
+    if (attr === 'psp_phase' && version?.phases?.length) {
+      [
+        'plan_loc', 
+        'plan_time', 
+        'actual_base_loc', 
+        'deleted', 
+        'modified', 
+        'new_reusable', 
+        'reused', 
+        'total', 
+        'pip_problem', 
+        'pip_proposal', 
+        'pip_notes'
+      ].forEach((item) => { 
+        newState = { ...newState, [item]: null }; 
+      });
+
+      if (value.first) {
+        const original_phase = [...version.phases].reverse()
+          .find((o) => o.psp_phase && o.psp_phase.first);
+
+        if (original_phase) {
+          ['plan_loc', 'plan_time', 'actual_base_loc'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
+        }
+      }
+
+      if (value.last) {
+        const original_phase = [...version.phases].reverse()
+          .find((o) => o.psp_phase && o.psp_phase.last);
+
+        if (original_phase) {
+          ['deleted', 'modified', 'new_reusable', 'reused', 'total'].map((item) => { newState = { ...newState, [item]: original_phase[item] }; });
+        }
+      }
     }
-  }
 
-  componentWillReceiveProps(nextProps) {
+    setWasEdited(true);
+    setActivePhase(newState);
+  };
 
-    if (nextProps.error) {
-      if (this.message_creating) {
-        this.message_creating();
-        this.message_creating = null;
+  useEffect(() => {
+    fetchProjectDetailsVersionPhaseDefectsProps(
+      studentId,
+      project.id,
+      version.id,
+      activePhase.id,
+    );
+  }, [activePhase]);
+
+  useEffect(() => {
+    if ((state?.phaseIndex || state?.phaseIndex === 0)
+    && version.phases[state.phaseIndex]) {
+      setActivePhase(version.phases[state.phaseIndex]);
+    }
+  }, [state, state?.phaseIndex]);
+
+  useEffect(() => {
+    if (forcedPM) {
+      setActivePhase(version.phases[forcedPM]);
+      setForcedPM(null);
+    }
+  }, [forcedPM]);
+
+  useEffect(() => {
+    if (error) {
+      if (messageCreating) {
+        message.loading('Creating new phase', 2);
+        setMessageCreating(false);
       }
-      if (this.message_editing) {
-        this.message_editing();
-        this.message_editing = null;
+      if (messageEditing) {
+        message.loading('Saving phase details', 2);
+        setMessageEditing(false);
       }
-      if (this.message_deleting) {
-        this.message_deleting();
-        this.message_deleting = null;
+      if (messageDeleting) {
+        message.loading('Deleting this phase', 2);
+        setMessageDeleting(false);
       }
-      if (this.message_error) {
-        this.message_error();
-        this.message_error = null;
-      }
-      if (nextProps.error.data && nextProps.error.data.errors && nextProps.error.data.errors && nextProps.error.data.errors.elapsed_time) {
-        this.message_error = message.error('Elapsed time should be a positive number (end_time - start_time - interruption_time)', 7);
+
+      if (error.data && error.data.errors && error.data.errors.elapsed_time) {
+        message.destroy();
+        message.error('Elapsed time should be a positive number (end_time - start_time - interruption_time)', 7);
+       
+        editPhase('interruption_time', 0);
       } else {
-        this.message_error = message.error(nextProps.error.msg, 7);
+        message.error(error.msg, 5);
       }
     }
+  }, [error]);
 
-
-    if (this.message_creating && nextProps.created) {
-      this.message_creating();
-      this.message_creating = null;
-      this.setState({
-        ...this.state,
-        activePhase: nextProps.version.phases[nextProps.version.phases.length - 1],
-        canEdit: (nextProps.version.status === 'working' && this.props.session.user.role !== 'professor'),
-      });
-    } else if (this.message_editing && nextProps.edited) {
-      this.message_editing();
-      this.message_editing = null;
-      this.setState({
-        ...this.state,
-        canEdit: (nextProps.version.status === 'working' && this.props.session.user.role !== 'professor'),
-      });
-    } else if (this.message_deleting && nextProps.deleted) {
-      this.message_deleting();
-      this.message_deleting = null;
-      this.setState({
-        ...this.state,
-        activePhase: nextProps.version.phases[nextProps.version.phases.length - 1],
-        canEdit: (nextProps.version.status === 'working' && this.props.session.user.role !== 'professor'),
-      });
+  useEffect(() => {
+    if (messageCreating && created) {
+      setMessageCreating(false);
+      setActivePhase(version.phases[version.phases.length - 1]);
+      setCanEdit(version.status === 'working' && session.user.role !== 'professor');
+    } else if (messageEditing && edited) {
+      message.success({ content: 'Phase details saved successfully', key: 'saving', duration: 2 });
+      setMessageEditing(false);
+      setCanEdit(version.status === 'working' && session.user.role !== 'professor');
+    } else if (messageDeleting && deleted) {
+      message.success('Phase deleted successfully', 2);
+      setMessageDeleting(false);
+      setActivePhase(version.phases[version.phases.length - 1]);
+      setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     } else {
-      this.setState({
-        ...this.state,
-        canEdit: (nextProps.version.status === 'working' && this.props.session.user.role !== 'professor'),
-      });
+      setCanEdit(version.status === 'working' && session.user.role !== 'professor');
     }
-  }
+  }, [created, edited, deleted, messageCreating, messageEditing, messageDeleting]);
 
-  selectPhase(phase) {
-    this.setState({ ...this.state, activePhase: phase});
+  useEffect(() => {
+    setCanEdit(version.status === 'working' && session.user.role !== 'professor');
+  }, [version.status]);
 
-  }
-
-  selectDefect = (defect) => {
-    this.setState({ ...this.state, activeDefect: defect});
+  const selectPhase = (phase) => {
+    setActivePhase(phase);
   };
 
-  customDot = (dot, { status, index }) => {
-    if (status === 'finish' && this.state.canEdit) {
-      return (
-        <Popover content="You are working on this phase.">
-          <Link onClick={() => this.selectPhase(this.props.version.phases[index])}>
-            <span className="dot" />
-          </Link>
-        </Popover>);
-    } else if (status === 'finish' && !this.state.canEdit) {
-      return (
-        <Popover content="You are reviewing this phase.">
-          <Link onClick={() => this.selectPhase(this.props.version.phases[index])}>
-            <span className="dot cantedit" />
-          </Link>
-        </Popover>);
-    } else if (status === 'process') {
-      return (
-        <Popover content="Click to review this phase.">
-          <Link onClick={() => this.selectPhase(this.props.version.phases[index])}>
-            <span className="dot"/>
-          </Link>
-        </Popover>);
-    } else if (status === 'wait' && this.state.canEdit) {
-      return (
-        <Popover content="Click to start a new phase.">
-          <Link onClick={this.createPhase}>
-            <Icon type="plus-circle" />
-          </Link>
-        </Popover>);
-    } else if (status === 'wait' && !this.state.canEdit) {
-      return (
-        <Icon type="plus-circle" />
-      )
-    }
+  const selectDefect = (defect) => {
+    setActiveDefect(defect);
   };
 
-  printPhasesSteps = () => {
-    const steps = this.props.version.phases.map((item, i) => {
-      if (item.id === this.state.activePhase.id) {
-        return (<Step key={item.id} status="finish" title={this.state.activePhase.psp_phase?this.state.activePhase.psp_phase.name:''} />);
-      } else {
-        return (<Step key={item.id} status="process" title={item.psp_phase?item.psp_phase.name:''} />);
+  const printPhasesSteps = () => {
+    const steps = version.phases.map((item) => {
+      if (item.id === activePhase.id) {
+        return (<Step key={item.id} status="finish" title={activePhase.psp_phase ? activePhase.psp_phase.name : ''} />);
       }
+      return (<Step key={item.id} status="process" title={item.psp_phase ? item.psp_phase.name : ''} />);
     });
-    return [steps,(<Step key="new_phase" title="Start Phase" />)];
-  }
+    return [steps, (<Step key="new_phase" title={session.user.role !== 'professor' ? 'Start Phase' : ''} />)];
+  };
 
-  printFormForActivePhase = () => {
-    var inputs = [('')];
-    if(this.state.activePhase.psp_phase && this.state.activePhase.psp_phase.first) {
-      if(this.props.project.psp_project.process.has_plan_time) {
+  useEffect(() => {
+    const saveData = setTimeout(() => {
+      if (!wasEdited) return; // not edited
+      setWasEdited(false);
+      editPhaseProps(studentId, project.id, version.id, activePhase.id, activePhase);
+      setMessageEditing(true);
+    }, 2000);
+
+    return () => clearTimeout(saveData);
+  }, [activePhase]);
+
+  const pipFields = ['pip_problem', 'pip_proposal', 'pip_notes'];
+
+  const isFieldInvalid = (fieldName) => (
+    hasSubmited && (
+      !activePhase[fieldName]?.length
+      || (fieldName !== 'pip_notes' && activePhase[fieldName]?.length < 15)
+    )
+  );
+
+  const pipErrorMessage = (hasMinimum) => (hasMinimum
+    ? 'This field should contain at least 15 characters'
+    : 'This field cannot be empty'
+  );
+
+  const printFormForActivePhase = () => {
+    const inputs = [('')];
+    if (activePhase?.psp_phase?.first) {
+      if (project.psp_project.process.has_plan_time) {
         inputs.push((
           <Col span={12} key="section_plan_time">
             <section>
               <FormItem
-                {...formItemLayout}
                 label="Plan Time"
+                validateStatus={plan_time ? 'warning' : ''}
+                hasFeedback={plan_time}
+                help={plan_time}
+                style={{ display: 'flex' }}
               >
-                <InputNumber min={0} value={this.state.activePhase.plan_time?this.state.activePhase.plan_time:null}
-                             disabled={(!this.state.canEdit || !this.state.activePhase.start_time)}
-                             onChange={(value) => this.editPhase('plan_time',value)}/>
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  value={activePhase.plan_time}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                  onChange={(value) => editPhase('plan_time', value)}
+                />
                 <InputTooltip input="project_details_phase_form_plan_time" />
               </FormItem>
             </section>
           </Col>
         ));
       }
-      if(this.props.project.psp_project.process.has_plan_loc) {
+      if (project.psp_project.process.has_plan_loc) {
         inputs.push((
           <Col span={12} key="section_plan_loc">
             <section>
               <FormItem
-                {...formItemLayout}
                 label="Plan LOCs (A+M)"
+                validateStatus={empty_loc ? 'warning' : ''}
+                hasFeedback={empty_loc}
+                help={empty_loc}
               >
-                <InputNumber min={0} value={this.state.activePhase.plan_loc?this.state.activePhase.plan_loc:null}
-                             disabled={(!this.state.canEdit || !this.state.activePhase.start_time)}
-                             onChange={(value) => this.editPhase('plan_loc',value)}/>
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  value={activePhase.plan_loc}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                  onChange={(value) => editPhase('plan_loc', value)}
+                />
                 <InputTooltip input="project_details_phase_form_plan_loc" />
               </FormItem>
               <FormItem
-                {...formItemLayout}
                 label="Actual Base LOCs"
               >
-                <InputNumber min={0} onChange={(value) => this.editPhase('actual_base_loc',value)} value={this.state.activePhase.actual_base_loc?this.state.activePhase.actual_base_loc:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('actual_base_loc', value)}
+                  value={activePhase.actual_base_loc}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
                 <InputTooltip input="project_details_phase_form_actual_base_loc" />
-
               </FormItem>
             </section>
           </Col>));
       }
-    } else if(this.state.activePhase.psp_phase && this.state.activePhase.psp_phase.last) {
-        if(this.props.project.psp_project.process.has_plan_loc) {
-          inputs.push((
-            <div key="section_pm_loc">
-              <Row>
-                <Col span={12}>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Modified (M)"
-                  >
-                    <InputNumber min={0} onChange={(value) => this.editPhase('modified',value)} value={this.state.activePhase.modified?this.state.activePhase.modified:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_loc_m" />
-
-                  </FormItem>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Deleted (D)"
-                  >
-                    <InputNumber min={0} onChange={(value) => this.editPhase('deleted',value)} value={this.state.activePhase.deleted?this.state.activePhase.deleted:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_loc_d" />
-
-                  </FormItem>
-                </Col>
-                <Col span={12}>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Reused (R)"
-                  >
-                    <InputNumber min={0} onChange={(value) => this.editPhase('reused',value)} value={this.state.activePhase.reused?this.state.activePhase.reused:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_loc_r" />
-
-                  </FormItem>
-                  <FormItem
-                    {...formItemLayout}
-                    label="New Reusable (NR)"
-                  >
-                    <InputNumber min={0} onChange={(value) => this.editPhase('new_reusable',value)} value={this.state.activePhase.new_reusable?this.state.activePhase.new_reusable:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_loc_nr" />
-                  </FormItem>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Total (T)"
-                  >
-                    <InputNumber min={0} onChange={(value) => this.editPhase('total',value)} value={this.state.activePhase.total?this.state.activePhase.total:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_loc_t" />
-
-                  </FormItem>
-                </Col>
-              </Row>
-              <div className="separator" />
-            </div>
-          ));
-        }
-        if(this.props.project.psp_project.process.has_pip) {
-          inputs.push((
-            <div key="section_pm_pip">
-              <Row>
-                <Col span={24}>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Problem Description"
-                    className="inputTextarea"
-                  >
-                    <TextArea autosize={{minRows:3}} onChange={(e) => this.editPhase('pip_problem',e.target.value)} value={this.state.activePhase.pip_problem?this.state.activePhase.pip_problem:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_pip_problem" />
-
-                  </FormItem>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Proposal Description"
-                    className="inputTextarea"
-                  >
-                    <TextArea autosize={{minRows:3}} onChange={(e) => this.editPhase('pip_proposal',e.target.value)} value={this.state.activePhase.pip_proposal?this.state.activePhase.pip_proposal:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_pip_proposal" />
-
-                  </FormItem>
-                  <FormItem
-                    {...formItemLayout}
-                    label="Other Notes"
-                    className="inputTextarea"
-                  >
-                    <TextArea autosize={{minRows:3}} onChange={(e) => this.editPhase('pip_notes',e.target.value)} value={this.state.activePhase.pip_notes?this.state.activePhase.pip_notes:null} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                    <InputTooltip input="project_details_phase_form_pm_pip_comments" />
-
-                  </FormItem>
-                </Col>
-              </Row>
-            </div>));
-        }
+    } else if (activePhase.psp_phase && activePhase.psp_phase.last) {
+      if (project.psp_project.process.has_plan_loc) {
+        inputs.push((
+          <Row className="complete-width">
+            <Col span={12}>
+              <FormItem
+                label="Modified (M)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('modified', value)}
+                  value={activePhase.modified}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_m" />
+              </FormItem>
+              <FormItem
+                label="Deleted (D)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('deleted', value)}
+                  value={activePhase.deleted}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_d" />
+              </FormItem>
+            </Col>
+            <Col span={12}>
+              <FormItem
+                label="Reused (R)"
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('reused', value)}
+                  value={activePhase.reused}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_r" />
+              </FormItem>
+              <FormItem
+                label="New Reusable (NR)"
+                validateStatus={(hasSubmited && !activePhase.new_reusable) ? 'warning' : ''}
+                hasFeedback={(hasSubmited && !activePhase.new_reusable)}
+                help={(hasSubmited && !activePhase.new_reusable) ? 'This field can\'t be empty' : ''}
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('new_reusable', value)}
+                  value={activePhase.new_reusable}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_nr" />
+              </FormItem>
+              <FormItem
+                label="Total (T)"
+                validateStatus={empty_total || (hasSubmited && !activePhase.total) ? 'warning' : ''}
+                hasFeedback={empty_total || (hasSubmited && !activePhase.total)}
+                help={empty_total || (hasSubmited && !activePhase.total ? 'This field can\'t be empty' : '')}
+              >
+                <InputNumber
+                  controls={false}
+                  min={0}
+                  onChange={(value) => editPhase('total', value)}
+                  value={activePhase.total}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_pm_loc_t" />
+              </FormItem>
+            </Col>
+          </Row>
+        ));
       }
-      if (inputs.length > 1) {
-        return (
-          <div key="special_input_separator" >
-            <Row>{inputs}</Row>
-            <div className="separator" />
-          </div>
-        );
-      }
-      return inputs;
-  };
-
-  createPhase = () => {
-
-    if(this.message_creating) {
-      this.message_creating();
-    }
-    this.message_creating = message.loading('Creating new phase',0);
-    this.setState({ ...this.state, canEdit: false});
-    this.props.createPhase(this.props.studentId, this.props.project.id, this.props.version.id);
-  };
-
-  editPhase = (attr, value, interval=2000) => {
-    const actualValue = this.state.activePhase[attr];
-    if (typeof value === 'number' && parseInt(value) === 0) value = "0";
-    if (typeof actualValue === 'number' && parseInt(actualValue) === parseInt(value) && value !== "0") return;
-    const newState = { ...this.state, activePhase: { ...this.state.activePhase, [attr]: value } };
-
-    if (attr === 'psp_phase' &&  this.props.version && this.props.version.phases && this.props.version.phases.length>0) {
-      ['plan_loc','plan_time','actual_base_loc','deleted','modified','new_reusable','reused','total','pip_problem','pip_proposal','pip_notes'].map((item,i) => newState.activePhase[item] = null);
-      if (value.first) {
-        const original_phase = [...this.props.version.phases].reverse().find(o => o.psp_phase && o.psp_phase.first);
-        if (original_phase) {
-          ['plan_loc','plan_time','actual_base_loc'].map((item,i) => newState.activePhase[item] = original_phase[item]);
-        }
-      }
-      if (value.last) {
-        const original_phase = [...this.props.version.phases].reverse().find(o => o.psp_phase && o.psp_phase.last);
-        if (original_phase) {
-          ['deleted','modified','new_reusable','reused','total'].map((item,i) => newState.activePhase[item] = original_phase[item]);
-        }
+      if (project.psp_project.process.has_pip) {
+        inputs.push((
+          <div className="section_pm_pip">
+            <Col>
+              {pipFields.map((fieldName) => (
+                <FormItem
+                  label={TEXTS[fieldName]}
+                  className="inputTextarea"
+                  key={fieldName}
+                  validateStatus={isFieldInvalid(fieldName) ? 'warning' : ''}
+                  help={isFieldInvalid(fieldName) ? pipErrorMessage(fieldName !== 'pip_notes') : ''}
+                >
+                  <TextArea
+                    autosize={{ minRows: 3 }}
+                    onChange={(e) => editPhase(fieldName, e.target.value)}
+                    value={activePhase[fieldName]}
+                    disabled={(!canEdit || !activePhase.start_time)}
+                  />
+                  <InputTooltip input={`project_details_phase_form_pm_${fieldName}`} />
+                </FormItem>
+              ))}
+            </Col>
+          </div>));
       }
     }
-    this.setState(newState);
-
-    if (typeof actualValue === 'string' && String(actualValue).trim() === String(value).trim()) return;
-
-    if(this.formTimeout) clearTimeout(this.formTimeout);
-    this.formTimeout = setTimeout(() => {
-      if(this.message_editing) {
-        this.message_editing();
-      }
-      this.message_editing = message.loading('Saving phase details',0);
-      this.props.editPhase(this.props.studentId, this.props.project.id, this.props.version.id, newState.activePhase.id, newState.activePhase);
-    }, interval);
-
+    if (inputs.length > 1) {
+      return (
+        <div key="special_input_separator">
+          <Row>{inputs}</Row>
+          <div className="separator" />
+        </div>
+      );
+    }
+    return inputs;
   };
 
-  deletePhase = () => {
-    const _this = this;
+  const createPhase = () => {
+    message.loading('Creating new phase', 1);
+    setMessageCreating(true);
+    setCanEdit(false);
+    createPhaseProps(studentId, project.id, version.id);
+  };
+
+  const customDot = (_, { status, index }) => {
+    if (status === 'finish' && canEdit) {
+      return (
+        <Popover content="You are working on this phase.">
+          <button className="dot-button" type="button" onClick={() => selectPhase(version.phases[index])}>
+            <span className="dot" />
+          </button>
+        </Popover>
+      );
+    } if (status === 'finish' && !canEdit) {
+      return (
+        <Popover content="You are reviewing this phase.">
+          <button className="dot-button" type="button" onClick={() => selectPhase(version.phases[index])}>
+            <span className="dot cantedit" />
+          </button>
+        </Popover>
+      );
+    } if (status === 'process') {
+      return (
+        <Popover content="Click to review this phase.">
+          <button className="dot-button" type="button" onClick={() => selectPhase(version.phases[index])}>
+            <span className="dot" />
+          </button>
+        </Popover>
+      );
+    } if (status === 'wait' && canEdit) {
+      return (
+        <Popover content="Click to start a new phase.">
+          <button className="dot-button" type="button" onClick={createPhase}>
+            <PlusCircleTwoTone twoToneColor="#0dc0bb" />
+          </button>
+        </Popover>
+      );
+    } if (status === 'wait' && !canEdit) {
+      return (
+        session.user.role === 'professor'
+          ? <span className="dot-end" />
+          : <PlusCircleTwoTone twoToneColor="#B1B1B1" />
+      );
+    }
+  };
+
+  const deletePhase = () => {
     Modal.confirm({
       title: 'Are you sure you want to delete this?',
       content: 'This operation can\'t be undone.',
@@ -384,182 +492,279 @@ class ProjectDetailsPhases extends Component {
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        _this.message_deleting = message.loading('Deleting this phase',0);
-        _this.setState({ ..._this.state, canEdit: false});
-        _this.props.deletePhase(_this.props.studentId, _this.props.project.id, _this.props.version.id, _this.state.activePhase.id);
+        setMessageDeleting(true);
+        setCanEdit(false);
+        deletePhaseProps(studentId, project.id, version.id, activePhase.id);
       },
       onCancel() {
       },
     });
   };
 
-  noFutureDate(current) {
-    return current > moment().endOf('day');
-  }
-  noSmallerThanDate(current,date) {
-    return current < moment(date);
-  }
+  const noFutureDate = (current) => current > moment().endOf('day');
 
+  const noSmallerThanDate = (current, date) => moment(current) < moment(date);
 
-  render() {
-    return (
-      <div className="projectDetailsPhases">
-        <section>
-          <Steps current={this.props.version.phases.indexOf(this.state.activePhase)} progressDot={this.customDot}>
-            {this.printPhasesSteps()}
-          </Steps>
-        </section>
-
-        <section>
-          <Form onSubmit={() => {}}>
-
-            <Row>
-              <Col span={12}>
+  return (
+    <div className="projectDetailsPhases">
+      <Steps
+        className="project-steps"
+        current={version.phases.indexOf(activePhase)}
+        progressDot={customDot}
+      >
+        { printPhasesSteps()}
+      </Steps>
+      {canEdit && (
+        <Alert
+          message="Phase data is automatically saved."
+          type="info"
+          showIcon
+          closable
+          className="info_saved"
+        />
+      )}
+      <section>
+        <Form>
+          <Row>
+            <Col span={12}>
               <FormItem
-                {...formItemLayout}
                 label="Phase"
                 className="inputSelect"
-
               >
-                <Select onChange={(value) => this.editPhase('psp_phase', this.props.psp_data.processes.find(o => o.process.id == this.props.project.psp_project.process.id).process.phases.find(o => o.id == value),10)} value={this.state.activePhase.psp_phase?String(this.state.activePhase.psp_phase.id):''} disabled={(!this.state.canEdit)}>
-                  {this.props.psp_data.processes.find(o => o.process.id == this.props.project.psp_project.process.id).process.phases.map((item, i) => {
-                    return (<Option key={item.id} value={String(item.id)}>{item.name}</Option>);
-                  })}
+                <Select
+                  onChange={(value) => editPhase('psp_phase', psp_data.processes
+                    .find((o) => o.process.id == project.psp_project.process.id).process.phases
+                    .find((o) => o.id == value), 10)}
+                  value={activePhase.psp_phase ? String(activePhase.psp_phase.id) : ''}
+                  disabled={(!canEdit)}
+                >
+                  {psp_data.processes
+                    .find((o) => o.process.id == project.psp_project.process.id).process.phases
+                    .map((item) => (
+                      <Option key={item.id} value={String(item.id)}>{item.name}</Option>
+                    ))}
                 </Select>
                 <InputTooltip input="project_details_phase_form_phase" />
               </FormItem>
               <FormItem
-                {...formItemLayout}
                 label="Start Time"
                 className="inputDatepicker"
-
               >
-                <DatePicker disabledDate={(date) => this.noFutureDate(date)} value={this.state.activePhase.start_time?moment(this.state.activePhase.start_time):null} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss"  onChange={(value) => this.editPhase('start_time',value)} disabled={(!this.state.canEdit)} />
+                <DatePicker
+                  disabledDate={(selected) => noFutureDate(selected)
+                    || noSmallerThanDate(activePhase.end_time, selected)}
+                  value={activePhase.start_time ? moment(activePhase.start_time) : null}
+                  placeholder="Select date and time"
+                  showTime
+                  format="DD/MM/YYYY HH:mm:ss"
+                  onChange={(value) => editPhase('start_time', value?.startOf('second'))}
+                  disabled={(!canEdit)}
+                />
                 <InputTooltip input="project_details_phase_form_start_time" />
               </FormItem>
-              </Col>
-            </Row>
-            <div className="separator" />
-            {this.printFormForActivePhase()}
-            {this.props.version.activePhaseDefects &&
-            <div>
-              <Row className="defectList">
-                <Col span={24}>
-                  <h3>Defects Detected in this Phase</h3>
-                  <DefectForm canEdit={this.state.canEdit && this.state.activePhase.start_time}
-                              studentId={this.props.studentId}
-                              projectId={this.props.project.id}
-                              phase={this.props.version.phases.find(o => o.id == this.state.activePhase.id)}
-                              version={this.props.version}
-                              defect={this.state.activeDefect}
-                              onEdit={this.selectDefect} />
-                  <DefectsList canEdit={this.state.canEdit && this.state.activePhase.start_time}
-                               studentId={this.props.studentId}
-                               projectId={this.props.project.id}
-                               phase={this.props.version.phases.find(o => o.id == this.state.activePhase.id)}
-                               defects={this.props.version.activePhaseDefects}
-                               version={this.props.version}
-                               onEdit={this.selectDefect}/>
-                </Col>
-              </Row>
-              < div className="separator" />
-            </div>
-            }
-            <Row>
-              <Col span={12}>
-
+            </Col>
+          </Row>
+          {time_conflict_start && (
+            <Alert
+              className="time-conflict-alert"
+              message={time_conflict_start}
+              type="warning"
+              showIcon
+              closable
+            />
+          )}
+          <div className="separator" />
+          { printFormForActivePhase()}
+          {version.activePhaseDefects
+            && (
+              <div>
+                <Row className="defectList">
+                  <Col span={24}>
+                    <h3>Defects Detected in this Phase</h3>
+                    <DefectForm
+                      canEdit={canEdit && activePhase.start_time}
+                      studentId={studentId}
+                      projectId={project.id}
+                      phase={version.phases.find((o) => o.id == activePhase.id)}
+                      version={version}
+                      defect={activeDefect}
+                      onEdit={selectDefect}
+                    />
+                    <DefectsList
+                      canEdit={canEdit && activePhase.start_time}
+                      studentId={studentId}
+                      projectId={project.id}
+                      phase={version.phases.find((o) => o.id == activePhase.id)}
+                      defects={version.activePhaseDefects}
+                      version={version}
+                      onEdit={selectDefect}
+                    />
+                  </Col>
+                </Row>
+                {fix_time && (
+                  <Alert
+                    className="defect-alert"
+                    message={fix_time}
+                    type="warning"
+                    showIcon
+                    closable
+                  />
+                )}
+                <div className="separator" />
+              </div>
+            )}
+          <Row>
+            <Col span={12}>
+              <section>
                 <FormItem
-                  {...formItemLayout}
                   label="End Time"
                   className="inputDatepicker"
+                  validateStatus={elapsed_time ? 'warning' : ''}
+                  hasFeedback={elapsed_time}
+                  help={elapsed_time}
                 >
-                  <DatePicker disabledDate={(date) => this.noFutureDate(date) || this.noSmallerThanDate(date,this.state.activePhase.start_time)} value={this.state.activePhase.end_time?moment(this.state.activePhase.end_time):null} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss" onChange={(value) => this.editPhase('end_time',value)} disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
+                  <DatePicker
+                    disabledDate={(date) => noFutureDate(date)
+                    || noSmallerThanDate(date, activePhase.start_time)}
+                    value={activePhase.end_time ? moment(activePhase.end_time) : null}
+                    placeholder="Select date and time"
+                    showTime
+                    format="DD/MM/YYYY HH:mm:ss"
+                    onChange={(value) => {
+                      editPhase('end_time', value?.startOf('second'));
+                    }}
+                    disabled={(!canEdit || !activePhase.start_time)}
+                  />
                   <InputTooltip input="project_details_phase_form_end_time" />
                 </FormItem>
                 <FormItem
-                  {...formItemLayout}
                   label="Int. time"
+                  validateStatus={break_time ? 'warning' : ''}
+                  hasFeedback={break_time}
+                  help={break_time}
                 >
-                  <InputNumber min={0} value={this.state.activePhase.interruption_time?this.state.activePhase.interruption_time:null}
-                               disabled={(!this.state.canEdit || !this.state.activePhase.start_time)}
-                               onChange={(value) => this.editPhase('interruption_time',value)}/>
+                  <InputNumber
+                    controls={false}
+                    min={0}
+                    value={activePhase.interruption_time}
+                    disabled={(!canEdit || !activePhase.start_time)}
+                    onChange={(value) => {
+                      console.log(value);
+                      editPhase('interruption_time', value);
+                    }}
+                  />
                   <InputTooltip input="project_details_phase_form_int" />
                 </FormItem>
-              </Col>
-              <Col span={12}>
-                <FormItem
-                  {...formItemLayout}
-                  label="Comments"
-                  className="inputTextarea2"
-                >
-                  <TextArea autosize={{minRows:3}} onChange={(e) => this.editPhase('comments',e.target.value,3000)} value={this.state.activePhase.comments}  disabled={(!this.state.canEdit || !this.state.activePhase.start_time)} />
-                  <InputTooltip input="project_details_phase_form_comments" />
-                </FormItem>
-              </Col>
-            </Row>
-          </Form>
-          <div className="separator" />
-          <div>
-            <span>Phase data is automatically saved.</span>
-            {this.state.canEdit && this.props.version.phases.length > 1 && <span><br />If you want to delete this phase, <Link className="dangerLink" onClick={this.deletePhase}>click here</Link>.</span>}
-          </div>
-        </section>
-
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    session: state.session,
-    created: state.projects.project_version_phase_create_finish,
-    edited: state.projects.project_version_phase_edit_finish,
-    deleted: state.projects.project_version_phase_delete_finish,
-    error: state.projects.error,
-
-
-    psp_data: state.utils.psp_data,
-  };
+              </section>
+              {time_conflict_end && (
+                <Alert
+                  className="time-conflict-alert"
+                  message={time_conflict_end}
+                  type="warning"
+                  showIcon
+                  closable
+                />
+              )}
+            </Col>
+            <Col span={12}>
+              <FormItem
+                label="Comments"
+                className="inputTextarea2"
+              >
+                <TextArea
+                  autosize={{ minRows: 3 }}
+                  onChange={(e) => editPhase('comments', e.target.value, 3000)}
+                  value={activePhase.comments}
+                  disabled={(!canEdit || !activePhase.start_time)}
+                />
+                <InputTooltip input="project_details_phase_form_comments" />
+              </FormItem>
+            </Col>
+          </Row>
+        </Form>
+        <div className="separator" />
+        <div>
+          {canEdit && version.phases.length > 1 && (
+            <button
+              onClick={deletePhase}
+              style={{
+                color: '#bd3931',
+                display: 'flex',
+                alignItems: 'center',
+                padding: 0,
+                border: 'none',
+                background: 'none',
+              }}
+            >
+              Delete Phase
+              <DeleteTwoTone
+                style={{ fontSize: '20px', marginLeft: '6px' }}
+                twoToneColor="#bd3931"
+              />
+            </button>
+          )}
+        </div>
+      </section>
+    </div>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
+const mapStateToProps = (state) => ({
+  session: state.session,
+  created: state.projects.project_version_phase_create_finish,
+  edited: state.projects.project_version_phase_edit_finish,
+  deleted: state.projects.project_version_phase_delete_finish,
+  error: state.projects.error,
 
-    fetchProjectDetailsVersionPhaseDefects: (userid,projectid,versionid,phaseid) => {
-      dispatch(fetchProjectDetailsVersionPhaseDefects(userid,projectid,versionid,phaseid)).payload.then((result) => {
-        dispatch(fetchProjectDetailsVersionPhaseDefectsSuccess(result));
-      }).catch((x)=> {
-        dispatch(fetchProjectDetailsVersionPhaseDefectsFailure(x));
-      });
-    },
-    createPhase: (userid, projectid, versionid) => {
-      dispatch(createPhaseOnProjectVersion(userid, projectid, versionid)).payload.then((result) => {
-        dispatch(createPhaseOnProjectVersionSuccess(result));
-      }).catch((x)=> {
-        dispatch(createPhaseOnProjectVersionFailure(x));
-      });
-    },
-    editPhase: (userid, projectid, versionid, phaseid, phase) => {
-      if(phase.psp_phase) phase.phase_id = phase.psp_phase.id;
-      dispatch(editPhaseOnProjectVersion(userid, projectid, versionid, phaseid, phase)).payload.then((result) => {
-        dispatch(editPhaseOnProjectVersionSuccess(result));
-      }).catch((x)=> {
-        dispatch(editPhaseOnProjectVersionFailure(x));
-      });
-    },
+  psp_data: state.utils.psp_data,
+});
 
-    deletePhase: (userid,projectid,versionid,phaseid) => {
-      dispatch(deletePhaseOnProjectVersion(userid,projectid,versionid,phaseid)).payload.then((result) => {
-        dispatch(deletePhaseOnProjectVersionSuccess(result));
-      }).catch((x)=> {
-        dispatch(deletePhaseOnProjectVersionFailure(x));
-      });
-    },
-    reset: () => {
-      // dispatch(createPhaseOnProjectVersionReset());
-    }
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  fetchProjectDetailsVersionPhaseDefectsProps: (userid, projectid, versionid, phaseid) => {
+    dispatch(fetchProjectDetailsVersionPhaseDefects(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+    )).payload.then((result) => {
+      dispatch(fetchProjectDetailsVersionPhaseDefectsSuccess(result));
+    }).catch((x) => {
+      dispatch(fetchProjectDetailsVersionPhaseDefectsFailure(x));
+    });
+  },
+  createPhaseProps: (userid, projectid, versionid) => {
+    dispatch(createPhaseOnProjectVersion(userid, projectid, versionid)).payload.then((result) => {
+      dispatch(createPhaseOnProjectVersionSuccess(result));
+    }).catch((x) => {
+      dispatch(createPhaseOnProjectVersionFailure(x));
+    });
+  },
+  editPhaseProps: (userid, projectid, versionid, phaseid, phase) => {
+    if (phase.psp_phase) phase.phase_id = phase.psp_phase.id;
+    dispatch(editPhaseOnProjectVersion(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+      phase,
+    )).payload.then((result) => {
+      dispatch(editPhaseOnProjectVersionSuccess(result));
+    }).catch((x) => {
+      dispatch(editPhaseOnProjectVersionFailure(x));
+    });
+  },
+  deletePhaseProps: (userid, projectid, versionid, phaseid) => {
+    dispatch(deletePhaseOnProjectVersion(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+    )).payload.then((result) => {
+      dispatch(deletePhaseOnProjectVersionSuccess(result));
+    }).catch((x) => {
+      dispatch(deletePhaseOnProjectVersionFailure(x));
+    });
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProjectDetailsPhases);

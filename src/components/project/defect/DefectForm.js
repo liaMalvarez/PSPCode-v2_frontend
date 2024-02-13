@@ -1,282 +1,315 @@
-import React, { Component, PropTypes } from 'react';
-import { Link } from 'react-router';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import {
+  message,
+  Input,
+  Form,
+  Select,
+  DatePicker,
+  InputNumber,
+  Modal,
+  Button,
+} from 'antd';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+
 import projectApi from '../../../api/projectApi';
 import InputTooltip from '../../common/InputTooltip';
-import {DEFECT_TYPES} from '../../../constants/constants';
+import { DEFECT_TYPES } from '../../../constants/constants';
 import {
-  createDefectOnProjectVersionPhase, createDefectOnProjectVersionPhaseSuccess, createDefectOnProjectVersionPhaseFailure, createDefectOnProjectVersionPhaseReset,
-  editDefectOnProjectVersionPhase, editDefectOnProjectVersionPhaseSuccess, editDefectOnProjectVersionPhaseFailure, editDefectOnProjectVersionPhaseReset
+  createDefectOnProjectVersionPhase, createDefectOnProjectVersionPhaseSuccess,
+  editDefectOnProjectVersionPhase, editDefectOnProjectVersionPhaseSuccess,
 } from '../../../actions/projectActions';
-import Input from "../../common/Input";
 
-const Icon = require('antd/lib/icon');
-const Steps = require('antd/lib/steps');
-const Popover = require('antd/lib/popover');
-const Form = require('antd/lib/form');
-const TextArea = require('antd/lib/input/TextArea');
-const Select = require('antd/lib/select');
-const Button = require('antd/lib/button');
-const Spin = require('antd/lib/spin');
-const DatePicker = require('antd/lib/date-picker');
-const InputNumber = require('antd/lib/input-number');
-const Modal = require('antd/lib/modal');
-const message = require('antd/lib/message');
 const moment = require('moment/moment');
 
 const FormItem = Form.Item;
-const Option = Select.Option;
+const { TextArea } = Input;
+const { Option } = Select;
 
-const Step = Steps.Step;
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 12 },
-  },
-};
+const DefectForm = ({
+  studentId,
+  projectId,
+  version,
+  editDefect,
+  phase,
+  createDefect,
+  onEdit,
+  canEdit,
+  creating,
+  editing,
+  defect,
+}) => {
+  const [defectState, setDefectState] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [fixDefectsReady, setFixDefectsReady] = useState(false);
+  const [fixDefectsLoading, setFixDefectsLoading] = useState(false);
+  const [fixDefectsList, setFixDefectsList] = useState([]);
 
+  const getFixDefects = (phaseInj = defect?.phase_injected?.id, onChange = false) => {
+    projectApi.assigned_project_version_phases_defect_find(
+      studentId,
+      projectId,
+      version.id,
+      phaseInj,
+    ).then((defectList) => {
+      const filteredList = defectList.filter(({ id }) => id !== defect?.id); // filter out current defect
+      setFixDefectsList(filteredList);
 
-class DefectForm extends Component {
+      const selectedDefect = filteredList.find(({ id }) => id === defect?.fix_defect);
 
-  constructor(props) {
-    super(props);
+      if((selectedDefect ?? !!defect?.fix_defect) && !onChange) {
+        setDefectState({
+          ...defect,
+          fix_defect: selectedDefect ? `#${selectedDefect.id} ${selectedDefect.defect_type}` : undefined,
+        });
+      }
 
-    this.state = {
-      defect: null,
-      showModal: false,
-      fixDefectsReady: false,
-      fixDefectsLoading: false,
-      fixDefectsList: []
-    };
+      setFixDefectsLoading(false);
+      setFixDefectsReady(true);
+    });
+  };
 
-  }
+  useEffect(() => {
+    if (defect) {
+      setShowModal(true);
+      setDefectState(defect);
 
-  componentWillUnmount() {
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.defect && nextProps.defect !== this.state.defect) {
-      this.setState({ ...this.state, defect: nextProps.defect, showModal: true });
+      if (defect.phase_injected.id) {
+        getFixDefects();
+      }
     }
-  }
+  }, [defect]);
 
-  handleChange(attr, value) {
-
-
+  const handleChange = (attr, value) => {
     if (attr === 'phase_injected') {
-      this.setState({
-        ...this.state,
-        defect: {
-          ...this.state.defect,
-          [attr]: value,
-          fix_defect: null,
-        },
-        fixDefectsLoading: true,
-      });
-      projectApi.assigned_project_version_phases_defect_find(this.props.studentId,this.props.projectId,this.props.version.id,value.id).then((x) => {
-        this.setState({...this.state, fixDefectsLoading: false, fixDefectsReady: true, fixDefectsList: x});
-      });
+      setDefectState({ ...defectState, fix_defect: null, [attr]: value });
+
+      setFixDefectsLoading(true);
+
+      getFixDefects(value.id, true);
     } else {
-      this.setState({
-        ...this.state,
-        defect: {
-          ...this.state.defect,
-          [attr]: value
-        }
-      });
+      setDefectState({ ...defectState, [attr]: value });
     }
-
   };
 
-  modalShow = () => {
-    this.setState({
-      ...this.state,
-      defect: null,
-      showModal: true
-    });
+  const modalShow = () => {
+    setDefectState(null);
+    setShowModal(true);
   };
 
+  const noFutureDate = (current) => current > moment().endOf('day');
 
-  noFutureDate(current) {
-    return current > moment().endOf('day');
-  }
-  noSmallerThanDate(current,date) {
-    return current < moment(date);
-  }
+  const noSmallerThanDate = (current, date) => current < moment(date);
 
-  modalOk = (e) => {
+  const modalCancel = () => {
+    setShowModal(false);
+    setDefectState(null);
+    setFixDefectsList([]);
+    onEdit(null);
+  };
 
-    //Required Inputs
-    if ( !this.state.defect
-      || !this.state.defect.discovered_time
-      || !this.state.defect.phase_injected
-      || !this.state.defect.defect_type
-      || !this.state.defect.fixed_time
-      || !this.state.defect.description
-      || String(this.state.defect.description).trim() === ""
-    ) {
-      console.log(this.state.defect);
-      message.warning('You must fill all the required inputs (marked with *)', 7);
-      return true;
+  const isFixDefectReq = ['5', '4'].includes(defectState?.phase_injected?.id)
+  && fixDefectsList.length;
+
+  const isSaveDisabled = (!defectState
+    || !defectState?.discovered_time
+    || !defectState?.phase_injected
+    || !defectState?.defect_type
+    || !defectState?.fixed_time
+    || !defectState?.description
+    || (isFixDefectReq && !defectState?.fix_defect)
+    || String(defectState?.description).trim() === ''
+  );
+
+  const modalOk = () => {
+    // Required Inputs
+    if (isSaveDisabled) {
+      message.warning('You must fill all the required inputs (marked with *)', 5);
+      return;
     }
 
-
-
-    if (this.state.defect.id) {
-      this.props.editDefect(this.props.studentId,this.props.projectId,this.props.version.id,this.props.phase.id,this.state.defect.id,this.state.defect);
+    if (defectState?.id) {
+      editDefect(studentId, projectId, version.id, phase.id, defectState?.id, defectState);
     } else {
-      this.props.createDefect(this.props.studentId,this.props.projectId,this.props.version.id,this.props.phase.id,this.state.defect);
+      createDefect(studentId, projectId, version.id, phase.id, defectState);
     }
-    this.props.onEdit(null);
-    this.setState({ ...this.state, showModal: false, defect: null });
+
+    modalCancel();
   };
 
-  modalCancel = (e) => {
-    this.setState({
-      ...this.state,
-      showModal: false,
-      defect: null
-    });
-    this.props.onEdit(null);
-  };
-
-  modalRender = () => {
-    return (
-      <Form className="defectFormPopover" onSubmit={() => {}}>
-        {this.state.defect && this.state.defect.id &&
+  const modalRender = () => (
+    <Form className="defectFormPopover" onSubmit={() => {}}>
+      {defectState?.id
+        && (
         <FormItem
-          {...formItemLayout}
           label="ID"
         >
-          <InputNumber value={this.state.defect && this.state.defect.id?this.state.defect.id:null} onChange={value => this.handleChange('id', value)} disabled />
+          <InputNumber value={defectState?.id ? defectState?.id : null} onChange={(value) => handleChange('id', value)} disabled />
           <InputTooltip input="project_details_phase_defect_form_id" />
         </FormItem>
-        }
-        <FormItem
-          {...formItemLayout}
-          label="* Discovered Time"
+        )}
+      <FormItem
+        label="Discovered Time"
+        required
+      >
+        <DatePicker
+          disabledDate={(date) => noFutureDate(date)}
+          value={defectState?.discovered_time
+            ? moment(defectState?.discovered_time)
+            : null}
+          onChange={(value) => handleChange('discovered_time', value)}
+          placeholder="Select date and time"
+          showTime
+          format="DD/MM/YYYY HH:mm:ss"
+        />
+        <InputTooltip input="project_details_phase_defect_form_discovered_time" />
+      </FormItem>
+      <FormItem
+        label="Phase Injected"
+        required
+      >
+        <Select
+          value={defectState?.phase_injected
+            ? String(defectState?.phase_injected.id)
+            : null}
+          onChange={(value) => handleChange('phase_injected', { id: value })}
         >
-          <DatePicker disabledDate={(date) => this.noFutureDate(date)} value={this.state.defect && this.state.defect.discovered_time?moment(this.state.defect.discovered_time):null} onChange={value => this.handleChange('discovered_time', value)} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss" />
-          <InputTooltip input="project_details_phase_defect_form_discovered_time" />
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="* Phase Injected"
+          {version.phases.map((item) => item.psp_phase).reduce((x, y) => (
+            x.some((o) => o && o.id && y && y.id && o.id === y.id)
+              ? x : [...x, y]), []).filter((o) => o && o.id).map((item) => (
+                <Option key={item.id} value={String(item.id)}>{item.name}</Option>
+          ))}
+        </Select>
+        <InputTooltip input="project_details_phase_defect_form_phase_injected" />
+      </FormItem>
+      <FormItem
+        label="Defect Type"
+        required
+      >
+        <Select
+          value={defectState?.defect_type ? defectState?.defect_type : null}
+          onChange={(value) => handleChange('defect_type', value)}
         >
-          <Select value={this.state.defect && this.state.defect.phase_injected?String(this.state.defect.phase_injected.id):null} onChange={value => this.handleChange('phase_injected', {id: value})}>
-            {this.props.version.phases.map((item, i) => item.psp_phase).reduce((x, y) => x.some( o => o && o.id && y && y.id && o.id === y.id)? x : [...x, y], []).filter(o => o && o.id).map((item, i) => {
-              return (<Option key={item.id} value={String(item.id)}>{item.name}</Option>);
-            })}
+          {DEFECT_TYPES.map((item, i) => (<Option key={i} value={item}>{item}</Option>))}
+        </Select>
+        <InputTooltip input="project_details_phase_defect_form_defect_type" />
+      </FormItem>
+      {fixDefectsList.length !== 0 && (
+        <FormItem
+          label={isFixDefectReq ? 'Fix Defect' : `${' '.repeat(3)}Fix Defect`}
+          required={isFixDefectReq}
+          className={!isFixDefectReq ? 'not-required' : ''}
+        >
+          <Select
+            value={defectState?.fix_defect ? defectState?.fix_defect : null}
+            onChange={(value) => handleChange('fix_defect', value)}
+            disabled={!fixDefectsReady}
+          >
+            {fixDefectsList.map((item) => (
+              <Option key={item.id} value={String(item.id)}>
+                {`#${item.id} ${item.defect_type}`}
+              </Option>
+            ))}
           </Select>
-          <InputTooltip input="project_details_phase_defect_form_phase_injected" />
+          {fixDefectsLoading && <LoadingOutlined style={{ marginLeft: '15px' }} />}
+          {!fixDefectsLoading && <InputTooltip input="project_details_phase_defect_form_fix_defect" />}
         </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="* Defect Type"
-        >
-          <Select value={this.state.defect && this.state.defect.defect_type?this.state.defect.defect_type:null} onChange={value => this.handleChange('defect_type', value)}>
-            {DEFECT_TYPES.map((item, i) => {
-              return (<Option key={i} value={item}>{item}</Option>);
-            })}
-          </Select>
-          <InputTooltip input="project_details_phase_defect_form_defect_type" />
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="&nbsp;&nbsp;Fix Defect"
-        >
-          <Select value={this.state.defect && this.state.defect.fix_defect?this.state.defect.fix_defect:null} onChange={value => this.handleChange('fix_defect', value)} disabled={!this.state.fixDefectsReady}>
-            <Option key="null" value="">&nbsp;</Option>
-            {this.state.fixDefectsList.map((item, i) => {
-              return (<Option key={item.id} value={String(item.id)}>{item.id} ({item.defect_type})</Option>);
-            })}
-          </Select>
-          {this.state.fixDefectsLoading && <Icon type="loading" style={{marginLeft: '15px'}} />}
-          {!this.state.fixDefectsLoading && <InputTooltip input="project_details_phase_defect_form_fix_defect" />}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="* Fixed Time"
-        >
-          <DatePicker placement={navigator.platform.toUpperCase().indexOf('MAC')>=0?'bottomLeft':'topLeft'} disabledDate={(date) => this.noFutureDate(date) || this.noSmallerThanDate(date,this.state.defect.discovered_time)} value={this.state.defect && this.state.defect.fixed_time?moment(this.state.defect.fixed_time):null} onChange={value => this.handleChange('fixed_time', value)} placeholder="Select date and time" showTime format="DD/MM/YYYY HH:mm:ss" disabled={!this.state.defect || !this.state.defect.discovered_time} />
-          <InputTooltip input="project_details_phase_defect_form_fixed_time" />
-        </FormItem>
-        <FormItem
-        {...formItemLayout}
-        label="* Description"
-        >
-          <TextArea autosize={{minRows:3}} value={this.state.defect && this.state.defect.description?this.state.defect.description:null} onChange={e => this.handleChange('description', e.target.value)} />
-          <InputTooltip input="project_details_phase_defect_form_comments" />
-        </FormItem>
+      )}
+      <FormItem
+        label="Fixed Time"
+        required
+      >
+        <DatePicker
+          placement={navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'bottomLeft' : 'topLeft'}
+          disabledDate={(date) => noFutureDate(date)
+             || noSmallerThanDate(date, defectState?.discovered_time)}
+          value={defectState?.fixed_time ? moment(defectState?.fixed_time) : null}
+          onChange={(value) => handleChange('fixed_time', value)}
+          placeholder="Select date and time"
+          showTime
+          format="DD/MM/YYYY HH:mm:ss"
+          disabled={!defectState?.discovered_time}
+        />
+        <InputTooltip input="project_details_phase_defect_form_fixed_time" />
+      </FormItem>
+      <FormItem
+        label="Description"
+        required
+      >
+        <TextArea
+          autosize={{ minRows: 3 }}
+          value={defectState?.description ? defectState?.description : null}
+          onChange={(e) => handleChange('description', e.target.value)}
+        />
+        <InputTooltip input="project_details_phase_defect_form_comments" />
+      </FormItem>
 
-      </Form>
-    );
-  };
+    </Form>
+  );
 
-
-  render() {
-    return (
-      <div>
-        <Button className="logNewDefect" icon="plus" type="boton1" onClick={this.modalShow} disabled={!this.props.canEdit}>Record New Defect</Button>
-        {this.props.canEdit &&
+  return (
+    <div>
+      <Button
+        className="logNewDefect"
+        icon={<PlusOutlined />}
+        type="boton1"
+        onClick={modalShow}
+        disabled={!canEdit}
+      >
+        Record New Defect
+      </Button>
+      {canEdit
+        && (
         <Modal
-          confirmLoading={this.props.creating || this.props.editing}
-          title={this.state.defect && this.state.defect.id?'Edit a recorded defect':'Record new defect'}
-          visible={this.state.showModal}
+          confirmLoading={creating || editing}
+          title={defectState?.id ? 'Edit a recorded defect' : 'Record new defect'}
+          visible={showModal}
           okText="Save"
-          onOk={this.modalOk}
-          onCancel={this.modalCancel}
+          onOk={modalOk}
+          okButtonProps={{ disabled: isSaveDisabled }}
+          onCancel={modalCancel}
           okType="primary"
         >
-            {this.modalRender()}
-        </Modal>}
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    created: state.projects.project_version_phase_create_finish,
-    edited: state.projects.project_version_phase_edit_finish,
-    deleted: state.projects.project_version_phase_delete_finish,
-  };
+          {modalRender()}
+        </Modal>
+        )}
+    </div>
+  );
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    createDefect: (userid,projectid,versionid,phaseid,defect) => {
-      defect.phase_injected_id = defect.phase_injected.id;
-      dispatch(createDefectOnProjectVersionPhase(userid,projectid,versionid,phaseid,defect)).payload.then((result) => {
-        if (true) {
-          dispatch(createDefectOnProjectVersionPhaseSuccess(result));
-        } else {
-          dispatch(createDefectOnProjectVersionPhaseFailure(result.error));
-        }
-      });
-    },
+const mapStateToProps = (state) => ({
+  created: state.projects.project_version_phase_create_finish,
+  edited: state.projects.project_version_phase_edit_finish,
+  deleted: state.projects.project_version_phase_delete_finish,
+});
 
-    editDefect: (userid,projectid,versionid,phaseid,defectid,defect) => {
-      defect.phase_injected_id = defect.phase_injected.id;
-      dispatch(editDefectOnProjectVersionPhase(userid,projectid,versionid,phaseid,defectid,defect)).payload.then((result) => {
-        if (true) {
-          dispatch(editDefectOnProjectVersionPhaseSuccess(result));
-        } else {
-          dispatch(editDefectOnProjectVersionPhaseFailure(result.error));
-        }
-      });
-    },
-  };
-};
+const mapDispatchToProps = (dispatch) => ({
+  createDefect: (userid, projectid, versionid, phaseid, defect) => {
+    defect.phase_injected_id = defect.phase_injected.id;
+    dispatch(createDefectOnProjectVersionPhase(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+      defect,
+    )).payload.then((result) => {
+      dispatch(createDefectOnProjectVersionPhaseSuccess(result));
+    });
+  },
+
+  editDefect: (userid, projectid, versionid, phaseid, defectid, defect) => {
+    defect.phase_injected_id = defect.phase_injected.id;
+    dispatch(editDefectOnProjectVersionPhase(
+      userid,
+      projectid,
+      versionid,
+      phaseid,
+      defectid,
+      defect,
+    )).payload.then((result) => {
+      dispatch(editDefectOnProjectVersionPhaseSuccess(result));
+    });
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(DefectForm);

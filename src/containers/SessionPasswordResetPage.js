@@ -2,40 +2,38 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { Link, Redirect } from 'react-router';
+import { Layout } from 'antd';
+
 import * as sessionActions from '../actions/sessionActions';
 import PasswordResetForm from '../components/session/PasswordResetForm'; // eslint-disable-line import/no-named-as-default
-import { routes } from '../constants/routesPaths';
 import Logo from '../components/common/Logo';
-
-const Layout = require('antd/lib/layout');
-const Icon = require('antd/lib/icon');
-require('antd/dist/antd.css');
 
 const { Content } = Layout;
 
-const SessionPasswordResetPage = ({ actions: { reset } }) => (
+const SessionPasswordResetPage = ({ actions: { reset }, session }) => (
   <Layout className="darkLayout">
-    <Content className={{centredContent:true, fullFormPage: true}}>
+    <Content className={{ centredContent: true, fullFormPage: true }}>
       <div>
         <Logo />
-        <PasswordResetForm onSubmit={reset} />
-        <div className="textBelowButton">
-          <Link to="/session/login"><Icon type="meh-o" /> I don't want to rest my password</Link>
-        </div>
+        <PasswordResetForm
+          onSubmit={reset}
+          isAuth={session.authenticated}
+        />
       </div>
     </Content>
   </Layout>
 );
 
-const { object } = PropTypes;
-
 SessionPasswordResetPage.propTypes = {
-  actions: object.isRequired
+  actions: PropTypes.object.isRequired,
 };
 
-const mapDispatch = dispatch => ({
-  actions: bindActionCreators(sessionActions, dispatch)
+const mapStateToProps = (state) => ({
+  session: state.session,
 });
 
-export default connect(null, mapDispatch)(SessionPasswordResetPage);
+const mapDispatch = (dispatch) => ({
+  actions: bindActionCreators(sessionActions, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatch)(SessionPasswordResetPage);

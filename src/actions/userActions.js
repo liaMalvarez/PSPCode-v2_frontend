@@ -18,19 +18,18 @@ export const USER_UPDATE_SUCCESS = 'USER_UPDATE_SUCCESS';
 export const USER_UPDATE_FAILURE = 'USER_UPDATE_FAILURE';
 export const USER_UPDATE_RESET = 'USER_UPDATE_RESET';
 
-
 export function fetchUserDetails(id) {
-    return {
-      type: USER_FETCH,
-      payload: new Promise((resolve, reject) => {
-        userApi.getUser(id).then((data) => {
-          resolve(data);
-        }).catch(() => {
-          console.log('Something went wrong fetching user');
-        })
-      }),
-    };
-  }
+  return {
+    type: USER_FETCH,
+    payload: new Promise((resolve, reject) => {
+      userApi.getUser(id).then((data) => {
+        resolve(data);
+      }).catch(() => {
+        console.log('Something went wrong fetching user');
+      });
+    }),
+  };
+}
 export function fetchUserDetailsSuccess(user) {
   return {
     type: USER_FETCH_SUCCESS,
@@ -44,7 +43,6 @@ export function fetchUserDetailsFailure(error) {
     payload: error
   };
 }
-
 
 export function fetchUserDetailsReset() {
   return {
@@ -61,7 +59,7 @@ export function fetchUserList() {
         resolve(summary);
       }).catch(() => {
         console.log('Something went wrong fetching projects');
-      })
+      });
     }),
   };
 }
@@ -80,7 +78,6 @@ export function fetchUserListFailure(error) {
   };
 }
 
-
 export function fetchUserListReset() {
   return {
     type: USER_LIST_FETCH_RESET,
@@ -95,8 +92,8 @@ export function updateUser(user) {
       userApi.updateUser(user).then((data) => {
         resolve(data);
       }).catch((x) => {
-        reject({error: true, msg: 'Something went wrong doing the update', data: x});
-      })
+        reject({ error: true, msg: 'Something went wrong doing the update', data: x });
+      });
     }),
   };
 }
@@ -114,7 +111,6 @@ export function updateUserFailure(error) {
     payload: error
   };
 }
-
 
 export function updateUserReset() {
   return {
