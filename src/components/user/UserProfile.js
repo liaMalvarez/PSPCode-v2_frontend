@@ -13,6 +13,7 @@ import {
   Input,
   Button,
 } from 'antd';
+import { isBoolean } from 'lodash';
 
 import InputTooltip from '../common/InputTooltip';
 import { ROLES } from '../../constants/constants';
@@ -180,7 +181,7 @@ const UserProfile = ({
                   <FormItem
                     label="Have a Job?"
                   >
-                    <Select onChange={(e) => update('have_a_job', e === 'true')} value={userState.have_a_job ? String(userState.have_a_job) : null}>
+                    <Select onChange={(e) => update('have_a_job', e === 'true')} value={isBoolean(userState.have_a_job) ? String(userState.have_a_job) : null}>
                       <Select.Option key="1" value="true">Yes</Select.Option>
                       <Select.Option key="0" value="false">No</Select.Option>
                     </Select>

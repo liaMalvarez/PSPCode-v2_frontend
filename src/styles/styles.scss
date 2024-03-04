@@ -1028,6 +1028,10 @@ form .ant-input-number {
       max-width: 600px;
       min-width: 500px;
       font-weight: 300;
+
+      &:disabled {
+        color: black
+      }
     }
 
     .title {
@@ -1330,6 +1334,10 @@ ol {
   padding: 0;
   padding-right: 25px;
   font-weight: 300;
+
+  &:disabled {
+    color: black;
+  }
 }
 
 .ant-input:disabled {
@@ -1524,4 +1532,9 @@ ol {
 
 .ant-popover-placement-bottomRight {
   position: fixed;
+}
+
+.not_assigned_project {
+  font-style: italic;
+  color: $color_colorless;
 }

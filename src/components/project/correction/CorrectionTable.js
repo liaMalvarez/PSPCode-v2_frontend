@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import {
   Table,
   Input,
+  Checkbox,
 } from 'antd';
 
 import { WarningTwoTone } from '@ant-design/icons';
@@ -20,6 +21,8 @@ const CorrectionTable = ({
 }) => {
   const [comments, setComments] = useState([]);
   const [status, setStatus] = useState([]);
+
+  const [selectAll, setSelectAll] = useState(false); 
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
@@ -54,6 +57,8 @@ const CorrectionTable = ({
     )) {
       setSection(sectionName, 'approved', status);
     }
+    
+    setSelectAll(selectedRowKeys.length === data.length);
   }, [selectedRowKeys]);
 
   useEffect(() => {
@@ -94,6 +99,20 @@ const CorrectionTable = ({
     Table.EXPAND_COLUMN,
     Table.SELECTION_COLUMN,
   ];
+
+  const onToggleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      // Select all rows
+      const allRowKeys = data.map((_, index) => index); 
+      setSelectedRowKeys(allRowKeys);
+      setStatus(data.map(() => true)); 
+    } else {
+      // Deselect all
+      setSelectedRowKeys([]);
+      setStatus(data.map(() => false));
+    }
+  };
 
   const expandedRowRender = ({ obs_phases }) => (
     <div style={{ margin: 0 }}>
@@ -148,7 +167,16 @@ const CorrectionTable = ({
         },
       })}
       rowSelection={{
-        columnTitle: 'Approved',
+        columnTitle: (
+          <Checkbox
+            checked={selectAll}
+            onChange={onToggleSelectAll}
+            disabled={disabled}
+            style={{flexDirection: 'row-reverse'}}
+          >
+            Approved
+          </Checkbox>
+        ),
         getCheckboxProps: () => ({
           disabled,
         }),
