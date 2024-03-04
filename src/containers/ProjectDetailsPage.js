@@ -902,7 +902,10 @@ const mapDispatchToProps = (dispatch) => ({
       message('Correction submitted successfully', 'success');
     }).catch(() => {
       message('Something went wrong on submitting the correction', 'error');
-    });
+    }).finally(() => {
+      setIsSubmittingCorrection(false);
+      setIsButtonLoading(false);
+    })
   },
   reset: () => {
     dispatch(resetProjectDetails());

@@ -86,6 +86,7 @@ const DashboardStudents = ({
     } else {
       project = record.current_project;
     }
+
     return project;
   };
 
@@ -203,19 +204,19 @@ const DashboardStudents = ({
     width: '20%',
     className: projectId ? 'displayNone' : '',
     sorter: (a, b) => a.current_project.id - b.current_project.id,
-    render: (_, record) => projectOfRecord(record).name,
+    render: (_, record) => projectOfRecord(record).name || <p className='not_assigned_project'>No Project Assigned</p>,
     sortOrder: sortedInfo?.columnKey === 'project' && sortedInfo.order,
   }, {
     title: 'STATUS',
     dataIndex: 'status',
     key: 'status',
     width: projectId ? '32%' : '20%',
-    sorter: (a, b) => statusOfProject(a).status.localeCompare(statusOfProject(b).status || ''),
+    sorter: (a, b) => (statusOfProject(a).status || '-').localeCompare(statusOfProject(b).status || '-'),
     sortOrder: sortedInfo?.columnKey === 'status' && sortedInfo.order,
     render: (_, record) => {
       const status = statusOfProject(record);
 
-      return status.status ? (
+      return status?.status ? (
         <Popover content={(
           <span style={{ maxWidth: '250px', display: 'block' }}>
             {status.msg}
@@ -227,7 +228,7 @@ const DashboardStudents = ({
             {status.status}
           </div>
         </Popover>
-      ) : (<div />);
+      ): <div>-</div>;
     },
   }, {
     title: 'ACTION',
