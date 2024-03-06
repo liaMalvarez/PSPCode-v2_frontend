@@ -1,6 +1,6 @@
 {
   "name": "psp-code",
-  "version": "2.0",
+  "version": "2.1.0",
   "description": "Frontend app used as a tool for the 'Principios y Fundamentos del Proceso Personal de Software' UdelaR's course",
   "engines": {
     "npm": ">=14.19.3",
@@ -16,7 +16,7 @@
   },
   "author": "Gustavo Audi y Lía Malvárez",
   "license": "MIT",
-  "homepage": "https://www.psp-course.com",
+  "homepage": "https://pspcode.com",
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "antd": "4.20.0",
