@@ -1,7 +1,6 @@
 import dashboardApi from '../api/dashboardApi';
 
 import projectApi from '../api/projectApi';
-import { getCacheObject, setCacheObject } from '../utils/functions';
 
 export const DASHBOARD_PROJECTS_LIST_FETCH = 'DASHBOARD_PROJECTS_LIST_FETCH';
 export const DASHBOARD_PROJECTS_LIST_SUCCESS = 'DASHBOARD_PROJECTS_LIST_SUCCESS';
@@ -30,6 +29,8 @@ export const DASHBOARD_COURSE_SELECT = 'DASHBOARD_COURSE_SELECT';
 export const DASHBOARD_COURSE_SELECT_SUCCESS = 'DASHBOARD_COURSE_SELECT_SUCCESS';
 export const DASHBOARD_COURSE_SELECT_FAILURE = 'DASHBOARD_COURSE_SELECT_FAILURE';
 export const DASHBOARD_COURSE_SELECT_RESET = 'DASHBOARD_STUDENTS_SELECT_RESET';
+
+export const REDUCER_RESET_ALL = 'USER_LOGOUT';
 
 export function dashboardProjectsList(courseId) {
   return {
@@ -152,21 +153,16 @@ export function dashboardStudentsAssignFailure(error) {
     payload: error,
   };
 }
+
 export function dashboardCourseList() {
   return {
     type: DASHBOARD_COURSE_LIST_FETCH,
-    payload: new Promise((resolve, reject) => {
-      const c = getCacheObject('courses_list');
-      if (c) {
-        resolve(c);
-      } else {
-        dashboardApi.courses_list().then((x) => {
-          setCacheObject('courses_list', x.reverse());
-          resolve(x.reverse());
-        }).catch((x) => {
-          console.log(`Something went wrong gathering courses list ${x}`);
-        });
-      }
+    payload: new Promise((resolve) => {
+      dashboardApi.courses_list().then((x) => {
+        resolve(x.reverse());
+      }).catch((x) => {
+        console.log(`Something went wrong gathering courses list ${x}`);
+      });
     }),
   };
 }
@@ -191,11 +187,11 @@ export function dashboardCourseListReset() {
     payload: null,
   };
 }
+
 export function dashboardCourseSelect(course) {
   return {
     type: DASHBOARD_COURSE_SELECT,
     payload: new Promise((resolve, reject) => {
-      setCacheObject('courses_active', course, 2);
       resolve(course);
     }),
   };
@@ -218,6 +214,13 @@ export function dashboardCourseSelectFailure(error) {
 export function dashboardCourseSelectReset() {
   return {
     type: DASHBOARD_COURSE_SELECT_RESET,
+    payload: null,
+  };
+}
+
+export function dashboardReducerResetAll() {
+  return {
+    type: REDUCER_RESET_ALL,
     payload: null,
   };
 }

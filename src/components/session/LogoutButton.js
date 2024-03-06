@@ -6,12 +6,14 @@ import { bindActionCreators } from 'redux';
 import {
   Button,
 } from 'antd';
+import { dashboardReducerResetAll } from '../../actions/dashboardActions';
 
 import * as sessionActions from '../../actions/sessionActions';
 
-const LogoutButton = ({ actions: { logout } }) => {
+const LogoutButton = ({ actions: { logout }, cleanAllData }) => {
   const navigate = useNavigate();
   const logoutHandler = async () => {
+    cleanAllData();
     await logout();
     navigate('/session/login');
   };
@@ -27,8 +29,14 @@ LogoutButton.propTypes = {
   actions: PropTypes.object.isRequired,
 };
 
-const mapDispatch = (dispatch) => ({
+const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(sessionActions, dispatch),
+
+  cleanAllData: () => {
+    dispatch(dashboardReducerResetAll())
+  },
 });
 
-export default connect(null, mapDispatch)(LogoutButton);
+
+
+export default connect(null, mapDispatchToProps)(LogoutButton);
