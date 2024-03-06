@@ -137,6 +137,7 @@ const NotificationBadge = ({
             <button
               onClick={() => {
                 handleVisibleChange(false);
+
                 navigate(data.link);
               }}
               type="button"

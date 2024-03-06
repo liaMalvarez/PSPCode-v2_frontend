@@ -26,10 +26,18 @@ const SelectCourse = ({
   }, []);
 
   useEffect(() => {
-    if (list && !active) {
+    if (active && list?.find((course) => String(course.id) == String(active?.id))) return;
+
+    if (list) {
       const c = getCacheObject('courses_active');
-      dashboardCourseSelectProp(c || list[0]);
+      
+      if(c && list.find((course) => String(course.id) == String(c.id))) {
+        return dashboardCourseSelectProp(c);
+      } else {
+        return dashboardCourseSelectProp(list[0]);
+      }
     }
+
     if (error) {
       alert(`Something went wrong: ${JSON.stringify(error)}`);
     }
@@ -42,6 +50,7 @@ const SelectCourse = ({
       </Select>
     );
   }
+
   return (
     <Select
       value={String(active.id)}
@@ -57,12 +66,10 @@ const SelectCourse = ({
 };
 
 const mapStateToProps = (state) => ({
-
   active: state.dashboard.courses.active,
   list: state.dashboard.courses.list,
   error: state.dashboard.courses.error,
   loading: state.dashboard.courses.loading,
-
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -73,6 +80,7 @@ const mapDispatchToProps = (dispatch) => ({
       dispatch(dashboardCourseListFailure(error));
     });
   },
+
   dashboardCourseSelectProp: (course) => {
     dispatch(dashboardCourseSelect(course)).payload.then((result) => {
       dispatch(dashboardCourseSelectSuccess(result));

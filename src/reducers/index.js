@@ -6,7 +6,7 @@ import projectReducers from './projectReducers';
 import notificationReducers from './notificationReducers';
 import userReducers from './userReducers';
 import dashboardReducers from './dashboardReducers';
-import utilsReducers from "./utilsReducers";
+import utilsReducers from './utilsReducers';
 
 const rootReducer = combineReducers({
   form: formReducer,
@@ -16,7 +16,13 @@ const rootReducer = combineReducers({
   notifications: notificationReducers,
   users: userReducers,
   dashboard: dashboardReducers,
-  utils: utilsReducers
+  utils: utilsReducers,
 });
 
-export default rootReducer;
+export default (state, action) => {
+  if (action.type === 'USER_LOGOUT') {
+    return rootReducer(undefined, action);
+  }
+
+  return rootReducer(state, action);
+};

@@ -13,19 +13,13 @@ export const login = (user) => () => sessionApi.login({ user }).then((user) => {
   });
 });
 
-export const logout = () => () => sessionApi.logout().then(() => {
-  sessionService.deleteSession();
-  sessionService.deleteUser();
-  removeAllCokies();
-  localStorage.clear();
-}).catch((err) => {
-  removeAllCokies();
-  sessionService.deleteSession();
-  sessionService.deleteUser();
-  removeAllCokies();
-  localStorage.clear();
-  throw (err);
-});
+export const logout = () => () => sessionApi.logout()
+  .finally(() => {
+    sessionService.deleteSession();
+    sessionService.deleteUser();
+    removeAllCokies();
+    localStorage.clear();
+  });
 
 export const forgot = (user) => () => sessionApi.forgot(user, String(window.location.href).replace('session/password/forgot', 'session/password/reset')).then(() => {
   throw new SubmissionError({ ok: true });
